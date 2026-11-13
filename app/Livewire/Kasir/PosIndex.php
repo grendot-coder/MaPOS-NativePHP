@@ -32,7 +32,7 @@ class PosIndex extends Component
     // Modal Pembayaran
     public bool $showPaymentModal = false;
     public string $paymentMethod = 'cash';
-    public float|string $nominalBayar = 0;
+    public $nominalBayar = 0;
     public float $kembalian = 0;
 
     // Modal Struk / Cetak

@@ -30,23 +30,23 @@ class ProdukForm extends Component
 
     public string $satuan = 'pcs';
 
-    public float|string $harga_beli = 0;
+    public $harga_beli = 0;
 
-    public float|string $harga_retail = 0;
+    public $harga_retail = 0;
 
-    public float|string|null $harga_grosir_1 = null;
+    public $harga_grosir_1 = null;
 
-    public float|string|null $harga_grosir_2 = null;
+    public $harga_grosir_2 = null;
 
-    public float|string|null $harga_grosir_3 = null;
+    public $harga_grosir_3 = null;
 
-    public float|string $diskon = 0;
+    public $diskon = 0;
 
-    public int|string $stok_etalase = 0;
+    public $stok_etalase = 0;
 
-    public int|string $stok_gudang = 0;
+    public $stok_gudang = 0;
 
-    public int|string $min_stok = 5;
+    public $min_stok = 5;
 
     public string $barcodeNotice = '';
 
@@ -132,7 +132,7 @@ class ProdukForm extends Component
 
         // Cek apakah barcode sudah terdaftar di produk lain
         $existing = Product::where('kode_produk', $this->kode_produk)
-            ->when($this->productId, fn ($q) => $q->where('id', '!=', $this->productId))
+            ->when($this->productId, fn($q) => $q->where('id', '!=', $this->productId))
             ->first();
 
         if ($existing) {
@@ -228,14 +228,20 @@ class ProdukForm extends Component
         $golongans = Golongan::orderBy('kode_golongan')->get();
 
         $margin = 0;
-        if ((float) $this->harga_beli > 0 && (float) $this->harga_retail > 0) {
-            $margin = (((float) $this->harga_retail - (float) $this->harga_beli) / (float) $this->harga_beli) * 100;
+        $hargaBeli = (float) ($this->harga_beli ?? 0);
+        $hargaRetail = (float) ($this->harga_retail ?? 0);
+
+        if ($hargaBeli > 0 && $hargaRetail > 0) {
+            $margin = (($hargaRetail - $hargaBeli) / $hargaBeli) * 100;
         }
+
+        $stokEtalase = (int) ($this->stok_etalase ?? 0);
+        $stokGudang = (int) ($this->stok_gudang ?? 0);
 
         return view('livewire.admin.produk-form', [
             'golongans' => $golongans,
             'margin' => round($margin, 1),
-            'totalStokHitung' => (int) $this->stok_etalase + (int) $this->stok_gudang,
+            'totalStokHitung' => $stokEtalase + $stokGudang,
         ]);
     }
 }
