@@ -107,19 +107,6 @@ class ProdukForm extends Component
         $this->checkBarcodeValidity();
     }
 
-    public function setScannedBarcode(string $code): void
-    {
-        $this->kode_produk = trim($code);
-        $this->checkBarcodeValidity();
-
-        try {
-            Flux::toast(
-                variant: 'success',
-                text: "Barcode [{$this->kode_produk}] berhasil dipindai!"
-            );
-        } catch (\Throwable) {}
-    }
-
     public function checkBarcodeValidity(): void
     {
         $this->kode_produk = trim($this->kode_produk);
@@ -141,6 +128,15 @@ class ProdukForm extends Component
             }
         } else {
             $this->barcodeNotice = "ℹ️ Format terdeteksi: {$type}";
+        }
+
+        // Cek apakah barcode sudah terdaftar di produk lain
+        $existing = Product::where('kode_produk', $this->kode_produk)
+            ->when($this->productId, fn ($q) => $q->where('id', '!=', $this->productId))
+            ->first();
+
+        if ($existing) {
+            $this->barcodeNotice .= " ⚠️ PERHATIAN: Barcode ini sudah terdaftar pada produk [{$existing->nama}]!";
         }
     }
 
