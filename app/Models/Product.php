@@ -83,4 +83,3 @@ class Product extends Model
         return $this->hasMany(StockMovement::class, 'product_id');
     }
 }
-

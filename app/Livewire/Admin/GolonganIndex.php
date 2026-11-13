@@ -23,6 +23,7 @@ class GolonganIndex extends Component
     public string $nama_golongan = '';
 
     public bool $showModal = false;
+
     public bool $isEditing = false;
 
     public function create(): void
@@ -55,7 +56,7 @@ class GolonganIndex extends Component
 
     public function save(GolonganRepository $repository): void
     {
-        $uniqueRule = 'unique:golongans,kode_golongan' . ($this->selectedId ? ',' . $this->selectedId : '');
+        $uniqueRule = 'unique:golongans,kode_golongan'.($this->selectedId ? ','.$this->selectedId : '');
 
         $this->validate([
             'kode_golongan' => ['required', 'digits:2', $uniqueRule],
@@ -95,6 +96,7 @@ class GolonganIndex extends Component
                 variant: 'danger',
                 text: "Tidak dapat menghapus golongan [{$golongan->nama_golongan}] karena masih memiliki {$golongan->products_count} produk terdaftar."
             );
+
             return;
         }
 
@@ -113,4 +115,3 @@ class GolonganIndex extends Component
         ]);
     }
 }
-

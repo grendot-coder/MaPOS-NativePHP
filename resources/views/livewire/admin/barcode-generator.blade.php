@@ -3,7 +3,6 @@
         <div>
             <div class="flex items-center gap-2">
                 <flux:heading size="xl" level="1">Generator & Validasi Barcode</flux:heading>
-                <flux:badge color="indigo" size="sm">Fase 1 - Barcode</flux:badge>
             </div>
             <flux:subheading>Uji validitas check digit EAN-13, buat kode barcode internal, dan render visual barcode siap scan.</flux:subheading>
         </div>
@@ -20,12 +19,11 @@
                 <!-- Input Langsung / Scan -->
                 <div>
                     <label class="block text-xs font-medium text-zinc-500 mb-1">Ketik / Scan Barcode</label>
-                    <input 
-                        type="text" 
-                        wire:model.live.debounce.300ms="barcode" 
+                    <input
+                        type="text"
+                        wire:model.live.debounce.300ms="barcode"
                         placeholder="Scan atau ketik kode..."
-                        class="w-full font-mono text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200"
-                    />
+                        class="w-full font-mono text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200" />
                 </div>
 
                 <!-- Atau Pilih Produk -->
@@ -34,7 +32,7 @@
                     <select wire:model.live="selectedProductId" class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200">
                         <option value="">-- Pilih Produk Terdaftar --</option>
                         @foreach($products as $p)
-                            <option value="{{ $p->id }}">{{ $p->kode_produk }} - {{ $p->nama }}</option>
+                        <option value="{{ $p->id }}">{{ $p->kode_produk }} - {{ $p->nama }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -52,7 +50,7 @@
                     <label class="block text-xs font-medium text-zinc-500 mb-1">Pilih Golongan</label>
                     <select wire:model="selectedGolonganId" class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200">
                         @foreach($golongans as $g)
-                            <option value="{{ $g->id }}">[{{ $g->kode_golongan }}] {{ $g->nama_golongan }}</option>
+                        <option value="{{ $g->id }}">[{{ $g->kode_golongan }}] {{ $g->nama_golongan }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -80,16 +78,16 @@
                 <!-- Preview Area (Background Putih untuk Kontras Barcode) -->
                 <div class="p-6 bg-white rounded-xl shadow-sm border border-zinc-200 inline-block mx-auto max-w-full overflow-x-auto text-black">
                     @if($barcodeSvg)
-                        <div class="flex justify-center barcode-svg-container">
-                            {!! $barcodeSvg !!}
-                        </div>
-                        <div class="mt-2 text-base font-mono font-bold tracking-widest text-zinc-900">
-                            {{ chunk_split($barcode, 4, ' ') }}
-                        </div>
+                    <div class="flex justify-center barcode-svg-container">
+                        {!! $barcodeSvg !!}
+                    </div>
+                    <div class="mt-2 text-base font-mono font-bold tracking-widest text-zinc-900">
+                        {{ chunk_split($barcode, 4, ' ') }}
+                    </div>
                     @else
-                        <div class="py-10 px-8 text-zinc-400 text-sm">
-                            Barcode belum tersedia atau format kode tidak valid.
-                        </div>
+                    <div class="py-10 px-8 text-zinc-400 text-sm">
+                        Barcode belum tersedia atau format kode tidak valid.
+                    </div>
                     @endif
                 </div>
 
@@ -108,9 +106,9 @@
                         <span class="text-zinc-400 block">Check Digit:</span>
                         <span class="font-mono font-semibold">
                             @if(strlen($barcode) === 13 && ctype_digit($barcode))
-                                Digit ke-13: {{ substr($barcode, -1) }} ({{ $isValidEan13 ? 'Cocok' : 'Gagal' }})
+                            Digit ke-13: {{ substr($barcode, -1) }} ({{ $isValidEan13 ? 'Cocok' : 'Gagal' }})
                             @else
-                                Standar {{ $detectedType }}
+                            Standar {{ $detectedType }}
                             @endif
                         </span>
                     </div>
@@ -123,7 +121,7 @@
 
             <!-- Card Aturan Barcode SmartPos Acuan PKL -->
             <flux:card class="space-y-3 bg-zinc-50 dark:bg-zinc-800/30 text-xs text-zinc-600 dark:text-zinc-400">
-                <flux:heading size="sm" class="text-zinc-700 dark:text-zinc-300">Pedoman Barcode Sesuai Dokumen PKL:</flux:heading>
+                <flux:heading size="sm" class="text-zinc-700 dark:text-zinc-300">Guide Barcode:</flux:heading>
                 <ul class="list-disc list-inside space-y-1">
                     <li><strong>EAN-13 (13 Digit)</strong>: Barcode ritel resmi atau kode internal dengan verifikasi digit pemeriksa (bobot 1 & 3).</li>
                     <li><strong>UPC-A (12 Digit)</strong>: Format standar barang impor AS/Kanada. Jika scan awal gagal, sistem mencoba tanpa awalan 0.</li>

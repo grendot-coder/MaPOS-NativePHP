@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 
 class ProductRepository
 {
@@ -42,7 +41,7 @@ class ProductRepository
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function create(array $data): Product
     {
@@ -50,7 +49,7 @@ class ProductRepository
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function update(Product $product, array $data): bool
     {
@@ -67,4 +66,3 @@ class ProductRepository
         return Product::count();
     }
 }
-

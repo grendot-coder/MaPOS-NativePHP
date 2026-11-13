@@ -26,7 +26,7 @@ class GolonganRepository
     }
 
     /**
-     * @param array{nama_golongan: string, kode_golongan: string} $data
+     * @param  array{nama_golongan: string, kode_golongan: string}  $data
      */
     public function create(array $data): Golongan
     {
@@ -34,7 +34,7 @@ class GolonganRepository
     }
 
     /**
-     * @param array{nama_golongan?: string, kode_golongan?: string} $data
+     * @param  array{nama_golongan?: string, kode_golongan?: string}  $data
      */
     public function update(Golongan $golongan, array $data): bool
     {
@@ -46,4 +46,3 @@ class GolonganRepository
         return $golongan->delete();
     }
 }
-

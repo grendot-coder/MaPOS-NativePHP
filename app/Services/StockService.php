@@ -28,7 +28,7 @@ class StockService
             $saldoSesudah = $lockedProduct->stok + $jumlah;
 
             if ($saldoSesudah < 0) {
-                throw new \InvalidArgumentException("Stok tidak mencukupi untuk produk [{$lockedProduct->nama}]. Stok tersedia: {$lockedProduct->stok}, dibutuhkan: " . abs($jumlah));
+                throw new \InvalidArgumentException("Stok tidak mencukupi untuk produk [{$lockedProduct->nama}]. Stok tersedia: {$lockedProduct->stok}, dibutuhkan: ".abs($jumlah));
             }
 
             // Update stok pada produk
@@ -67,4 +67,3 @@ class StockService
         });
     }
 }
-

@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use Picqer\Barcode\BarcodeGeneratorHTML;
+use Picqer\Barcode\BarcodeGeneratorSVG;
+
 class BarcodeService
 {
     public function __construct()
@@ -16,7 +19,7 @@ class BarcodeService
             if (str_starts_with($class, $prefix)) {
                 $relative = substr($class, strlen($prefix));
                 $baseDir = dirname(__DIR__, 2);
-                $file = $baseDir . '/vendor/picqer/php-barcode-generator/src/' . str_replace('\\', '/', $relative) . '.php';
+                $file = $baseDir.'/vendor/picqer/php-barcode-generator/src/'.str_replace('\\', '/', $relative).'.php';
                 if (file_exists($file)) {
                     require_once $file;
                 }
@@ -68,10 +71,10 @@ class BarcodeService
         $device1Digit = substr((string) $deviceDigit, 0, 1);
         $sequence7Digit = str_pad((string) $sequenceNumber, 7, '0', STR_PAD_LEFT);
 
-        $digits12 = '20' . $device1Digit . $golongan2Digit . $sequence7Digit;
+        $digits12 = '20'.$device1Digit.$golongan2Digit.$sequence7Digit;
         $checkDigit = $this->calculateEan13CheckDigit($digits12);
 
-        return $digits12 . $checkDigit;
+        return $digits12.$checkDigit;
     }
 
     /**
@@ -102,7 +105,7 @@ class BarcodeService
     public function renderSvg(string $barcode, int $widthFactor = 2, int $height = 50): string
     {
         $barcode = trim($barcode);
-        $generator = new \Picqer\Barcode\BarcodeGeneratorSVG();
+        $generator = new BarcodeGeneratorSVG;
         $type = $this->detectBarcodeType($barcode);
 
         try {
@@ -129,7 +132,7 @@ class BarcodeService
     public function renderHtml(string $barcode, int $widthFactor = 2, int $height = 50): string
     {
         $barcode = trim($barcode);
-        $generator = new \Picqer\Barcode\BarcodeGeneratorHTML();
+        $generator = new BarcodeGeneratorHTML;
         $type = $this->detectBarcodeType($barcode);
 
         try {

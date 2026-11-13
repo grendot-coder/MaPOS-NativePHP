@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Golongan;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
+use App\Services\BarcodeService;
 use Flux\Flux;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -36,17 +37,21 @@ class ProdukIndex extends Component
     public ?string $deletingId = null;
 
     public bool $showBarcodeModal = false;
+
     public string $previewBarcode = '';
+
     public string $previewNama = '';
+
     public string $previewHarga = '';
+
     public string $previewSvg = '';
 
-    public function showBarcode(string $id, \App\Services\BarcodeService $service): void
+    public function showBarcode(string $id, BarcodeService $service): void
     {
         $product = Product::findOrFail($id);
         $this->previewBarcode = $product->kode_produk;
         $this->previewNama = $product->nama;
-        $this->previewHarga = 'Rp ' . number_format($product->harga_retail, 0, ',', '.');
+        $this->previewHarga = 'Rp '.number_format($product->harga_retail, 0, ',', '.');
         $this->previewSvg = $service->renderSvg($product->kode_produk, 2, 55);
         $this->showBarcodeModal = true;
     }
@@ -85,6 +90,7 @@ class ProdukIndex extends Component
                 variant: 'danger',
                 text: "Produk [{$product->nama}] tidak dapat dihapus permanen karena sudah memiliki riwayat transaksi penjualan."
             );
+
             return;
         }
 
@@ -116,4 +122,3 @@ class ProdukIndex extends Component
         ]);
     }
 }
-

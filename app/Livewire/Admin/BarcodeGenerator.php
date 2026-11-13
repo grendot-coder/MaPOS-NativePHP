@@ -15,12 +15,17 @@ use Livewire\Component;
 class BarcodeGenerator extends Component
 {
     public string $barcode = '8998866200233';
+
     public ?string $selectedProductId = null;
+
     public ?string $selectedGolonganId = null;
 
     public string $detectedType = '';
+
     public bool $isValidEan13 = false;
+
     public string $validationMessage = '';
+
     public string $barcodeSvg = '';
 
     public function mount(BarcodeService $service): void
@@ -53,6 +58,7 @@ class BarcodeGenerator extends Component
     {
         if (! $this->selectedGolonganId) {
             Flux::toast(variant: 'warning', text: 'Pilih golongan terlebih dahulu.');
+
             return;
         }
 
@@ -75,6 +81,7 @@ class BarcodeGenerator extends Component
             $this->detectedType = '-';
             $this->isValidEan13 = false;
             $this->validationMessage = 'Silakan masukkan kode barcode.';
+
             return;
         }
 
@@ -96,7 +103,7 @@ class BarcodeGenerator extends Component
             $this->barcodeSvg = $service->renderSvg($this->barcode, 2, 60);
         } catch (\Throwable $e) {
             $this->barcodeSvg = '';
-            $this->validationMessage = 'Gagal merender barcode: ' . $e->getMessage();
+            $this->validationMessage = 'Gagal merender barcode: '.$e->getMessage();
         }
     }
 

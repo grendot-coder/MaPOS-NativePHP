@@ -20,4 +20,3 @@ class PosIndex extends Component
         ]);
     }
 }
-

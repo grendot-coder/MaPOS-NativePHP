@@ -62,4 +62,3 @@ test('kasir and admin can both access kasir pos page', function () {
     $this->actingAs($kasir)->get(route('kasir.pos'))->assertOk();
     $this->actingAs($admin)->get(route('kasir.pos'))->assertOk();
 });
-

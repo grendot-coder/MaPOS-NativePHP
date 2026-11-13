@@ -85,4 +85,3 @@ test('admin can generate internal barcode automatically', function () {
     expect(strlen($generatedCode))->toBe(13);
     expect(str_starts_with($generatedCode, '20001'))->toBeTrue();
 });
-

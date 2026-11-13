@@ -25,8 +25,11 @@
                         <flux:sidebar.item icon="tag" :href="route('admin.golongan.index')" :current="request()->routeIs('admin.golongan.*')" wire:navigate>
                             Golongan Produk
                         </flux:sidebar.item>
-                        <flux:sidebar.item icon="qr-code" :href="route('admin.barcode.index')" :current="request()->routeIs('admin.barcode.*')" wire:navigate>
+                        <flux:sidebar.item icon="qr-code" :href="route('admin.barcode.index')" :current="request()->routeIs('admin.barcode.index')" wire:navigate>
                             Generator Barcode
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="printer" :href="route('admin.barcode.print-label')" :current="request()->routeIs('admin.barcode.print-label')" wire:navigate>
+                            Cetak Label Barcode
                         </flux:sidebar.item>
                     </flux:sidebar.group>
 

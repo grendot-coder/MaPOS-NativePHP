@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Sale;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 
 class SaleRepository
 {
@@ -34,11 +33,10 @@ class SaleRepository
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function create(array $data): Sale
     {
         return Sale::create($data);
     }
 }
-

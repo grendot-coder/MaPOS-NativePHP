@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Admin\BarcodeGenerator;
+use App\Livewire\Admin\BarcodePrintLabel;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\GolonganIndex;
 use App\Livewire\Admin\ProdukForm;
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('/produk/create', ProdukForm::class)->name('produk.create');
         Route::get('/produk/{id}/edit', ProdukForm::class)->name('produk.edit');
         Route::get('/barcode', BarcodeGenerator::class)->name('barcode.index');
+        Route::get('/barcode/print-label', BarcodePrintLabel::class)->name('barcode.print-label');
     });
 
 Route::middleware(['auth', 'verified', 'role:kasir,admin'])

@@ -24,7 +24,7 @@
                 <select wire:model.live="selectedGolongan" class="w-full text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200">
                     <option value="">– Semua Golongan –</option>
                     @foreach($golongans as $g)
-                        <option value="{{ $g->id }}">[{{ $g->kode_golongan }}] {{ $g->nama_golongan }}</option>
+                    <option value="{{ $g->id }}">[{{ $g->kode_golongan }}] {{ $g->nama_golongan }}</option>
                     @endforeach
                 </select>
             </div>
@@ -33,12 +33,11 @@
             <div class="sm:col-span-2">
                 <label class="block text-xs font-medium text-zinc-500 mb-1">Cari Barcode / Nama Produk</label>
                 <div class="relative">
-                    <input 
-                        type="text" 
-                        wire:model.live.debounce.300ms="search" 
+                    <input
+                        type="text"
+                        wire:model.live.debounce.300ms="search"
                         placeholder="Scan atau ketik kode produk / nama barang..."
-                        class="w-full text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 pl-9 pr-4 py-2 text-zinc-800 dark:text-zinc-200 placeholder-zinc-400"
-                    />
+                        class="w-full text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 pl-9 pr-4 py-2 text-zinc-800 dark:text-zinc-200 placeholder-zinc-400" />
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                         <flux:icon name="magnifying-glass" class="size-4" />
                     </div>
@@ -53,7 +52,7 @@
                     <option value="25">25 Baris (Default)</option>
                     <option value="50">50 Baris</option>
                     <option value="100">100 Baris</option>
-                    <option value="200">200 Baris (SmartPos Max)</option>
+                    <option value="200">200 Baris (MaPOS Max)</option>
                 </select>
             </div>
         </div>
@@ -69,13 +68,13 @@
                         <th class="py-3 px-3 cursor-pointer hover:text-indigo-600" wire:click="sort('kode_produk')">
                             Kode Barcode
                             @if($sortBy === 'kode_produk')
-                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             @endif
                         </th>
                         <th class="py-3 px-3 cursor-pointer hover:text-indigo-600" wire:click="sort('nama')">
                             Nama Produk
                             @if($sortBy === 'nama')
-                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             @endif
                         </th>
                         <th class="py-3 px-3">Golongan</th>
@@ -95,8 +94,8 @@
                 </thead>
                 <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
                     @forelse($products as $index => $p)
-                        @php
-                            $isLowStock = $p->stok <= $p->min_stok;
+                    @php
+                    $isLowStock = $p->stok <= $p->min_stok;
                         @endphp
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/60 {{ $isLowStock ? 'bg-amber-50/40 dark:bg-amber-950/20' : '' }}">
                             <td class="py-2.5 px-3 text-center text-zinc-400">
@@ -134,9 +133,9 @@
                             </td>
                             <td class="py-2.5 px-3 text-center">
                                 @if($p->diskon > 0)
-                                    <flux:badge color="rose" size="sm">{{ $p->diskon }}%</flux:badge>
+                                <flux:badge color="rose" size="sm">{{ $p->diskon }}%</flux:badge>
                                 @else
-                                    <span class="text-zinc-400">-</span>
+                                <span class="text-zinc-400">-</span>
                                 @endif
                             </td>
                             <td class="py-2.5 px-3 text-right font-mono text-zinc-600 dark:text-zinc-300">
@@ -148,24 +147,25 @@
                             <td class="py-2.5 px-3 text-right font-mono font-bold {{ $isLowStock ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-900 dark:text-zinc-100' }}">
                                 {{ $p->stok }}
                                 @if($isLowStock)
-                                    <span class="text-xs text-amber-500" title="Stok kritis &le; minimum">⚠️</span>
+                                <span class="text-xs text-amber-500" title="Stok kritis &le; minimum">⚠️</span>
                                 @endif
                             </td>
                             <td class="py-2.5 px-3 text-right text-zinc-400 font-mono">
                                 {{ $p->min_stok }}
                             </td>
                             <td class="py-2.5 px-3 text-center space-x-1">
+                                <flux:button href="{{ route('admin.barcode.print-label', ['product_id' => $p->id]) }}" size="xs" variant="subtle" icon="printer" wire:navigate title="Cetak Label Barcode" />
                                 <flux:button href="{{ route('admin.produk.edit', $p->id) }}" size="xs" variant="subtle" icon="pencil-square" wire:navigate title="Edit Produk (F9)" />
                                 <flux:button wire:click="delete('{{ $p->id }}')" wire:confirm="Yakin ingin menghapus produk {{ $p->nama }}?" size="xs" variant="danger" icon="trash" title="Hapus Produk (F10)" />
                             </td>
                         </tr>
-                    @empty
+                        @empty
                         <tr>
                             <td colspan="16" class="py-12 text-center text-zinc-500">
                                 Tidak ada data produk yang cocok dengan pencarian / filter Anda.
                             </td>
                         </tr>
-                    @endforelse
+                        @endforelse
                 </tbody>
             </table>
         </div>
@@ -184,12 +184,12 @@
 
         <div class="p-4 bg-white rounded-xl border border-zinc-200 inline-block mx-auto text-black">
             @if($previewSvg)
-                <div class="flex justify-center">
-                    {!! $previewSvg !!}
-                </div>
-                <div class="mt-2 text-sm font-mono font-bold tracking-widest text-zinc-900">
-                    {{ $previewBarcode }}
-                </div>
+            <div class="flex justify-center">
+                {!! $previewSvg !!}
+            </div>
+            <div class="mt-2 text-sm font-mono font-bold tracking-widest text-zinc-900">
+                {{ $previewBarcode }}
+            </div>
             @endif
         </div>
 
@@ -204,4 +204,3 @@
         </div>
     </flux:modal>
 </div>
-

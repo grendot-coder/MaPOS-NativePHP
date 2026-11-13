@@ -19,20 +19,33 @@ use Livewire\Component;
 class ProdukForm extends Component
 {
     public ?string $productId = null;
+
     public bool $isEditing = false;
 
     public string $golongan_id = '';
+
     public string $kode_produk = '';
+
     public string $nama = '';
+
     public string $satuan = 'pcs';
+
     public float|string $harga_beli = 0;
+
     public float|string $harga_retail = 0;
+
     public float|string|null $harga_grosir_1 = null;
+
     public float|string|null $harga_grosir_2 = null;
+
     public float|string|null $harga_grosir_3 = null;
+
     public float|string $diskon = 0;
+
     public int|string $stok_etalase = 0;
+
     public int|string $stok_gudang = 0;
+
     public int|string $min_stok = 5;
 
     public string $barcodeNotice = '';
@@ -72,6 +85,7 @@ class ProdukForm extends Component
     {
         if (! $this->golongan_id) {
             Flux::toast(variant: 'warning', text: 'Pilih Golongan terlebih dahulu sebelum membuat barcode internal.');
+
             return;
         }
 
@@ -98,6 +112,7 @@ class ProdukForm extends Component
         $this->kode_produk = trim($this->kode_produk);
         if (empty($this->kode_produk)) {
             $this->barcodeNotice = '';
+
             return;
         }
 
@@ -215,4 +230,3 @@ class ProdukForm extends Component
         ]);
     }
 }
-

@@ -78,7 +78,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'nama' => 'Biskuit Roma Kelapa 300g',
-                'kode_produk' => '899275312345' . $barcodeService->calculateEan13CheckDigit('899275312345'),
+                'kode_produk' => '899275312345'.$barcodeService->calculateEan13CheckDigit('899275312345'),
                 'golongan_id' => $gFood->id,
                 'satuan' => 'bks',
                 'harga_beli' => 9500,
@@ -112,7 +112,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'nama' => 'Sabun Mandi Lifebuoy Total 10 110g',
-                'kode_produk' => '899999955512' . $barcodeService->calculateEan13CheckDigit('899999955512'),
+                'kode_produk' => '899999955512'.$barcodeService->calculateEan13CheckDigit('899999955512'),
                 'golongan_id' => $gNonFood->id,
                 'satuan' => 'pcs',
                 'harga_beli' => 4500,
@@ -128,7 +128,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'nama' => 'Deterjen Rinso Molto Matic 800g',
-                'kode_produk' => '899999977712' . $barcodeService->calculateEan13CheckDigit('899999977712'),
+                'kode_produk' => '899999977712'.$barcodeService->calculateEan13CheckDigit('899999977712'),
                 'golongan_id' => $gNonFood->id,
                 'satuan' => 'pack',
                 'harga_beli' => 22000,
@@ -146,7 +146,7 @@ class ProductSeeder extends Seeder
             // ALAT TULIS / STATION - Campuran Ritel & Kode Internal
             [
                 'nama' => 'Pulpen Standard AE7 Hitam 0.5mm',
-                'kode_produk' => '899317611001' . $barcodeService->calculateEan13CheckDigit('899317611001'),
+                'kode_produk' => '899317611001'.$barcodeService->calculateEan13CheckDigit('899317611001'),
                 'golongan_id' => $gAlatTulis->id,
                 'satuan' => 'pcs',
                 'harga_beli' => 2200,
@@ -162,7 +162,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'nama' => 'Buku Tulis Sinar Dunia 38 Lembar',
-                'kode_produk' => '899274198765' . $barcodeService->calculateEan13CheckDigit('899274198765'),
+                'kode_produk' => '899274198765'.$barcodeService->calculateEan13CheckDigit('899274198765'),
                 'golongan_id' => $gAlatTulis->id,
                 'satuan' => 'buku',
                 'harga_beli' => 3500,
@@ -197,7 +197,7 @@ class ProductSeeder extends Seeder
             // KOSMETIK - Campuran Ritel & Internal
             [
                 'nama' => 'Bedak Marcks Classic White 40g',
-                'kode_produk' => '899888812345' . $barcodeService->calculateEan13CheckDigit('899888812345'),
+                'kode_produk' => '899888812345'.$barcodeService->calculateEan13CheckDigit('899888812345'),
                 'golongan_id' => $gKosmetik->id,
                 'satuan' => 'pcs',
                 'harga_beli' => 13000,
@@ -298,4 +298,3 @@ class ProductSeeder extends Seeder
         }
     }
 }
-
