@@ -113,3 +113,4 @@ class GolonganIndex extends Component
         ]);
     }
 }
+

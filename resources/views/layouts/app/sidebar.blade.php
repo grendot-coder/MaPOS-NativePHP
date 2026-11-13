@@ -25,6 +25,9 @@
                         <flux:sidebar.item icon="tag" :href="route('admin.golongan.index')" :current="request()->routeIs('admin.golongan.*')" wire:navigate>
                             Golongan Produk
                         </flux:sidebar.item>
+                        <flux:sidebar.item icon="qr-code" :href="route('admin.barcode.index')" :current="request()->routeIs('admin.barcode.*')" wire:navigate>
+                            Generator Barcode
+                        </flux:sidebar.item>
                     </flux:sidebar.group>
 
                     <flux:sidebar.group heading="Operasional" class="grid">

@@ -4,6 +4,26 @@ namespace App\Services;
 
 class BarcodeService
 {
+    public function __construct()
+    {
+        $this->ensureAutoload();
+    }
+
+    protected function ensureAutoload(): void
+    {
+        spl_autoload_register(function ($class) {
+            $prefix = 'Picqer\\Barcode\\';
+            if (str_starts_with($class, $prefix)) {
+                $relative = substr($class, strlen($prefix));
+                $baseDir = dirname(__DIR__, 2);
+                $file = $baseDir . '/vendor/picqer/php-barcode-generator/src/' . str_replace('\\', '/', $relative) . '.php';
+                if (file_exists($file)) {
+                    require_once $file;
+                }
+            }
+        });
+    }
+
     /**
      * Menghitung check digit EAN-13 untuk 12 digit pertama.
      */
@@ -16,7 +36,6 @@ class BarcodeService
         $sum = 0;
         for ($i = 0; $i < 12; $i++) {
             $digit = (int) $digits12[$i];
-            // Indeks ganjil (posisi ke-1, 3, 5, ...) bobot 1; indeks genap (posisi ke-2, 4, 6, ...) bobot 3
             $sum += ($i % 2 === 0) ? $digit : $digit * 3;
         }
 
@@ -76,5 +95,51 @@ class BarcodeService
 
         return 'CODE-128';
     }
-}
 
+    /**
+     * Render Barcode dalam format SVG murni (ringan, vektor, tajam dicetak di printer thermal).
+     */
+    public function renderSvg(string $barcode, int $widthFactor = 2, int $height = 50): string
+    {
+        $barcode = trim($barcode);
+        $generator = new \Picqer\Barcode\BarcodeGeneratorSVG();
+        $type = $this->detectBarcodeType($barcode);
+
+        try {
+            if ($type === 'EAN-13') {
+                return $generator->getBarcode($barcode, $generator::TYPE_EAN_13, $widthFactor, $height);
+            }
+            if ($type === 'UPC-A') {
+                return $generator->getBarcode($barcode, $generator::TYPE_UPC_A, $widthFactor, $height);
+            }
+            if ($type === 'EAN-8') {
+                return $generator->getBarcode($barcode, $generator::TYPE_EAN_8, $widthFactor, $height);
+            }
+
+            return $generator->getBarcode($barcode, $generator::TYPE_CODE_128, $widthFactor, $height);
+        } catch (\Throwable) {
+            // Fallback aman ke CODE-128 jika tipe spesifik menemui kendala karakter
+            return $generator->getBarcode($barcode, $generator::TYPE_CODE_128, $widthFactor, $height);
+        }
+    }
+
+    /**
+     * Render Barcode dalam format HTML (div bergaris, bekerja tanpa ekstensi image apa pun).
+     */
+    public function renderHtml(string $barcode, int $widthFactor = 2, int $height = 50): string
+    {
+        $barcode = trim($barcode);
+        $generator = new \Picqer\Barcode\BarcodeGeneratorHTML();
+        $type = $this->detectBarcodeType($barcode);
+
+        try {
+            if ($type === 'EAN-13') {
+                return $generator->getBarcode($barcode, $generator::TYPE_EAN_13, $widthFactor, $height);
+            }
+
+            return $generator->getBarcode($barcode, $generator::TYPE_CODE_128, $widthFactor, $height);
+        } catch (\Throwable) {
+            return $generator->getBarcode($barcode, $generator::TYPE_CODE_128, $widthFactor, $height);
+        }
+    }
+}

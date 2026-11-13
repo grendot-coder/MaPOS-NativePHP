@@ -33,3 +33,15 @@ test('it auto detects barcode types correctly', function () {
     expect($service->detectBarcodeType('12345670'))->toBe('EAN-8');
     expect($service->detectBarcodeType('PROD-CUSTOM-99'))->toBe('CODE-128');
 });
+
+test('it renders svg and html barcodes correctly', function () {
+    $service = new BarcodeService();
+
+    $svg = $service->renderSvg('8998866200233');
+    expect($svg)->toContain('<svg');
+    expect($svg)->toContain('</svg>');
+
+    $html = $service->renderHtml('8998866200233');
+    expect($html)->toContain('<div');
+    expect($html)->toContain('</div>');
+});

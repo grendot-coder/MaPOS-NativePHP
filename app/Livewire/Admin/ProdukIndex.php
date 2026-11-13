@@ -35,6 +35,22 @@ class ProdukIndex extends Component
 
     public ?string $deletingId = null;
 
+    public bool $showBarcodeModal = false;
+    public string $previewBarcode = '';
+    public string $previewNama = '';
+    public string $previewHarga = '';
+    public string $previewSvg = '';
+
+    public function showBarcode(string $id, \App\Services\BarcodeService $service): void
+    {
+        $product = Product::findOrFail($id);
+        $this->previewBarcode = $product->kode_produk;
+        $this->previewNama = $product->nama;
+        $this->previewHarga = 'Rp ' . number_format($product->harga_retail, 0, ',', '.');
+        $this->previewSvg = $service->renderSvg($product->kode_produk, 2, 55);
+        $this->showBarcodeModal = true;
+    }
+
     public function updatedSearch(): void
     {
         $this->resetPage();
@@ -100,3 +116,4 @@ class ProdukIndex extends Component
         ]);
     }
 }
+

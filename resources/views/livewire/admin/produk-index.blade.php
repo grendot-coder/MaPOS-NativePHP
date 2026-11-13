@@ -103,9 +103,10 @@
                                 {{ $products->firstItem() + $index }}
                             </td>
                             <td class="py-2.5 px-3 font-mono font-bold text-zinc-900 dark:text-zinc-100">
-                                <span class="px-1.5 py-0.5 rounded bg-zinc-200/60 dark:bg-zinc-700/60 text-xs">
-                                    {{ $p->kode_produk }}
-                                </span>
+                                <button type="button" wire:click="showBarcode('{{ $p->id }}')" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-200/60 dark:bg-zinc-700/60 hover:bg-indigo-100 dark:hover:bg-indigo-950/60 text-xs transition cursor-pointer group" title="Klik untuk pratinjau barcode">
+                                    <flux:icon name="qr-code" class="size-3.5 text-zinc-400 group-hover:text-indigo-500" />
+                                    <span>{{ $p->kode_produk }}</span>
+                                </button>
                             </td>
                             <td class="py-2.5 px-3 font-medium text-zinc-900 dark:text-zinc-100 max-w-xs truncate" title="{{ $p->nama }}">
                                 {{ $p->nama }}
@@ -173,4 +174,34 @@
             {{ $products->links() }}
         </div>
     </flux:card>
+
+    <!-- Modal Pratinjau Barcode Produk -->
+    <flux:modal wire:model="showBarcodeModal" class="md:w-96 text-center space-y-4">
+        <div>
+            <flux:heading size="lg">{{ $previewNama }}</flux:heading>
+            <flux:subheading>{{ $previewHarga }}</flux:subheading>
+        </div>
+
+        <div class="p-4 bg-white rounded-xl border border-zinc-200 inline-block mx-auto text-black">
+            @if($previewSvg)
+                <div class="flex justify-center">
+                    {!! $previewSvg !!}
+                </div>
+                <div class="mt-2 text-sm font-mono font-bold tracking-widest text-zinc-900">
+                    {{ $previewBarcode }}
+                </div>
+            @endif
+        </div>
+
+        <div class="text-xs text-zinc-400">
+            Barcode vektor SVG tajam siap dipindai menggunakan scanner USB/Bluetooth.
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+            <flux:modal.close>
+                <flux:button variant="ghost">Tutup</flux:button>
+            </flux:modal.close>
+        </div>
+    </flux:modal>
 </div>
+
