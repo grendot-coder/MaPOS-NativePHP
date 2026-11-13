@@ -107,6 +107,19 @@ class ProdukForm extends Component
         $this->checkBarcodeValidity();
     }
 
+    public function setScannedBarcode(string $code): void
+    {
+        $this->kode_produk = trim($code);
+        $this->checkBarcodeValidity();
+
+        try {
+            Flux::toast(
+                variant: 'success',
+                text: "Barcode [{$this->kode_produk}] berhasil dipindai!"
+            );
+        } catch (\Throwable) {}
+    }
+
     public function checkBarcodeValidity(): void
     {
         $this->kode_produk = trim($this->kode_produk);
