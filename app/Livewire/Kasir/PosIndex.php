@@ -51,6 +51,16 @@ class PosIndex extends Component
     public function scanBarcode(SaleService $saleService): void
     {
         $barcode = trim($this->barcodeInput);
+        $this->barcodeInput = '';
+
+        if (! empty($barcode)) {
+            $this->scanBarcodeValue($barcode, $saleService);
+        }
+    }
+
+    public function scanBarcodeValue(string $barcode, SaleService $saleService): void
+    {
+        $barcode = trim($barcode);
         if (empty($barcode)) {
             return;
         }
@@ -64,12 +74,10 @@ class PosIndex extends Component
                     text: "Produk dengan barcode [{$barcode}] tidak terdaftar!"
                 );
             } catch (\Throwable) {}
-            $this->barcodeInput = '';
             return;
         }
 
         $this->addProductToCart($product);
-        $this->barcodeInput = '';
     }
 
     public function addProductToCart(Product $product, int $addQty = 1): void

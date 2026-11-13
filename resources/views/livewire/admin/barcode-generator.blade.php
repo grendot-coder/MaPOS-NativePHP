@@ -61,7 +61,6 @@
             </flux:card>
         </div>
 
-        <!-- Kolom Kanan: Visual Render & Info Teknis -->
         <div class="md:col-span-2 space-y-6">
             <!-- Kartu Visual Barcode -->
             <flux:card class="p-6 text-center space-y-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700">
