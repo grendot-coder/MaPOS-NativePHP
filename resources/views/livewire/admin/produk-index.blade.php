@@ -4,7 +4,6 @@
         <div>
             <div class="flex items-center gap-2">
                 <flux:heading size="xl" level="1">Master Produk</flux:heading>
-                <flux:badge color="zinc" size="sm">SmartPos Mode</flux:badge>
             </div>
             <flux:subheading>Tabel data produk lengkap: kode barcode, harga beli/retail/grosir, dan pemantauan stok etalase & gudang.</flux:subheading>
         </div>

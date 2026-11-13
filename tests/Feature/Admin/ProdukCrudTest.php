@@ -9,6 +9,10 @@ use App\Models\StockMovement;
 use App\Models\User;
 use Livewire\Livewire;
 
+beforeEach(function () {
+    $this->seed();
+});
+
 test('admin can view products on smartpos table', function () {
     $admin = User::where('role', UserRole::Admin)->first();
 
@@ -16,7 +20,7 @@ test('admin can view products on smartpos table', function () {
         ->get(route('admin.produk.index'))
         ->assertOk()
         ->assertSee('Master Produk')
-        ->assertSee('SmartPos Mode');
+        ->assertSee('Filter Golongan');
 });
 
 test('admin can search products by name or barcode', function () {

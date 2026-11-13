@@ -51,7 +51,7 @@
 
             <div class="px-3 py-2 text-xs text-zinc-400">
                 <div class="font-semibold text-zinc-500">MaPOS v1.0 (PKL)</div>
-                <div>Role: <span class="capitalize font-medium text-indigo-500">{{ auth()->user()->role->label() }}</span></div>
+                <div>Role: <span class="capitalize font-medium text-indigo-500">{{ auth()->user()->role?->label() ?? 'Pengguna' }}</span></div>
             </div>
 
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />

@@ -6,6 +6,10 @@ use App\Models\Product;
 use App\Models\User;
 use Livewire\Livewire;
 
+beforeEach(function () {
+    $this->seed();
+});
+
 test('admin can access barcode print label page', function () {
     $admin = User::where('role', UserRole::Admin)->first();
 
@@ -43,5 +47,6 @@ test('admin can clear print queue', function () {
         ->call('addToQueue', $product->id)
         ->assertSee($product->nama)
         ->call('clearQueue')
-        ->assertDontSee($product->nama);
+        ->assertSet('printQueue', []);
 });
+
