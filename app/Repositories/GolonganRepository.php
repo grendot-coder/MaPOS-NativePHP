@@ -46,3 +46,4 @@ class GolonganRepository
         return $golongan->delete();
     }
 }
+

@@ -30,3 +30,4 @@ class Golongan extends Model
         return $this->hasMany(Product::class, 'golongan_id');
     }
 }
+

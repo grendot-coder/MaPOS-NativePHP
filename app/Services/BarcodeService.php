@@ -77,3 +77,4 @@ class BarcodeService
         return 'CODE-128';
     }
 }
+

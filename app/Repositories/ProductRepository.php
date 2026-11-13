@@ -67,3 +67,4 @@ class ProductRepository
         return Product::count();
     }
 }
+

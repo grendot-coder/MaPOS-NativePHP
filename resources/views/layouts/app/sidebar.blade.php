@@ -11,24 +11,42 @@
             </flux:sidebar.header>
 
             <flux:sidebar.nav>
-                <flux:sidebar.group :heading="__('Platform')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
+                @if(auth()->user()->isAdmin())
+                    <flux:sidebar.group heading="Utama" class="grid">
+                        <flux:sidebar.item icon="home" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>
+                            Dashboard
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+
+                    <flux:sidebar.group heading="Referensi (SmartPos)" class="grid">
+                        <flux:sidebar.item icon="cube" :href="route('admin.produk.index')" :current="request()->routeIs('admin.produk.*')" wire:navigate>
+                            Master Produk
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="tag" :href="route('admin.golongan.index')" :current="request()->routeIs('admin.golongan.*')" wire:navigate>
+                            Golongan Produk
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+
+                    <flux:sidebar.group heading="Operasional" class="grid">
+                        <flux:sidebar.item icon="shopping-cart" :href="route('kasir.pos')" :current="request()->routeIs('kasir.pos')" wire:navigate>
+                            Layar Kasir (POS)
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+                @else
+                    <flux:sidebar.group heading="Menu Kasir" class="grid">
+                        <flux:sidebar.item icon="shopping-cart" :href="route('kasir.pos')" :current="request()->routeIs('kasir.pos')" wire:navigate>
+                            Layar Kasir (POS)
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+                @endif
             </flux:sidebar.nav>
 
             <flux:spacer />
 
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
-
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
-                </flux:sidebar.item>
-            </flux:sidebar.nav>
+            <div class="px-3 py-2 text-xs text-zinc-400">
+                <div class="font-semibold text-zinc-500">MaPOS v1.0 (PKL)</div>
+                <div>Role: <span class="capitalize font-medium text-indigo-500">{{ auth()->user()->role->label() }}</span></div>
+            </div>
 
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>

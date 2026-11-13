@@ -41,3 +41,4 @@ class SaleRepository
         return Sale::create($data);
     }
 }
+
