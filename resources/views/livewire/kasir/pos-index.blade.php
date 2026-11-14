@@ -19,49 +19,32 @@
     @keydown.window.f8.prevent="$wire.openPayment()"
     @keydown.window.f9.prevent="if(confirm('Kosongkan keranjang belanja?')) { $wire.clearCart(); }"
     class="space-y-4">
-    <!-- CSS Cetak Struk Khusus (@media print) -->
+    <!-- CSS Cetak Struk Khusus (@media print fallback) -->
     <style>
         @media print {
-            body {
-                background: white !important;
-                color: black !important;
+            body * {
+                visibility: hidden !important;
             }
-
-            flux-sidebar,
-            header,
-            nav,
-            .no-print,
-            [data-flux-sidebar],
-            flux-header,
-            .modal-backdrop,
-            flux-modal {
-                display: none !important;
+            #receipt-print-area, #receipt-print-area * {
+                visibility: visible !important;
             }
-
-            main {
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-
             #receipt-print-area {
-                display: block !important;
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: 78mm;
-                margin: 0;
-                padding: 4mm;
-                font-family: 'Courier New', Courier, monospace;
-                font-size: 11px;
-                line-height: 1.3;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 72mm !important;
+                max-width: 72mm !important;
+                margin: 0 !important;
+                padding: 4mm 2mm !important;
+                border: none !important;
+                box-shadow: none !important;
                 background: white !important;
                 color: black !important;
-                box-shadow: none !important;
-                border: none !important;
+                font-family: 'Courier New', Courier, monospace !important;
+                font-size: 11px !important;
             }
-
             @page {
-                size: 80mm auto;
+                size: auto;
                 margin: 0;
             }
         }
@@ -188,7 +171,6 @@
                 </div>
             </flux:card>
 
-            <!-- Card Petunjuk Penggunaan Scanner Kasir & HP -->
             <div class="p-3.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/50 text-xs text-emerald-950 dark:text-emerald-200 space-y-1.5">
                 <div class="font-semibold flex items-center gap-1.5">
                     <flux:icon name="device-phone-mobile" class="size-4 text-emerald-600 dark:text-emerald-400" />
@@ -504,12 +486,26 @@
                         <span>{{ $item->qty }} x {{ number_format($item->harga_satuan, 0, ',', '.') }}</span>
                         <span class="font-bold text-zinc-900">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
                     </div>
+                    @php
+                        $normalSubtotal = $item->qty * $item->harga_satuan;
+                        $hematItem = $normalSubtotal - $item->subtotal;
+                    @endphp
+                    @if($hematItem > 0)
+                    <div class="flex justify-between text-[10px] text-emerald-700 italic">
+                        <span>* Diskon item</span>
+                        <span>-Rp {{ number_format($hematItem, 0, ',', '.') }}</span>
+                    </div>
+                    @endif
                 </div>
                 @endforeach
             </div>
 
             <!-- Rincian Total, Bayar & Kembali -->
             <div class="space-y-1 pt-1 pb-2 border-b border-dashed border-zinc-400 text-xs">
+                <div class="flex justify-between text-[11px] text-zinc-600">
+                    <span>Total Item / Qty:</span>
+                    <span>{{ $lastSale->items->count() }} jenis ({{ $lastSale->items->sum('qty') }} pcs)</span>
+                </div>
                 <div class="flex justify-between font-bold text-sm">
                     <span>TOTAL</span>
                     <span>Rp {{ number_format($lastSale->total, 0, ',', '.') }}</span>
@@ -533,13 +529,27 @@
         @endif
 
         <!-- Tombol Aksi Modal Struk -->
-        <div class="no-print flex items-center justify-between pt-2">
-            <flux:button type="button" wire:click="closeReceiptModal" variant="subtle" icon="arrow-path">
-                Transaksi Baru (Tutup)
-            </flux:button>
-            <flux:button type="button" onclick="window.print()" variant="primary" class="bg-emerald-600 hover:bg-emerald-700" icon="printer">
-                Cetak Struk Sekarang
-            </flux:button>
+        <div class="no-print space-y-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <div class="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400">
+                <span class="font-medium">Ukuran Kertas Thermal:</span>
+                <select id="pos-paper-size" class="text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded px-2.5 py-1 font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    <option value="80mm" selected>Thermal 80mm (Standar POS)</option>
+                    <option value="58mm">Thermal 58mm (Mini POS)</option>
+                </select>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+                <flux:button type="button" wire:click="closeReceiptModal" variant="subtle" icon="arrow-path">
+                    Transaksi Baru
+                </flux:button>
+                <flux:button
+                    type="button"
+                    onclick="const s = document.getElementById('pos-paper-size')?.value || '80mm'; window.printThermalReceipt('receipt-print-area', s);"
+                    variant="primary"
+                    class="bg-emerald-600 hover:bg-emerald-700"
+                    icon="printer">
+                    Cetak Struk Sekarang
+                </flux:button>
+            </div>
         </div>
     </flux:modal>
 

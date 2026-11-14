@@ -97,7 +97,12 @@ test('kasir can process sale and stock is properly deducted and logged', functio
 
     // Keranjang harus sudah kosong dan modal struk muncul
     $test->assertSet('cart', [])
-        ->assertSet('showReceiptModal', true);
+        ->assertSet('showReceiptModal', true)
+        ->assertSee('MAPOS MINIMARKET')
+        ->assertSee('Cetak Struk Sekarang')
+        ->assertSee('Thermal 80mm')
+        ->assertSee('receipt-print-area')
+        ->assertSee('Total Item / Qty:');
 
     $lastSaleId = $test->get('lastSaleId');
     expect($lastSaleId)->not->toBeNull();
