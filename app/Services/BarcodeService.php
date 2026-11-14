@@ -19,7 +19,7 @@ class BarcodeService
             if (str_starts_with($class, $prefix)) {
                 $relative = substr($class, strlen($prefix));
                 $baseDir = dirname(__DIR__, 2);
-                $file = $baseDir.'/vendor/picqer/php-barcode-generator/src/'.str_replace('\\', '/', $relative).'.php';
+                $file = $baseDir . '/vendor/picqer/php-barcode-generator/src/' . str_replace('\\', '/', $relative) . '.php';
                 if (file_exists($file)) {
                     require_once $file;
                 }
@@ -27,9 +27,7 @@ class BarcodeService
         });
     }
 
-    /**
-     * Menghitung check digit EAN-13 untuk 12 digit pertama.
-     */
+    //Menghitung check digit EAN-13 untuk 12 digit pertama.
     public function calculateEan13CheckDigit(string $digits12): int
     {
         if (strlen($digits12) !== 12 || ! ctype_digit($digits12)) {
@@ -71,10 +69,10 @@ class BarcodeService
         $device1Digit = substr((string) $deviceDigit, 0, 1);
         $sequence7Digit = str_pad((string) $sequenceNumber, 7, '0', STR_PAD_LEFT);
 
-        $digits12 = '20'.$device1Digit.$golongan2Digit.$sequence7Digit;
+        $digits12 = '20' . $device1Digit . $golongan2Digit . $sequence7Digit;
         $checkDigit = $this->calculateEan13CheckDigit($digits12);
 
-        return $digits12.$checkDigit;
+        return $digits12 . $checkDigit;
     }
 
     /**

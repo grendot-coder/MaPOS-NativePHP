@@ -4,9 +4,14 @@ use App\Livewire\Admin\BarcodeGenerator;
 use App\Livewire\Admin\BarcodePrintLabel;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\GolonganIndex;
+use App\Livewire\Admin\LaporanPenjualan;
+use App\Livewire\Admin\LaporanStok;
 use App\Livewire\Admin\ProdukForm;
 use App\Livewire\Admin\ProdukIndex;
+use App\Livewire\Admin\StokPenyesuaian;
+use App\Livewire\Admin\StokRiwayat;
 use App\Livewire\Kasir\PosIndex as KasirPosIndex;
+use App\Livewire\Kasir\RiwayatPenjualan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -38,6 +43,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('/produk/{id}/edit', ProdukForm::class)->name('produk.edit');
         Route::get('/barcode', BarcodeGenerator::class)->name('barcode.index');
         Route::get('/barcode/print-label', BarcodePrintLabel::class)->name('barcode.print-label');
+        Route::get('/stok/penyesuaian', StokPenyesuaian::class)->name('stok.penyesuaian');
+        Route::get('/stok/riwayat', StokRiwayat::class)->name('stok.riwayat');
+        Route::get('/laporan/penjualan', LaporanPenjualan::class)->name('laporan.penjualan');
+        Route::get('/laporan/stok', LaporanStok::class)->name('laporan.stok');
     });
 
 Route::middleware(['auth', 'verified', 'role:kasir,admin'])
@@ -45,6 +54,7 @@ Route::middleware(['auth', 'verified', 'role:kasir,admin'])
     ->name('kasir.')
     ->group(function () {
         Route::get('/pos', KasirPosIndex::class)->name('pos');
+        Route::get('/riwayat', RiwayatPenjualan::class)->name('riwayat');
     });
 
 require __DIR__.'/settings.php';

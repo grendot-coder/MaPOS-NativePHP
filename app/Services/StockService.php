@@ -66,4 +66,38 @@ class StockService
             );
         });
     }
+
+    /**
+     * Penyesuaian stok rinci per lokasi (Etalase & Gudang) untuk Stock Opname.
+     */
+    public function adjustStockDetailed(
+        Product $product,
+        int $stokEtalase,
+        int $stokGudang,
+        string $keterangan
+    ): StockMovement {
+        if ($stokEtalase < 0 || $stokGudang < 0) {
+            throw new \InvalidArgumentException('Jumlah stok etalase dan gudang tidak boleh bernilai negatif.');
+        }
+
+        return DB::transaction(function () use ($product, $stokEtalase, $stokGudang, $keterangan) {
+            $lockedProduct = Product::lockForUpdate()->findOrFail($product->id);
+            $newTotal = $stokEtalase + $stokGudang;
+            $selisih = $newTotal - $lockedProduct->stok;
+
+            $lockedProduct->update([
+                'stok_etalase' => $stokEtalase,
+                'stok_gudang' => $stokGudang,
+                'stok' => $newTotal,
+            ]);
+
+            return StockMovement::create([
+                'product_id' => $lockedProduct->id,
+                'jenis' => StockMovementType::Penyesuaian,
+                'jumlah' => $selisih,
+                'saldo_sesudah' => $newTotal,
+                'keterangan' => $keterangan,
+            ]);
+        });
+    }
 }

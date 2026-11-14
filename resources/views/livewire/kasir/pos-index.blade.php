@@ -94,8 +94,8 @@
             <button
                 type="button"
                 wire:click="openPayment"
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-zinc-50 dark:bg-zinc-950/60 hover:bg-zinc-100 dark:hover:bg-zinc-900/60 text-xs font-mono text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 transition">
-                <kbd class="font-bold text-zinc-600 dark:text-zinc-400">F8</kbd> Bayar
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-xs font-mono text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition">
+                <kbd class="font-bold text-emerald-600 dark:text-emerald-400">F8</kbd> Bayar
             </button>
             <button
                 type="button"
@@ -148,12 +148,11 @@
                 </form>
             </flux:card>
 
-            <!-- Box Produk Populer / Cepat (Quick Add) -->
             <flux:card class="p-4 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <flux:icon name="sparkles" class="size-4 text-amber-500" />
-                        <span class="font-bold text-sm text-zinc-800 dark:text-zinc-200">Produk Laris</span>
+                        <span class="font-bold text-sm text-zinc-800 dark:text-zinc-200">Produk Cepat (Favorit)</span>
                     </div>
                     <span class="text-xs text-zinc-400">Klik untuk tambah</span>
                 </div>
@@ -321,7 +320,7 @@
                                     </div>
                                     <div class="font-medium text-zinc-600 dark:text-zinc-400">Keranjang masih kosong</div>
                                     <div class="text-xs text-zinc-400 max-w-xs mx-auto">
-                                        Scan barcode barang belanjaan pelanggan atau pilih dari daftar laris di sebelah kiri.
+                                        Scan barcode barang belanjaan pelanggan atau pilih dari daftar produk cepat di sebelah kiri.
                                     </div>
                                 </td>
                             </tr>

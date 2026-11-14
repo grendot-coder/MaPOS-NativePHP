@@ -38,10 +38,31 @@
                             Layar Kasir (POS)
                         </flux:sidebar.item>
                     </flux:sidebar.group>
+
+                    <flux:sidebar.group heading="Manajemen Stok" class="grid">
+                        <flux:sidebar.item icon="adjustments-horizontal" :href="route('admin.stok.penyesuaian')" :current="request()->routeIs('admin.stok.penyesuaian')" wire:navigate>
+                            Penyesuaian Stok
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="clock" :href="route('admin.stok.riwayat')" :current="request()->routeIs('admin.stok.riwayat')" wire:navigate>
+                            Buku Kartu Stok
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+
+                    <flux:sidebar.group heading="Laporan" class="grid">
+                        <flux:sidebar.item icon="document-chart-bar" :href="route('admin.laporan.penjualan')" :current="request()->routeIs('admin.laporan.penjualan')" wire:navigate>
+                            Laporan Penjualan
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="archive-box" :href="route('admin.laporan.stok')" :current="request()->routeIs('admin.laporan.stok')" wire:navigate>
+                            Laporan Stok & Aset
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
                 @else
                     <flux:sidebar.group heading="Menu Kasir" class="grid">
                         <flux:sidebar.item icon="shopping-cart" :href="route('kasir.pos')" :current="request()->routeIs('kasir.pos')" wire:navigate>
                             Layar Kasir (POS)
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="clock" :href="route('kasir.riwayat')" :current="request()->routeIs('kasir.riwayat')" wire:navigate>
+                            Riwayat Transaksi Saya
                         </flux:sidebar.item>
                     </flux:sidebar.group>
                 @endif
