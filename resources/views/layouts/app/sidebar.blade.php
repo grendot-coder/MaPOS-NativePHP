@@ -142,6 +142,6 @@
         @endpersist
 
         @fluxScripts
-        <script src="{{ asset('js/receipt-printer.js') }}"></script>
+        <script src="{{ asset('js/receipt-printer.js') }}?v={{ file_exists(public_path('js/receipt-printer.js')) ? filemtime(public_path('js/receipt-printer.js')) : time() }}"></script>
     </body>
 </html>

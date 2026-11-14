@@ -14,10 +14,8 @@
         </div>
     </div>
 
-    <!-- Filter & Toolbar Bergaya SmartPos -->
     <flux:card class="space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-            <!-- Filter Golongan -->
             <div>
                 <label class="block text-xs font-medium text-zinc-500 mb-1">Filter Golongan</label>
                 <select wire:model.live="selectedGolongan" class="w-full text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200">
@@ -28,7 +26,6 @@
                 </select>
             </div>
 
-            <!-- Pencarian Barcode / Nama -->
             <div class="sm:col-span-2">
                 <label class="block text-xs font-medium text-zinc-500 mb-1">Cari Barcode / Nama Produk</label>
                 <div class="relative">
@@ -43,7 +40,6 @@
                 </div>
             </div>
 
-            <!-- Limit Tampilan Data (Limit 200 di SmartPos) -->
             <div>
                 <label class="block text-xs font-medium text-zinc-500 mb-1">Batas Baris (Limit)</label>
                 <select wire:model.live="perPage" class="w-full text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200">

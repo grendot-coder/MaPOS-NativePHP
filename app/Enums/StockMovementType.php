@@ -13,7 +13,7 @@ enum StockMovementType: string
     {
         return match ($this) {
             StockMovementType::Penjualan => 'Penjualan',
-            StockMovementType::Penyesuaian => 'Penyesuaian Stok',
+            StockMovementType::Penyesuaian => 'Penyesuaian',
             StockMovementType::Pembelian => 'Pembelian',
             StockMovementType::Retur => 'Retur',
         };

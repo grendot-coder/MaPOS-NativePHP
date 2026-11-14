@@ -26,13 +26,27 @@
                 visibility: hidden !important;
             }
 
+            dialog, [data-flux-modal], flux-modal, [popover] {
+                position: static !important;
+                inset: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+                max-height: none !important;
+                max-width: none !important;
+                width: auto !important;
+            }
+
             #receipt-print-area,
             #receipt-print-area * {
                 visibility: visible !important;
             }
 
             #receipt-print-area {
-                position: absolute !important;
+                position: fixed !important;
                 left: 0 !important;
                 top: 0 !important;
                 width: 72mm !important;
@@ -48,7 +62,7 @@
             }
 
             @page {
-                size: auto;
+                size: 80mm auto;
                 margin: 0;
             }
         }
