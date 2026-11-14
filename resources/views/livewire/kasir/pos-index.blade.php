@@ -25,9 +25,12 @@
             body * {
                 visibility: hidden !important;
             }
-            #receipt-print-area, #receipt-print-area * {
+
+            #receipt-print-area,
+            #receipt-print-area * {
                 visibility: visible !important;
             }
+
             #receipt-print-area {
                 position: absolute !important;
                 left: 0 !important;
@@ -43,6 +46,7 @@
                 font-family: 'Courier New', Courier, monospace !important;
                 font-size: 11px !important;
             }
+
             @page {
                 size: auto;
                 margin: 0;
@@ -134,8 +138,7 @@
             <flux:card class="p-4 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <flux:icon name="sparkles" class="size-4 text-amber-500" />
-                        <span class="font-bold text-sm text-zinc-800 dark:text-zinc-200">Produk Cepat (Favorit)</span>
+                        <span class="font-bold text-sm text-zinc-800 dark:text-zinc-200">Produk paling laris</span>
                     </div>
                     <span class="text-xs text-zinc-400">Klik untuk tambah</span>
                 </div>
@@ -458,7 +461,7 @@
             <div class="text-center space-y-0.5 pb-2 border-b border-dashed border-zinc-400">
                 <div class="text-base font-bold tracking-wider">MAPOS MINIMARKET</div>
                 <div class="text-[10px] text-zinc-600">Sistem Kasir & Manajemen POS</div>
-                <div class="text-[10px] text-zinc-500">Jl. Pelajar PKL No. 10 - Telp: (021) 555-MAPOS</div>
+                <div class="text-[10px] text-zinc-500">Jl. Soedirman No. 10 - Telp: (085) 555-555-555</div>
             </div>
 
             <!-- Info Transaksi -->
@@ -487,8 +490,8 @@
                         <span class="font-bold text-zinc-900">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
                     </div>
                     @php
-                        $normalSubtotal = $item->qty * $item->harga_satuan;
-                        $hematItem = $normalSubtotal - $item->subtotal;
+                    $normalSubtotal = $item->qty * $item->harga_satuan;
+                    $hematItem = $normalSubtotal - $item->subtotal;
                     @endphp
                     @if($hematItem > 0)
                     <div class="flex justify-between text-[10px] text-emerald-700 italic">
