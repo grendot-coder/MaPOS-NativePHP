@@ -24,7 +24,7 @@
                     <select wire:model.live="golongan_id" class="w-full text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200">
                         <option value="">-- Pilih Golongan --</option>
                         @foreach($golongans as $g)
-                            <option value="{{ $g->id }}">[{{ $g->kode_golongan }}] {{ $g->nama_golongan }}</option>
+                        <option value="{{ $g->id }}">[{{ $g->kode_golongan }}] {{ $g->nama_golongan }}</option>
                         @endforeach
                     </select>
                     @error('golongan_id') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
@@ -42,27 +42,26 @@
                     <div class="flex items-center justify-between">
                         <label class="block text-xs font-medium text-zinc-500">Kode Barcode / Kode Produk *</label>
                         <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                            📱 Siap Scan via Barcode to PC / Scanner USB
+                            Siap Scan
                         </span>
                     </div>
                     <div class="flex gap-2">
-                        <input 
+                        <input
                             id="input-kode-produk"
-                            type="text" 
-                            wire:model.live.debounce.300ms="kode_produk" 
+                            type="text"
+                            wire:model.live.debounce.300ms="kode_produk"
                             @keydown.enter.prevent="document.getElementById('input-nama-produk')?.focus()"
-                            placeholder="Arahkan scan dari HP (Barcode to PC) atau ketik kode..." 
-                            class="flex-1 font-mono text-sm rounded-lg border-2 border-emerald-500/30 dark:border-emerald-500/20 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200 focus:border-emerald-500 focus:outline-none" 
-                            {{ !$isEditing ? 'autofocus' : '' }}
-                        />
+                            placeholder="Arahkan scan dari HP (Barcode to PC) atau ketik kode..."
+                            class="flex-1 font-mono text-sm rounded-lg border-2 border-emerald-500/30 dark:border-emerald-500/20 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200 focus:border-emerald-500 focus:outline-none"
+                            {{ !$isEditing ? 'autofocus' : '' }} />
                         <flux:button type="button" wire:click="generateInternalBarcode" variant="filled" icon="qr-code">
                             Buat Kode Internal
                         </flux:button>
                     </div>
                     @if($barcodeNotice)
-                        <div class="text-xs font-mono {{ str_contains($barcodeNotice, '⚠️') ? 'text-amber-600 dark:text-amber-400 font-bold' : (str_contains($barcodeNotice, '✅') ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500') }}">
-                            {{ $barcodeNotice }}
-                        </div>
+                    <div class="text-xs font-mono {{ str_contains($barcodeNotice, '⚠️') ? 'text-amber-600 dark:text-amber-400 font-bold' : (str_contains($barcodeNotice, '✅') ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500') }}">
+                        {{ $barcodeNotice }}
+                    </div>
                     @endif
                     @error('kode_produk') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
                 </div>
@@ -70,13 +69,12 @@
                 <!-- Nama Produk -->
                 <div class="md:col-span-2">
                     <label class="block text-xs font-medium text-zinc-500 mb-1">Nama Produk Lengkap *</label>
-                    <input 
+                    <input
                         id="input-nama-produk"
-                        type="text" 
-                        wire:model="nama" 
-                        placeholder="Contoh: Indomie Mi Goreng Spesial 85g" 
-                        class="w-full text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200" 
-                    />
+                        type="text"
+                        wire:model="nama"
+                        placeholder="Contoh: Indomie Mi Goreng Spesial 85g"
+                        class="w-full text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200" />
                     @error('nama') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -87,7 +85,7 @@
             <div class="flex items-center justify-between">
                 <flux:heading size="lg">2. Penetapan Harga & Diskon</flux:heading>
                 @if($margin > 0)
-                    <flux:badge color="emerald" size="sm">Margin Retail: +{{ $margin }}%</flux:badge>
+                <flux:badge color="emerald" size="sm">Margin Retail: +{{ $margin }}%</flux:badge>
                 @endif
             </div>
             <flux:separator />
@@ -195,4 +193,3 @@
         </div>
     </form>
 </div>
-
