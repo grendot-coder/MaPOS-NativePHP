@@ -8,14 +8,14 @@ return [
      * It is used to determine if the app needs to be updated.
      * Increment this value every time you release a new version of your app.
      */
-    'version' => env('NATIVEPHP_APP_VERSION', '1.0.0'),
+    'version' => '1.0.0',
 
     /**
      * The ID of your application. This should be a unique identifier
      * usually in the form of a reverse domain name.
      * For example: com.nativephp.app
      */
-    'app_id' => env('NATIVEPHP_APP_ID', 'com.nativephp.app'),
+    'app_id' => 'com.mapos.app',
 
     /**
      * If your application allows deep linking, you can specify the scheme
@@ -31,17 +31,17 @@ return [
     /**
      * The author of your application.
      */
-    'author' => env('NATIVEPHP_APP_AUTHOR'),
+    'author' => 'Grendy',
 
     /**
      * The copyright notice for your application.
      */
-    'copyright' => env('NATIVEPHP_APP_COPYRIGHT'),
+    'copyright' => '@ 2026 MaPos - All rights reserved',
 
     /**
      * The description of your application.
      */
-    'description' => env('NATIVEPHP_APP_DESCRIPTION', 'An awesome app built with NativePHP'),
+    'description' => 'A Retail Focused POS Apps',
 
     /**
      * The Website of your application.
@@ -92,11 +92,18 @@ return [
      * You may use glob / wildcard patterns here.
      */
     'cleanup_exclude_files' => [
-        'build',
-        'temp',
-        'content',
-        'node_modules',
-        '*/tests',
+        'build*',
+        'temp*',
+        'content*',
+        '*node_modules*',
+        'tests*',
+        '*/tests*',
+        'nativephp/binaries*',
+        'nativephp/electron/dist*',
+        'vendor/nativephp/desktop/resources*',
+        'vendor/nativephp/desktop/vendor*',
+        '*.md',
+        '*.log',
     ],
 
     /**
