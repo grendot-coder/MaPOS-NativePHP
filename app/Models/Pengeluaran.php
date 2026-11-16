@@ -20,6 +20,7 @@ class Pengeluaran extends Model
         'nominal',
         'keterangan',
         'user_id',
+        'cash_shift_id',
         'waktu',
     ];
 
@@ -35,5 +36,10 @@ class Pengeluaran extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function cashShift(): BelongsTo
+    {
+        return $this->belongsTo(CashShift::class, 'cash_shift_id');
     }
 }

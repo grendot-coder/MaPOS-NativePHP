@@ -46,7 +46,8 @@ class SaleService
         array $cartItems,
         float $total,
         float $bayar,
-        float $kembali
+        float $kembali,
+        ?string $cashShiftId = null
     ): Sale {
         if (empty($cartItems)) {
             throw new \InvalidArgumentException('Keranjang belanja kasir tidak boleh kosong.');
@@ -56,13 +57,14 @@ class SaleService
             throw new \InvalidArgumentException('Uang bayar kurang dari total belanja.');
         }
 
-        return DB::transaction(function () use ($kasir, $cartItems, $total, $bayar, $kembali) {
+        return DB::transaction(function () use ($kasir, $cartItems, $total, $bayar, $kembali, $cashShiftId) {
             $noTransaksi = $this->generateTransactionNumber();
 
             // 1. Buat record transaksi penjualan utama
             $sale = Sale::create([
                 'no_transaksi' => $noTransaksi,
                 'kasir_id' => $kasir->id,
+                'cash_shift_id' => $cashShiftId,
                 'waktu' => now(),
                 'total' => $total,
                 'bayar' => $bayar,

@@ -87,6 +87,8 @@ class PengeluaranIndex extends Component
         $countToday = Pengeluaran::whereDate('waktu', Carbon::parse($this->waktu)->toDateString())->count() + 1;
         $noRef = sprintf('%s-%s-%04d', $prefix, $dateCode, $countToday);
 
+        $activeShift = \App\Models\CashShift::activeShift(auth()->id())->first();
+
         Pengeluaran::create([
             'no_referensi' => $noRef,
             'kategori' => $this->kategori,
@@ -94,6 +96,7 @@ class PengeluaranIndex extends Component
             'nominal' => (float) $this->nominal,
             'keterangan' => trim($this->keterangan),
             'user_id' => auth()->id(),
+            'cash_shift_id' => $activeShift?->id,
             'waktu' => Carbon::parse($this->waktu),
         ]);
 

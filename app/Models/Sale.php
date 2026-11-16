@@ -27,6 +27,7 @@ class Sale extends Model
     protected $fillable = [
         'no_transaksi',
         'kasir_id',
+        'cash_shift_id',
         'waktu',
         'total',
         'bayar',
@@ -41,6 +42,12 @@ class Sale extends Model
             'bayar' => 'decimal:2',
             'kembali' => 'decimal:2',
         ];
+    }
+
+    /** @return BelongsTo<CashShift, $this> */
+    public function cashShift(): BelongsTo
+    {
+        return $this->belongsTo(CashShift::class, 'cash_shift_id');
     }
 
     /** @return BelongsTo<User, $this> */

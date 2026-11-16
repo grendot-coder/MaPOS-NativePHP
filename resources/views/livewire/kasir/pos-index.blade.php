@@ -19,6 +19,7 @@
     @keydown.window.f2.prevent="$wire.openSearchModal()"
     @keydown.window.f8.prevent="$wire.openPayment()"
     @keydown.window.f9.prevent="if(confirm('Kosongkan keranjang belanja?')) { $wire.clearCart(); }"
+    @keydown.window.f10.prevent="$wire.confirmCloseShift()"
     class="space-y-4">
     <!-- CSS Cetak Struk Khusus (@media print fallback) -->
     <style>
@@ -42,11 +43,14 @@
             }
 
             #receipt-print-area,
-            #receipt-print-area * {
+            #receipt-print-area *,
+            #shift-receipt-print-area,
+            #shift-receipt-print-area * {
                 visibility: visible !important;
             }
 
-            #receipt-print-area {
+            #receipt-print-area,
+            #shift-receipt-print-area {
                 position: fixed !important;
                 left: 0 !important;
                 top: 0 !important;
@@ -84,15 +88,45 @@
             </flux:subheading>
         </div>
 
-        <!-- Tombol Aksi Cepat Header & Bantuan HP Scanner -->
-        <div class="flex items-center gap-2">
+        <!-- Tombol Aksi Cepat Header, Status Shift Laci & Bantuan HP Scanner -->
+        <div class="flex flex-wrap items-center gap-2">
+            @if($activeShift)
+            <div class="flex items-center gap-2.5 px-3 py-1.5 rounded bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-xs font-mono">
+                <div class="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400">
+                    <span class="inline-block size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Modal: <strong class="text-zinc-900 dark:text-zinc-100">Rp {{ number_format($saldoAwal, 0, ',', '.') }}</strong></span>
+                </div>
+                <div class="h-3 w-px bg-zinc-300 dark:bg-zinc-700"></div>
+                <div class="text-zinc-600 dark:text-zinc-400">
+                    <span>Kas Laci: <strong class="text-emerald-600 dark:text-emerald-400 font-bold">Rp {{ number_format($saldoKasSaatIni, 0, ',', '.') }}</strong></span>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                wire:click="confirmCloseShift"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800 transition"
+                title="Tutup Shift & Rekap Laci Kasir [F10]">
+                <flux:icon name="arrow-right-start-on-rectangle" class="size-3.5" />
+                <span>Tutup Shift <kbd class="font-mono text-[10px] font-bold">[F10]</kbd></span>
+            </button>
+            @else
+            <button
+                type="button"
+                wire:click="$set('showOpenShiftModal', true)"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold text-white bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition">
+                <flux:icon name="lock-open" class="size-3.5" />
+                <span>+ Buka Shift Kasir</span>
+            </button>
+            @endif
+
             <button
                 type="button"
                 @click="showGuide = true"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 transition"
                 title="Panduan Koneksi Barcode to PC">
                 <flux:icon name="device-phone-mobile" class="size-4 text-emerald-600 dark:text-emerald-400" />
-                <span>Koneksi HP Scanner</span>
+                <span>HP Scanner</span>
             </button>
 
             <button
@@ -100,7 +134,7 @@
                 wire:click="openSearchModal"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 transition">
                 <flux:icon name="magnifying-glass" class="size-3.5 text-zinc-500" />
-                <span>Cari Barang <kbd class="font-mono font-bold text-zinc-500">[F2]</kbd></span>
+                <span>Cari <kbd class="font-mono font-bold text-zinc-500">[F2]</kbd></span>
             </button>
         </div>
     </div>
@@ -357,6 +391,63 @@
                 </div>
             </div>
 
+            <!-- Card Status Laci Kasir & Shift -->
+            <div class="bg-white dark:bg-zinc-900 rounded border border-zinc-200 dark:border-zinc-800 p-3.5 space-y-3 font-mono">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="flex items-center gap-1.5 font-bold text-xs text-zinc-800 dark:text-zinc-200 uppercase tracking-wide">
+                        <flux:icon name="inbox-stack" class="size-4 text-zinc-500" />
+                        <span>Laci Kasir (Shift)</span>
+                    </div>
+                    @if($activeShift)
+                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-semibold border border-emerald-300 dark:border-emerald-800">AKTIF</span>
+                    @else
+                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-semibold border border-amber-300 dark:border-amber-800">BELUM BUKA</span>
+                    @endif
+                </div>
+
+                @if($activeShift)
+                <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between text-zinc-500">
+                        <span>Modal Awal:</span>
+                        <span class="font-bold text-zinc-800 dark:text-zinc-200">Rp {{ number_format($saldoAwal, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="flex justify-between text-zinc-500">
+                        <span>Penjualan Tunai:</span>
+                        <span class="font-bold text-emerald-600 dark:text-emerald-400">+ Rp {{ number_format($totalPenjualanShift, 0, ',', '.') }}</span>
+                    </div>
+                    @if($totalPengeluaranShift > 0)
+                    <div class="flex justify-between text-zinc-500">
+                        <span>Pengeluaran Kas:</span>
+                        <span class="font-bold text-rose-600 dark:text-rose-400">- Rp {{ number_format($totalPengeluaranShift, 0, ',', '.') }}</span>
+                    </div>
+                    @endif
+                    <div class="pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-700 flex justify-between items-baseline">
+                        <span class="text-xs font-bold text-zinc-700 dark:text-zinc-300">Kas Saat Ini:</span>
+                        <span class="text-base font-black text-emerald-700 dark:text-emerald-400">Rp {{ number_format($saldoKasSaatIni, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    wire:click="confirmCloseShift"
+                    class="w-full py-2 px-3 rounded text-xs font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-rose-50 hover:text-rose-700 dark:hover:bg-rose-950/40 dark:hover:text-rose-300 border border-zinc-200 dark:border-zinc-700 transition flex items-center justify-center gap-1.5">
+                    <flux:icon name="arrow-right-start-on-rectangle" class="size-3.5" />
+                    <span>Tutup Shift & Rekap Kas [F10]</span>
+                </button>
+                @else
+                <div class="text-xs text-zinc-500 space-y-2">
+                    <p class="leading-relaxed">Shift kasir belum dibuka. Buka shift sekarang untuk mencatat modal kasir dan melacak kas laci.</p>
+                    <button
+                        type="button"
+                        wire:click="$set('showOpenShiftModal', true)"
+                        class="w-full py-2 px-3 rounded text-xs font-bold text-white bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition flex items-center justify-center gap-1.5">
+                        <flux:icon name="lock-open" class="size-3.5" />
+                        <span>Buka Shift Kasir Baru</span>
+                    </button>
+                </div>
+                @endif
+            </div>
+
             <!-- Panduan Hotkey Keyboard POS (Bukan Pill Dekoratif) -->
             <div class="bg-zinc-50 dark:bg-zinc-800/40 rounded border border-zinc-200 dark:border-zinc-800 p-3 text-xs text-zinc-600 dark:text-zinc-400 space-y-1.5 font-mono">
                 <div class="font-bold text-[11px] text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">Pintas Tombol (Keyboard)</div>
@@ -365,6 +456,7 @@
                     <div><span class="font-bold text-zinc-900 dark:text-zinc-100">[F2]</span> Cari manual</div>
                     <div><span class="font-bold text-emerald-600 dark:text-emerald-400">[F8]</span> Pembayaran</div>
                     <div><span class="font-bold text-rose-600 dark:text-rose-400">[F9]</span> Kosongkan</div>
+                    <div><span class="font-bold text-indigo-600 dark:text-indigo-400">[F10]</span> Tutup Shift</div>
                 </div>
             </div>
 
@@ -677,5 +769,290 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL BUKA SHIFT KASIR -->
+    <flux:modal wire:model="showOpenShiftModal" class="md:w-[460px] space-y-4">
+        <div>
+            <div class="flex items-center gap-2">
+                <flux:icon name="lock-open" class="size-5 text-zinc-800 dark:text-zinc-200" />
+                <flux:heading size="lg">Buka Shift Kasir Baru</flux:heading>
+            </div>
+            <flux:subheading>Tetapkan modal awal uang tunai di laci kasir sebelum melayani transaksi.</flux:subheading>
+        </div>
+
+        <div class="space-y-3">
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Pilihan Cepat Modal Awal:</label>
+                <div class="grid grid-cols-4 gap-1.5 font-mono">
+                    <button
+                        type="button"
+                        wire:click="setSaldoAwalPreset(50000)"
+                        class="py-1.5 px-2 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition">
+                        50rb
+                    </button>
+                    <button
+                        type="button"
+                        wire:click="setSaldoAwalPreset(100000)"
+                        class="py-1.5 px-2 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition">
+                        100rb
+                    </button>
+                    <button
+                        type="button"
+                        wire:click="setSaldoAwalPreset(200000)"
+                        class="py-1.5 px-2 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition">
+                        200rb
+                    </button>
+                    <button
+                        type="button"
+                        wire:click="setSaldoAwalPreset(500000)"
+                        class="py-1.5 px-2 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition">
+                        500rb
+                    </button>
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Nominal Modal Awal Laci (Rp):</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center font-bold text-zinc-400 font-mono text-sm">Rp</span>
+                    <input
+                        type="number"
+                        wire:model="saldoAwalInput"
+                        min="0"
+                        step="1000"
+                        class="w-full py-2.5 pl-10 pr-4 text-xl font-mono font-bold rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100"
+                        placeholder="0">
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Catatan Pembukaan (Opsional):</label>
+                <input
+                    type="text"
+                    wire:model="catatanShift"
+                    placeholder="Contoh: Shift pagi kasir A"
+                    class="w-full py-1.5 px-3 text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <flux:button type="button" wire:click="$set('showOpenShiftModal', false)" variant="subtle">
+                Batal
+            </flux:button>
+            <flux:button type="button" wire:click="openShift" variant="primary">
+                Buka Shift Sekarang
+            </flux:button>
+        </div>
+    </flux:modal>
+
+    <!-- MODAL TUTUP SHIFT & SETTLEMENT KASIR -->
+    <flux:modal wire:model="showCloseShiftModal" class="md:w-[500px] space-y-4">
+        <div>
+            <div class="flex items-center gap-2">
+                <flux:icon name="arrow-right-start-on-rectangle" class="size-5 text-rose-600 dark:text-rose-400" />
+                <flux:heading size="lg">Tutup Shift & Rekapitulasi Kasir</flux:heading>
+            </div>
+            <flux:subheading>Hitung uang fisik di laci kasir dan bandingkan dengan perhitungan sistem.</flux:subheading>
+        </div>
+
+        <!-- Rekapitulasi Perhitungan Sistem Kasir -->
+        <div class="p-3.5 rounded bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 space-y-2 text-xs font-mono">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 pb-1 border-b border-zinc-200 dark:border-zinc-700">
+                Data Perhitungan Sistem
+            </div>
+            <div class="flex justify-between text-zinc-600 dark:text-zinc-400">
+                <span>Modal Awal Laci:</span>
+                <span class="font-bold text-zinc-800 dark:text-zinc-200">Rp {{ number_format($saldoAwal, 0, ',', '.') }}</span>
+            </div>
+            <div class="flex justify-between text-zinc-600 dark:text-zinc-400">
+                <span>Total Penjualan Tunai:</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400">+ Rp {{ number_format($totalPenjualanShift, 0, ',', '.') }}</span>
+            </div>
+            @if($totalPengeluaranShift > 0)
+            <div class="flex justify-between text-zinc-600 dark:text-zinc-400">
+                <span>Total Pengeluaran Kas:</span>
+                <span class="font-bold text-rose-600 dark:text-rose-400">- Rp {{ number_format($totalPengeluaranShift, 0, ',', '.') }}</span>
+            </div>
+            @endif
+            <div class="pt-2 border-t border-dashed border-zinc-300 dark:border-zinc-600 flex justify-between items-baseline font-bold text-sm">
+                <span class="text-zinc-800 dark:text-zinc-200">Kas Seharusnya di Laci:</span>
+                <span class="text-zinc-900 dark:text-zinc-100 font-black">Rp {{ number_format($saldoKasSaatIni, 0, ',', '.') }}</span>
+            </div>
+        </div>
+
+        <!-- Input Fisik Laci Kasir -->
+        <div class="space-y-3">
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Total Uang Fisik di Laci Kasir (Rp):</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center font-bold text-zinc-400 font-mono text-sm">Rp</span>
+                    <input
+                        type="number"
+                        wire:model.live="saldoFisikInput"
+                        min="0"
+                        step="1000"
+                        class="w-full py-2.5 pl-10 pr-4 text-xl font-mono font-bold rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100"
+                        placeholder="0"
+                        autofocus>
+                </div>
+            </div>
+
+            @php
+            $diffKas = (float) $saldoFisikInput - (float) $saldoKasSaatIni;
+            @endphp
+
+            <!-- Status Selisih Kas -->
+            <div class="p-3 rounded border font-mono text-xs flex items-center justify-between {{ $diffKas == 0 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' : ($diffKas > 0 ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-300 dark:border-blue-800 text-blue-800 dark:text-blue-300' : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-300') }}">
+                <div>
+                    <span class="font-bold">STATUS REKONSILIASI:</span>
+                    <div class="text-[11px]">
+                        @if($diffKas == 0)
+                            Uang Pas / Seimbang
+                        @elseif($diffKas > 0)
+                            Surplus / Uang Fisik Lebih
+                        @else
+                            Defisit / Uang Fisik Kurang
+                        @endif
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider">Selisih Kas</div>
+                    <div class="text-base font-black">
+                        {{ $diffKas > 0 ? '+' : '' }}Rp {{ number_format($diffKas, 0, ',', '.') }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Catatan Penutupan / Keterangan Selisih (Opsional):</label>
+                <input
+                    type="text"
+                    wire:model="catatanShift"
+                    placeholder="Contoh: Selisih uang receh pecahan 500"
+                    class="w-full py-1.5 px-3 text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <flux:button type="button" wire:click="$set('showCloseShiftModal', false)" variant="subtle">
+                Batal
+            </flux:button>
+            <flux:button type="button" wire:click="closeShift" variant="danger">
+                Konfirmasi Tutup Shift & Cetak Rekap
+            </flux:button>
+        </div>
+    </flux:modal>
+
+    <!-- MODAL CETAK STRUK REKAPITULASI SHIFT KASIR -->
+    <flux:modal wire:model="showShiftReceiptModal" class="md:w-[460px] space-y-4">
+        <div class="no-print">
+            <div class="flex items-center gap-2">
+                <flux:icon name="printer" class="size-5 text-zinc-800 dark:text-zinc-200" />
+                <flux:heading size="lg">Rekapitulasi Penutupan Shift</flux:heading>
+            </div>
+            <flux:subheading>Shift kasir telah berhasil ditutup. Struk settlement laci kasir siap dicetak.</flux:subheading>
+        </div>
+
+        @if($lastClosedShift)
+        <!-- Area Preview & Cetak Struk Rekap Shift Kasir (Thermal 58mm/80mm) -->
+        <div id="shift-receipt-print-area" class="p-4 bg-white text-zinc-900 border border-dashed border-zinc-300 rounded shadow-inner font-mono text-xs leading-relaxed space-y-2">
+            <!-- Header Toko -->
+            <div class="text-center space-y-0.5 pb-2 border-b border-dashed border-zinc-400">
+                <div class="text-base font-bold tracking-wider">MAPOS MINIMARKET</div>
+                <div class="text-[10px] text-zinc-600">REKAPITULASI SHIFT KASIR</div>
+                <div class="text-[10px] text-zinc-500">{{ now()->translatedFormat('d F Y H:i') }}</div>
+            </div>
+
+            <!-- Detail Shift -->
+            <div class="text-[11px] space-y-0.5 pb-1 border-b border-dashed border-zinc-300">
+                <div class="flex justify-between">
+                    <span>ID Shift:</span>
+                    <span class="font-bold">#{{ $lastClosedShift->id }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Kasir:</span>
+                    <span class="font-bold">{{ $lastClosedShift->user->name ?? auth()->user()->name }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Waktu Buka:</span>
+                    <span>{{ $lastClosedShift->waktu_buka?->format('d/m/Y H:i') }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Waktu Tutup:</span>
+                    <span>{{ $lastClosedShift->waktu_tutup?->format('d/m/Y H:i') }}</span>
+                </div>
+            </div>
+
+            <!-- Rincian Aliran Kas Laci -->
+            <div class="space-y-1 py-1 border-b border-dashed border-zinc-300 text-xs">
+                <div class="flex justify-between">
+                    <span>Modal Awal:</span>
+                    <span>Rp {{ number_format($lastClosedShift->saldo_awal, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Total Penjualan:</span>
+                    <span>Rp {{ number_format($lastClosedShift->total_penjualan, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Total Pengeluaran:</span>
+                    <span>Rp {{ number_format($lastClosedShift->total_pengeluaran, 0, ',', '.') }}</span>
+                </div>
+                <div class="pt-1 border-t border-dashed border-zinc-200 flex justify-between font-bold">
+                    <span>Kas Seharusnya:</span>
+                    <span>Rp {{ number_format($lastClosedShift->saldo_akhir_sistem, 0, ',', '.') }}</span>
+                </div>
+            </div>
+
+            <!-- Hasil Fisik & Selisih -->
+            <div class="space-y-1 py-1 border-b border-dashed border-zinc-400 text-xs">
+                <div class="flex justify-between font-bold">
+                    <span>Uang Fisik di Laci:</span>
+                    <span>Rp {{ number_format($lastClosedShift->saldo_akhir_fisik, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between font-bold">
+                    <span>Selisih (Fisik - Kas):</span>
+                    <span>{{ $lastClosedShift->selisih > 0 ? '+' : '' }}Rp {{ number_format($lastClosedShift->selisih, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between text-[11px]">
+                    <span>Status Rekonsiliasi:</span>
+                    <span class="font-bold uppercase">{{ $lastClosedShift->status_selisih }}</span>
+                </div>
+                @if($lastClosedShift->catatan)
+                <div class="text-[10px] text-zinc-600 pt-1">
+                    <span>Catatan: {{ $lastClosedShift->catatan }}</span>
+                </div>
+                @endif
+            </div>
+
+            <!-- Lembar Tanda Tangan Kasir & Supervisor -->
+            <div class="pt-3 pb-1 grid grid-cols-2 text-center text-[10px] text-zinc-600">
+                <div class="space-y-8">
+                    <div>Kasir Yang Menyerahkan</div>
+                    <div class="font-bold underline">{{ $lastClosedShift->user->name ?? 'Kasir' }}</div>
+                </div>
+                <div class="space-y-8">
+                    <div>Supervisor / Finance</div>
+                    <div class="font-bold">( .................... )</div>
+                </div>
+            </div>
+
+            <!-- Footer Struk Rekap -->
+            <div class="text-center text-[10px] text-zinc-500 pt-2 border-t border-dashed border-zinc-300">
+                <div>*** DOKUMEN SETTLEMENT LACI KASIR RESMI ***</div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Tombol Aksi Modal Rekap Shift -->
+        <div class="no-print flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <flux:button type="button" wire:click="closeShiftReceiptModal" variant="subtle">
+                Selesai & Buka Shift Baru
+            </flux:button>
+            <flux:button type="button" onclick="window.print()" variant="primary" class="gap-1.5">
+                <flux:icon name="printer" class="size-4" />
+                <span>Cetak Rekap Struk</span>
+            </flux:button>
+        </div>
+    </flux:modal>
 
 </div>

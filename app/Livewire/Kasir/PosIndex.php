@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Kasir;
 
+use App\Models\CashShift;
 use App\Models\Golongan;
 use App\Models\Product;
 use App\Models\Sale;
@@ -15,6 +16,16 @@ use Livewire\Component;
 #[Title('Kasir POS - MaPOS')]
 class PosIndex extends Component
 {
+    // Shift Laci Kasir (Cash Drawer Settlement)
+    public ?string $activeShiftId = null;
+    public $saldoAwalInput = 100000;
+    public bool $showOpenShiftModal = false;
+    public bool $showCloseShiftModal = false;
+    public $saldoFisikInput = 0;
+    public string $catatanShift = '';
+    public bool $showShiftReceiptModal = false;
+    public ?string $lastClosedShiftId = null;
+
     // Input Barcode Scanner (Autofocus)
     public string $barcodeInput = '';
 
@@ -46,6 +57,95 @@ class PosIndex extends Component
     public function mount(): void
     {
         $this->calculateTotals();
+        $this->loadActiveShift();
+    }
+
+    public function loadActiveShift(): void
+    {
+        $shift = CashShift::where('user_id', auth()->id())
+            ->where('status', 'open')
+            ->latest('waktu_buka')
+            ->first();
+
+        if ($shift) {
+            $this->activeShiftId = $shift->id;
+        }
+    }
+
+    public function openShift(): void
+    {
+        $saldoAwal = max(0, (float) $this->saldoAwalInput);
+
+        $shift = CashShift::create([
+            'user_id' => auth()->id(),
+            'waktu_buka' => now(),
+            'saldo_awal' => $saldoAwal,
+            'saldo_akhir_sistem' => $saldoAwal,
+            'status' => 'open',
+        ]);
+
+        $this->activeShiftId = $shift->id;
+        $this->showOpenShiftModal = false;
+
+        try {
+            Flux::toast(variant: 'success', text: 'Shift kasir berhasil dibuka dengan modal Rp ' . number_format($saldoAwal, 0, ',', '.'));
+        } catch (\Throwable) {}
+    }
+
+    public function setSaldoAwalPreset(float $amount): void
+    {
+        $this->saldoAwalInput = $amount;
+    }
+
+    public function confirmCloseShift(): void
+    {
+        if (! $this->activeShiftId) {
+            return;
+        }
+
+        $shift = CashShift::with(['sales', 'pengeluarans'])->find($this->activeShiftId);
+        if ($shift) {
+            $this->saldoFisikInput = $shift->saldo_saat_ini;
+            $this->catatanShift = '';
+            $this->showCloseShiftModal = true;
+        }
+    }
+
+    public function closeShift(): void
+    {
+        if (! $this->activeShiftId) {
+            return;
+        }
+
+        $shift = CashShift::with(['sales', 'pengeluarans'])->findOrFail($this->activeShiftId);
+
+        $saldoSistem = (float) $shift->saldo_saat_ini;
+        $saldoFisik = max(0, (float) $this->saldoFisikInput);
+        $selisih = $saldoFisik - $saldoSistem;
+
+        $shift->update([
+            'waktu_tutup' => now(),
+            'saldo_akhir_sistem' => $saldoSistem,
+            'saldo_akhir_fisik' => $saldoFisik,
+            'selisih' => $selisih,
+            'status' => 'closed',
+            'catatan' => $this->catatanShift,
+        ]);
+
+        $this->lastClosedShiftId = $shift->id;
+        $this->activeShiftId = null;
+        $this->showCloseShiftModal = false;
+        $this->showShiftReceiptModal = true;
+
+        try {
+            Flux::toast(variant: 'success', text: 'Shift kasir berhasil ditutup dan direkap!');
+        } catch (\Throwable) {}
+    }
+
+    public function closeShiftReceiptModal(): void
+    {
+        $this->showShiftReceiptModal = false;
+        $this->lastClosedShiftId = null;
     }
 
     public function scanBarcode(SaleService $saleService): void
@@ -265,7 +365,8 @@ class PosIndex extends Component
                 $this->cart,
                 $this->grandTotal,
                 $bayar,
-                $this->kembalian
+                $this->kembalian,
+                $this->activeShiftId
             );
 
             $this->lastSaleId = $sale->id;
@@ -288,6 +389,21 @@ class PosIndex extends Component
             $lastSale = Sale::with(['items', 'kasir'])->find($this->lastSaleId);
         }
 
+        $activeShift = null;
+        if ($this->activeShiftId) {
+            $activeShift = CashShift::with(['sales', 'pengeluarans'])->find($this->activeShiftId);
+        }
+
+        $lastClosedShift = null;
+        if ($this->lastClosedShiftId) {
+            $lastClosedShift = CashShift::with(['user', 'sales', 'pengeluarans'])->find($this->lastClosedShiftId);
+        }
+
+        $saldoAwal = $activeShift ? $activeShift->saldo_awal : 0;
+        $totalPenjualanShift = $activeShift ? $activeShift->total_penjualan : 0;
+        $totalPengeluaranShift = $activeShift ? $activeShift->total_pengeluaran : 0;
+        $saldoKasSaatIni = $activeShift ? $activeShift->saldo_saat_ini : 0;
+
         $searchResults = [];
         if ($this->showSearchModal && ! empty($this->searchKeyword)) {
             $searchResults = Product::where('nama', 'like', "%{$this->searchKeyword}%")
@@ -306,6 +422,12 @@ class PosIndex extends Component
 
         return view('livewire.kasir.pos-index', [
             'lastSale' => $lastSale,
+            'activeShift' => $activeShift,
+            'saldoAwal' => $saldoAwal,
+            'totalPenjualanShift' => $totalPenjualanShift,
+            'totalPengeluaranShift' => $totalPengeluaranShift,
+            'saldoKasSaatIni' => $saldoKasSaatIni,
+            'lastClosedShift' => $lastClosedShift,
             'searchResults' => $searchResults,
             'quickProducts' => $quickProducts,
             'nextTransactionNumber' => $nextTransactionNumber,
