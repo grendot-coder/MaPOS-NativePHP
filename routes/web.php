@@ -13,6 +13,7 @@ use App\Livewire\Admin\StokRiwayat;
 use App\Livewire\Kasir\PosIndex as KasirPosIndex;
 use App\Livewire\Kasir\RiwayatPenjualan;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Admin\PengeluaranIndex;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -45,6 +46,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('/barcode/print-label', BarcodePrintLabel::class)->name('barcode.print-label');
         Route::get('/stok/penyesuaian', StokPenyesuaian::class)->name('stok.penyesuaian');
         Route::get('/stok/riwayat', StokRiwayat::class)->name('stok.riwayat');
+        Route::get('/pengeluaran', PengeluaranIndex::class)->name('pengeluaran.index');
         Route::get('/laporan/penjualan', LaporanPenjualan::class)->name('laporan.penjualan');
         Route::get('/laporan/stok', LaporanStok::class)->name('laporan.stok');
     });
@@ -57,4 +59,4 @@ Route::middleware(['auth', 'verified', 'role:kasir,admin'])
         Route::get('/riwayat', RiwayatPenjualan::class)->name('riwayat');
     });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
