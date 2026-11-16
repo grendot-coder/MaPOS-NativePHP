@@ -55,7 +55,7 @@
                     </select>
                 </div>
 
-                <flux:button type="button" wire:click="generateInternal" variant="primary" class="w-full" icon="sparkles">
+                <flux:button type="button" wire:click="generateInternal" variant="primary" class="w-full" icon="qr-code">
                     Generate EAN-13 Internal
                 </flux:button>
             </flux:card>
@@ -69,9 +69,9 @@
                         <flux:icon name="qr-code" class="size-5 text-indigo-500" />
                         <span class="text-sm font-semibold">Tampilan Visual Barcode</span>
                     </div>
-                    <flux:badge color="{{ $detectedType === 'EAN-13' ? 'emerald' : 'blue' }}">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
                         Format: {{ $detectedType }}
-                    </flux:badge>
+                    </span>
                 </div>
 
                 <!-- Preview Area (Background Putih untuk Kontras Barcode) -->

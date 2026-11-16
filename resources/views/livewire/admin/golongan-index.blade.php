@@ -32,9 +32,9 @@
                                 {{ $g->nama_golongan }}
                             </td>
                             <td class="py-3 px-4 text-center">
-                                <flux:badge size="sm" color="{{ $g->products_count > 0 ? 'zinc' : 'amber' }}">
+                                <span class="font-mono text-xs text-zinc-600 dark:text-zinc-400">
                                     {{ $g->products_count }} Produk
-                                </flux:badge>
+                                </span>
                             </td>
                             <td class="py-3 px-4 text-right space-x-1">
                                 <flux:button wire:click="edit('{{ $g->id }}')" size="sm" variant="subtle" icon="pencil-square">
