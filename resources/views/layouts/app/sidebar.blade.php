@@ -20,7 +20,7 @@
                 </flux:sidebar.item>
             </flux:sidebar.group>
 
-            <flux:sidebar.group heading="Referensi (SmartPos)" class="grid">
+            <flux:sidebar.group heading="Referensi" class="grid">
                 <flux:sidebar.item icon="cube" :href="route('admin.produk.index')" :current="request()->routeIs('admin.produk.*')" wire:navigate>
                     Master Produk
                 </flux:sidebar.item>
@@ -32,12 +32,6 @@
                 </flux:sidebar.item>
                 <flux:sidebar.item icon="printer" :href="route('admin.barcode.print-label')" :current="request()->routeIs('admin.barcode.print-label')" wire:navigate>
                     Cetak Label Barcode
-                </flux:sidebar.item>
-            </flux:sidebar.group>
-
-            <flux:sidebar.group heading="Operasional" class="grid">
-                <flux:sidebar.item icon="shopping-cart" :href="route('kasir.pos')" :current="request()->routeIs('kasir.pos')" wire:navigate>
-                    Layar Kasir (POS)
                 </flux:sidebar.item>
             </flux:sidebar.group>
 

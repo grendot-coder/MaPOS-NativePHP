@@ -39,12 +39,7 @@
 
                 <!-- Kode Barcode & Generator -->
                 <div class="md:col-span-2 space-y-1">
-                    <div class="flex items-center justify-between">
-                        <label class="block text-xs font-medium text-zinc-500">Kode Barcode / Kode Produk *</label>
-                        <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                            Siap Scan
-                        </span>
-                    </div>
+                    <label class="block text-xs font-medium text-zinc-500">Kode Barcode / Kode Produk *</label>
                     <div class="flex gap-2">
                         <input
                             id="input-kode-produk"
@@ -85,7 +80,7 @@
             <div class="flex items-center justify-between">
                 <flux:heading size="lg">2. Penetapan Harga & Diskon</flux:heading>
                 @if($margin > 0)
-                <flux:badge color="emerald" size="sm">Margin Retail: +{{ $margin }}%</flux:badge>
+                <span class="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">Margin: +{{ $margin }}%</span>
                 @endif
             </div>
             <flux:separator />

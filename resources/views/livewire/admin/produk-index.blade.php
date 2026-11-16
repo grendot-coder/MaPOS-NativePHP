@@ -128,7 +128,7 @@
                             </td>
                             <td class="py-2.5 px-3 text-center">
                                 @if($p->diskon > 0)
-                                <flux:badge color="rose" size="sm">{{ $p->diskon }}%</flux:badge>
+                                <span class="font-mono font-bold text-rose-600 dark:text-rose-400">{{ $p->diskon }}%</span>
                                 @else
                                 <span class="text-zinc-400">-</span>
                                 @endif

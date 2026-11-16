@@ -1,5 +1,6 @@
 <div
     x-data="{
+        showGuide: false,
         focusScanner() {
             this.$nextTick(() => {
                 const modal = document.querySelector('flux-modal[open], [data-flux-modal][open]');
@@ -68,202 +69,141 @@
         }
     </style>
 
-    <!-- Header Kasir & Shortcut Info -->
-    <div class="no-print flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+    <!-- Header Kasir: Status Bar Bersih & Profesional -->
+    <div class="no-print flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-3">
                 <flux:heading size="xl" level="1">Point of Sale (Kasir)</flux:heading>
+                <span class="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                    TRX: <strong class="text-zinc-900 dark:text-zinc-100">{{ $nextTransactionNumber }}</strong>
+                </span>
             </div>
-            <flux:subheading>
+            <flux:subheading class="mt-0.5">
                 Kasir: <strong>{{ auth()->user()->name }}</strong> &bull;
-                No. TRX: <span class="font-mono font-semibold text-emerald-600 dark:text-emerald-400">{{ $nextTransactionNumber }}</span> &bull;
                 {{ now()->translatedFormat('l, d F Y') }}
             </flux:subheading>
         </div>
 
-        <!-- Tombol Pintas Keyboard Kasir -->
-        <div class="flex flex-wrap items-center gap-2">
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-xs font-mono text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
-                <kbd class="font-bold text-zinc-900 dark:text-zinc-100">Enter</kbd> Scan Barcode
-            </span>
+        <!-- Tombol Aksi Cepat Header & Bantuan HP Scanner -->
+        <div class="flex items-center gap-2">
+            <button
+                type="button"
+                @click="showGuide = true"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 transition"
+                title="Panduan Koneksi Barcode to PC">
+                <flux:icon name="device-phone-mobile" class="size-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Koneksi HP Scanner</span>
+            </button>
+
             <button
                 type="button"
                 wire:click="openSearchModal"
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-mono text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 transition">
-                <kbd class="font-bold text-blue-600 dark:text-blue-400">F2</kbd> Cari Barang
-            </button>
-            <button
-                type="button"
-                wire:click="openPayment"
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-xs font-mono text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition">
-                <kbd class="font-bold text-emerald-600 dark:text-emerald-400">F8</kbd> Bayar
-            </button>
-            <button
-                type="button"
-                wire:click="clearCart"
-                wire:confirm="Kosongkan seluruh keranjang belanja saat ini?"
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-xs font-mono text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition">
-                <kbd class="font-bold text-rose-600 dark:text-rose-400">F9</kbd> Bersihkan
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 transition">
+                <flux:icon name="magnifying-glass" class="size-3.5 text-zinc-500" />
+                <span>Cari Barang <kbd class="font-mono font-bold text-zinc-500">[F2]</kbd></span>
             </button>
         </div>
     </div>
 
-    <!-- Grid 2 Kolom: Kiri (Scanner & Quick Products) - Kanan (Keranjang & Pembayaran) -->
-    <div class="no-print grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <!-- Layout Workstation POS: 68% Area Kerja (Scanner, Keranjang, Produk Cepat) | 32% Panel Checkout Kasir -->
+    <div class="no-print grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
-        <!-- KOLOM KIRI (lg:col-span-5): Barcode Scanner & Quick Products -->
-        <div class="lg:col-span-5 space-y-4">
+        <!-- AREA KIRI (lg:col-span-8): Barcode Input & Keranjang Belanja Dominan -->
+        <div class="lg:col-span-8 space-y-4">
 
-            <!-- Box Pemindai Barcode (Scanner Input) -->
-            <flux:card class="p-4 bg-white dark:bg-zinc-900 border-2 border-emerald-500/30 dark:border-emerald-500/20 shadow-sm space-y-3">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <flux:icon name="qr-code" class="size-5 text-emerald-600 dark:text-emerald-400" />
-                        <span class="font-bold text-sm text-zinc-800 dark:text-zinc-200">Pemindai Barcode</span>
-                    </div>
+            <!-- Bar Pemindai Barcode (Scanner Bar) -->
+            <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-3 shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <label for="barcode-input-field" class="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
+                        <flux:icon name="qr-code" class="size-4 text-emerald-600 dark:text-emerald-400" />
+                        <span>Pemindai Barcode</span>
+                    </label>
+                    <span class="text-[11px] text-zinc-400 font-mono">Autofocus aktif &bull; Tekan Enter setelah scan</span>
                 </div>
 
-                <form wire:submit.prevent="scanBarcode" @submit="focusScanner()" class="space-y-2">
-                    <div class="relative">
+                <form wire:submit.prevent="scanBarcode" @submit="focusScanner()" class="flex items-center gap-2">
+                    <div class="relative flex-1">
                         <input
                             id="barcode-input-field"
                             wire:model="barcodeInput"
                             type="text"
-                            placeholder="Arahkan scan dari HP (Barcode to PC) atau ketik kode..."
-                            class="w-full py-3 px-4 pl-11 text-base font-mono rounded-lg border-2 border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition shadow-inner"
+                            placeholder="Arahkan scanner ke barcode atau ketik kode produk..."
+                            class="w-full py-2.5 pl-10 pr-4 text-sm font-mono rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 focus:bg-white dark:focus:bg-zinc-900 transition"
                             autocomplete="off"
                             autofocus />
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                            <flux:icon name="bars-3-bottom-left" class="size-5" />
+                            <flux:icon name="bars-3-bottom-left" class="size-4" />
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <flux:button type="submit" variant="primary" class="flex-1 bg-emerald-600 hover:bg-emerald-700" icon="plus">
-                            Tambah (Enter)
-                        </flux:button>
-                        <flux:button type="button" wire:click="openSearchModal" variant="subtle" icon="magnifying-glass">
-                            Cari (F2)
-                        </flux:button>
-                    </div>
-                </form>
-            </flux:card>
-
-            <flux:card class="p-4 space-y-3">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold text-sm text-zinc-800 dark:text-zinc-200">Produk paling laris</span>
-                    </div>
-                    <span class="text-xs text-zinc-400">Klik untuk tambah</span>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    @forelse($quickProducts as $product)
                     <button
                         type="button"
-                        wire:click="selectProduct('{{ $product->id }}')"
-                        class="p-2.5 text-left rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/60 hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 transition group flex flex-col justify-between">
-                        <div class="space-y-0.5">
-                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 line-clamp-2">
-                                {{ $product->nama }}
-                            </div>
-                            <div class="text-[11px] font-mono text-zinc-400">
-                                {{ $product->kode_produk }}
-                            </div>
-                        </div>
-                        <div class="pt-2 flex items-center justify-between">
-                            <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                                Rp {{ number_format($product->harga_retail, 0, ',', '.') }}
-                            </span>
-                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-zinc-200/80 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
-                                Stok: {{ $product->stok }}
-                            </span>
-                        </div>
+                        wire:click="openSearchModal"
+                        class="px-3.5 py-2.5 rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium text-zinc-700 dark:text-zinc-300 transition whitespace-nowrap flex items-center gap-1.5">
+                        <flux:icon name="magnifying-glass" class="size-4" />
+                        <span>[F2] Cari</span>
                     </button>
-                    @empty
-                    <div class="col-span-2 py-4 text-center text-xs text-zinc-400">
-                        Belum ada produk berstok tersedia.
-                    </div>
-                    @endforelse
-                </div>
-            </flux:card>
-
-            <div class="p-3.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/50 text-xs text-emerald-950 dark:text-emerald-200 space-y-1.5">
-                <div class="font-semibold flex items-center gap-1.5">
-                    <flux:icon name="device-phone-mobile" class="size-4 text-emerald-600 dark:text-emerald-400" />
-                    Panduan Kamera HP (Barcode to PC: Wi-Fi Scanner)
-                </div>
-                <p class="text-emerald-900/80 dark:text-emerald-300/80 text-[11px] leading-relaxed">
-                    Buka aplikasi <strong>Barcode to PC</strong> di HP yang terhubung ke Wi-Fi yang sama dengan PC ini. Saat Anda menembak barcode dengan kamera HP, kode otomatis masuk ke keranjang belanja kasir.
-                </p>
-                <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
-                    *Mendukung juga scanner fisik USB/Bluetooth atau pencarian manual <strong>[F2]</strong>.
-                </div>
+                </form>
             </div>
-        </div>
 
-        <!-- KOLOM KANAN (lg:col-span-7): Keranjang Belanja & Panel Pembayaran -->
-        <div class="lg:col-span-7 space-y-4">
-
-            <!-- Card Keranjang Belanja -->
-            <flux:card class="p-0 overflow-hidden shadow-sm">
-                <!-- Header Keranjang -->
-                <div class="p-4 bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+            <!-- Tabel Keranjang Belanja (High-Density) -->
+            <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
+                <!-- Baris Judul Keranjang -->
+                <div class="px-4 py-2.5 bg-zinc-100/70 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <flux:icon name="shopping-cart" class="size-5 text-zinc-700 dark:text-zinc-300" />
-                        <span class="font-bold text-zinc-900 dark:text-zinc-100">Keranjang Belanja</span>
-                        <flux:badge size="sm" color="emerald">{{ count($cart) }} Item</flux:badge>
+                        <flux:icon name="shopping-cart" class="size-4 text-zinc-600 dark:text-zinc-400" />
+                        <span class="font-bold text-xs uppercase tracking-wider text-zinc-800 dark:text-zinc-200">Keranjang Belanja</span>
+                        <span class="text-xs font-mono font-medium text-zinc-500">({{ count($cart) }} item)</span>
                     </div>
 
                     @if(count($cart) > 0)
-                    <flux:button
+                    <button
                         type="button"
                         wire:click="clearCart"
-                        wire:confirm="Yakin ingin membersihkan seluruh item di keranjang?"
-                        size="sm"
-                        variant="danger"
-                        icon="trash">
-                        Kosongkan (F9)
-                    </flux:button>
+                        wire:confirm="Kosongkan seluruh item di keranjang?"
+                        class="text-xs font-medium text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1">
+                        <flux:icon name="trash" class="size-3.5" />
+                        <span>Kosongkan [F9]</span>
+                    </button>
                     @endif
                 </div>
 
-                <!-- Tabel Item Keranjang Belanja -->
-                <div class="overflow-x-auto max-h-[380px] overflow-y-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-zinc-100 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-300 text-xs font-semibold uppercase sticky top-0 z-10">
+                <!-- Kontainer Tabel Scrollable -->
+                <div class="overflow-x-auto max-h-[420px] overflow-y-auto">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead class="bg-zinc-50 dark:bg-zinc-800/90 text-zinc-500 dark:text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-10">
                             <tr>
-                                <th class="py-2.5 px-3 w-10 text-center">#</th>
-                                <th class="py-2.5 px-3">Produk & Barcode</th>
-                                <th class="py-2.5 px-3 text-right">Harga</th>
-                                <th class="py-2.5 px-3 text-center w-28">Qty</th>
-                                <th class="py-2.5 px-3 text-right">Subtotal</th>
-                                <th class="py-2.5 px-3 w-10 text-center">Aksi</th>
+                                <th class="py-2 px-3 w-8 text-center">#</th>
+                                <th class="py-2 px-3">Produk & Barcode</th>
+                                <th class="py-2 px-3 text-right">Harga</th>
+                                <th class="py-2 px-3 text-center w-28">Qty</th>
+                                <th class="py-2 px-3 text-right">Subtotal</th>
+                                <th class="py-2 px-3 w-10 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+                        <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800 font-mono">
                             @php $no = 1; @endphp
                             @forelse($cart as $id => $item)
-                            <tr class="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 transition">
-                                <td class="py-2.5 px-3 text-center text-xs text-zinc-400">
+                            <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition">
+                                <td class="py-2 px-3 text-center text-zinc-400 font-normal">
                                     {{ $no++ }}
                                 </td>
-                                <td class="py-2.5 px-3">
-                                    <div class="font-semibold text-zinc-900 dark:text-zinc-100">
+                                <td class="py-2 px-3 font-sans">
+                                    <div class="font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
                                         {{ $item['nama'] }}
                                     </div>
-                                    <div class="flex items-center gap-2 text-xs font-mono text-zinc-400">
+                                    <div class="flex items-center gap-2 text-[11px] font-mono text-zinc-500">
                                         <span>{{ $item['kode_produk'] }}</span>
                                         <span>&bull;</span>
                                         <span>{{ $item['satuan'] }}</span>
                                         @if($item['diskon'] > 0)
-                                        <span class="text-rose-600 dark:text-rose-400 font-semibold">Diskon {{ $item['diskon'] }}%</span>
+                                        <span class="text-rose-600 dark:text-rose-400 font-semibold font-sans">Disc {{ $item['diskon'] }}%</span>
                                         @endif
                                     </div>
                                 </td>
-                                <td class="py-2.5 px-3 text-right whitespace-nowrap">
+                                <td class="py-2 px-3 text-right whitespace-nowrap">
                                     @if($item['diskon'] > 0)
-                                    <div class="text-[11px] line-through text-zinc-400">
+                                    <div class="text-[10px] line-through text-zinc-400">
                                         Rp {{ number_format($item['harga_satuan'], 0, ',', '.') }}
                                     </div>
                                     <div class="font-semibold text-zinc-900 dark:text-zinc-100">
@@ -275,12 +215,12 @@
                                     </div>
                                     @endif
                                 </td>
-                                <td class="py-2.5 px-3">
+                                <td class="py-2 px-3">
                                     <div class="flex items-center justify-center gap-1">
                                         <button
                                             type="button"
                                             wire:click="decrementQty('{{ $id }}')"
-                                            class="size-7 flex items-center justify-center rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold transition">
+                                            class="size-6 flex items-center justify-center rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold transition">
                                             &minus;
                                         </button>
                                         <input
@@ -289,19 +229,19 @@
                                             max="{{ $item['stok_max'] }}"
                                             value="{{ $item['qty'] }}"
                                             wire:change="updateQty('{{ $id }}', $event.target.value)"
-                                            class="w-12 text-center py-1 text-xs font-mono font-bold rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-emerald-500" />
+                                            class="w-12 text-center py-0.5 text-xs font-mono font-bold rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500" />
                                         <button
                                             type="button"
                                             wire:click="incrementQty('{{ $id }}')"
-                                            class="size-7 flex items-center justify-center rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold transition">
+                                            class="size-6 flex items-center justify-center rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold transition">
                                             +
                                         </button>
                                     </div>
                                 </td>
-                                <td class="py-2.5 px-3 text-right font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+                                <td class="py-2 px-3 text-right font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
                                     Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
                                 </td>
-                                <td class="py-2.5 px-3 text-center">
+                                <td class="py-2 px-3 text-center">
                                     <button
                                         type="button"
                                         wire:click="removeItem('{{ $id }}')"
@@ -313,90 +253,151 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="6" class="py-12 text-center text-zinc-400 space-y-2">
-                                    <div class="mx-auto size-12 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400">
-                                        <flux:icon name="shopping-bag" class="size-6" />
-                                    </div>
-                                    <div class="font-medium text-zinc-600 dark:text-zinc-400">Keranjang masih kosong</div>
-                                    <div class="text-xs text-zinc-400 max-w-xs mx-auto">
-                                        Scan barcode barang belanjaan pelanggan atau pilih dari daftar produk cepat di sebelah kiri.
-                                    </div>
+                                <td colspan="6" class="py-12 text-center text-zinc-400 font-sans">
+                                    <div class="font-medium text-zinc-600 dark:text-zinc-400 mb-1">Keranjang masih kosong</div>
+                                    <div class="text-xs text-zinc-500">Scan barcode barang belanjaan atau tekan <kbd class="font-mono font-bold text-zinc-700 dark:text-zinc-300">[F2]</kbd> untuk cari produk.</div>
                                 </td>
                             </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
+            </div>
 
-                <!-- Footer Rincian & Grand Total -->
-                <div class="p-4 bg-zinc-50 dark:bg-zinc-800/80 border-t border-zinc-200 dark:border-zinc-800 space-y-3">
-                    <div class="space-y-1.5 text-sm">
-                        <div class="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
-                            <span>Subtotal Kotor</span>
-                            <span class="font-mono">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
-                        </div>
-                        @if($totalDiskon > 0)
-                        <div class="flex items-center justify-between text-rose-600 dark:text-rose-400">
-                            <span>Potongan Diskon</span>
-                            <span class="font-mono">- Rp {{ number_format($totalDiskon, 0, ',', '.') }}</span>
-                        </div>
-                        @endif
-                    </div>
+            <!-- Produk Cepat / Populer (Compact Grid) -->
+            <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-3 shadow-sm space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Produk Cepat (Klik Tambah)</span>
+                    <span class="text-[11px] text-zinc-400">8 produk aktif</span>
+                </div>
 
-                    <!-- Grand Total Display Besar -->
-                    <div class="pt-2 border-t border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-                        <div>
-                            <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Total Tagihan</div>
-                            <div class="text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
-                                Rp {{ number_format($grandTotal, 0, ',', '.') }}
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    @forelse($quickProducts as $product)
+                    <button
+                        type="button"
+                        wire:click="selectProduct('{{ $product->id }}')"
+                        class="p-2 text-left rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:border-zinc-400 transition flex flex-col justify-between">
+                        <div class="space-y-0.5">
+                            <div class="text-xs font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                                {{ $product->nama }}
+                            </div>
+                            <div class="text-[10px] font-mono text-zinc-400">
+                                {{ $product->kode_produk }}
                             </div>
                         </div>
-
-                        <!-- Tombol Bayar -->
-                        <div>
-                            <flux:button
-                                type="button"
-                                wire:click="openPayment"
-                                variant="primary"
-                                class="px-8 py-3.5 text-base font-bold bg-emerald-600 hover:bg-emerald-700 shadow-md"
-                                icon="banknotes"
-                                :disabled="empty($cart)">
-                                Bayar (F8)
-                            </flux:button>
+                        <div class="pt-1.5 flex items-center justify-between font-mono">
+                            <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                Rp {{ number_format($product->harga_retail, 0, ',', '.') }}
+                            </span>
+                            <span class="text-[10px] text-zinc-500">
+                                S:{{ $product->stok }}
+                            </span>
                         </div>
+                    </button>
+                    @empty
+                    <div class="col-span-4 py-3 text-center text-xs text-zinc-400">
+                        Belum ada data produk tersedia.
                     </div>
+                    @endforelse
                 </div>
-            </flux:card>
+            </div>
 
         </div>
+
+        <!-- PANEL KANAN (lg:col-span-4): Total Tagihan & Konsol Kasir (Sticky) -->
+        <div class="lg:col-span-4 space-y-3 sticky top-4">
+
+            <!-- Card Utama Total Tagihan -->
+            <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm space-y-4">
+                <div class="text-center pb-3 border-b border-zinc-200 dark:border-zinc-800">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Total Tagihan</div>
+                    <div class="text-3xl font-black font-mono text-zinc-900 dark:text-zinc-100 mt-1">
+                        Rp {{ number_format($grandTotal, 0, ',', '.') }}
+                    </div>
+                </div>
+
+                <!-- Rincian Biaya -->
+                <div class="space-y-2 text-xs font-mono">
+                    <div class="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
+                        <span>Subtotal Kotor</span>
+                        <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                    </div>
+                    @if($totalDiskon > 0)
+                    <div class="flex items-center justify-between text-rose-600 dark:text-rose-400">
+                        <span>Potongan Diskon</span>
+                        <span>- Rp {{ number_format($totalDiskon, 0, ',', '.') }}</span>
+                    </div>
+                    @endif
+                    <div class="flex items-center justify-between text-zinc-500 text-[11px] pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                        <span>Total Qty</span>
+                        <span>{{ count($cart) }} item ({{ collect($cart)->sum('qty') }} pcs)</span>
+                    </div>
+                </div>
+
+                <!-- Tombol Eksekusi Pembayaran Kasir -->
+                <div class="pt-2 space-y-2">
+                    <button
+                        type="button"
+                        wire:click="openPayment"
+                        @disabled(empty($cart))
+                        class="w-full py-3 px-4 rounded text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2 shadow-sm">
+                        <flux:icon name="banknotes" class="size-4" />
+                        <span>Bayar Transaksi [F8]</span>
+                    </button>
+
+                    @if(count($cart) > 0)
+                    <button
+                        type="button"
+                        wire:click="clearCart"
+                        wire:confirm="Yakin ingin membersihkan seluruh item di keranjang?"
+                        class="w-full py-2 px-3 rounded text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                        Batal / Kosongkan Keranjang [F9]
+                    </button>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Panduan Hotkey Keyboard POS (Bukan Pill Dekoratif) -->
+            <div class="bg-zinc-50 dark:bg-zinc-800/40 rounded border border-zinc-200 dark:border-zinc-800 p-3 text-xs text-zinc-600 dark:text-zinc-400 space-y-1.5 font-mono">
+                <div class="font-bold text-[11px] text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">Pintas Tombol (Keyboard)</div>
+                <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px]">
+                    <div><span class="font-bold text-zinc-900 dark:text-zinc-100">[Enter]</span> Scan barcode</div>
+                    <div><span class="font-bold text-zinc-900 dark:text-zinc-100">[F2]</span> Cari manual</div>
+                    <div><span class="font-bold text-emerald-600 dark:text-emerald-400">[F8]</span> Pembayaran</div>
+                    <div><span class="font-bold text-rose-600 dark:text-rose-400">[F9]</span> Kosongkan</div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- MODAL PEMBAYARAN KASIR (Payment Modal) -->
-    <flux:modal wire:model="showPaymentModal" class="md:w-[500px] space-y-5">
+    <!-- MODAL PEMBAYARAN KASIR (Payment Modal F8) -->
+    <flux:modal wire:model="showPaymentModal" class="md:w-[480px] space-y-4">
         <div>
             <div class="flex items-center gap-2">
-                <flux:icon name="banknotes" class="size-6 text-emerald-600 dark:text-emerald-400" />
+                <flux:icon name="banknotes" class="size-5 text-emerald-600 dark:text-emerald-400" />
                 <flux:heading size="lg">Pembayaran Transaksi</flux:heading>
             </div>
             <flux:subheading>Masukkan uang tunai yang diterima dari pelanggan.</flux:subheading>
         </div>
 
         <!-- Box Total Tagihan -->
-        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-center space-y-1">
-            <div class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">Total Yang Harus Dibayar</div>
-            <div class="text-3xl font-black text-emerald-700 dark:text-emerald-300 font-mono">
+        <div class="p-3.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-center space-y-0.5">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Total Yang Harus Dibayar</div>
+            <div class="text-2xl font-black text-zinc-900 dark:text-zinc-100 font-mono">
                 Rp {{ number_format($grandTotal, 0, ',', '.') }}
             </div>
         </div>
 
-        <!-- Tombol Pecahan Cepat -->
-        <div class="space-y-1.5">
+        <!-- Tombol Pecahan Cepat Tunai -->
+        <div class="space-y-1">
             <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Pecahan Cepat:</label>
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-3 gap-1.5">
                 <button
                     type="button"
                     wire:click="setNominalBayar({{ $grandTotal }})"
-                    class="py-2 px-2.5 rounded-lg border border-emerald-300 dark:border-emerald-700 bg-emerald-100/60 dark:bg-emerald-900/40 hover:bg-emerald-200 text-xs font-bold text-emerald-800 dark:text-emerald-200 transition">
+                    class="py-1.5 px-2 rounded border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-xs font-bold text-emerald-800 dark:text-emerald-200 transition">
                     Uang Pas
                 </button>
                 @php
@@ -407,7 +408,7 @@
                 <button
                     type="button"
                     wire:click="setNominalBayar({{ $frac }})"
-                    class="py-2 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 transition">
+                    class="py-1.5 px-2 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-mono font-medium text-zinc-800 dark:text-zinc-200 transition">
                     Rp {{ number_format($frac, 0, ',', '.') }}
                 </button>
                 @endif
@@ -419,37 +420,38 @@
         <div class="space-y-1">
             <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Nominal Tunai Diterima (Rp):</label>
             <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center font-bold text-zinc-400">Rp</span>
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center font-bold text-zinc-400 font-mono text-sm">Rp</span>
                 <input
                     type="number"
                     wire:model.live="nominalBayar"
                     min="{{ $grandTotal }}"
                     step="1000"
-                    class="w-full py-2.5 pl-10 pr-4 text-xl font-mono font-bold rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    class="w-full py-2.5 pl-10 pr-4 text-xl font-mono font-bold rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                     placeholder="0"
                     autofocus />
             </div>
         </div>
 
         <!-- Box Kembalian -->
-        <div class="p-3.5 rounded-lg {{ (float)$nominalBayar >= $grandTotal ? 'bg-emerald-100/70 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800' : 'bg-rose-100/70 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800' }} flex items-center justify-between">
-            <span class="text-sm font-semibold {{ (float)$nominalBayar >= $grandTotal ? 'text-emerald-800 dark:text-emerald-200' : 'text-rose-800 dark:text-rose-200' }}">
+        <div class="p-3 rounded {{ (float)$nominalBayar >= $grandTotal ? 'bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700' : 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800' }} flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider {{ (float)$nominalBayar >= $grandTotal ? 'text-zinc-700 dark:text-zinc-300' : 'text-rose-700 dark:text-rose-300' }}">
                 {{ (float)$nominalBayar >= $grandTotal ? 'Kembalian:' : 'Uang Kurang:' }}
             </span>
-            <span class="text-xl font-black font-mono {{ (float)$nominalBayar >= $grandTotal ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300' }}">
+            <span class="text-xl font-black font-mono {{ (float)$nominalBayar >= $grandTotal ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
                 Rp {{ number_format(abs((float)$nominalBayar - $grandTotal), 0, ',', '.') }}
             </span>
         </div>
 
         <!-- Tombol Aksi Modal Pembayaran -->
-        <div class="flex items-center justify-end gap-2 pt-2">
-            <flux:button type="button" wire:click="closePaymentModal" variant="subtle">
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <flux:button type="button" wire:click="closePaymentModal" variant="subtle" size="sm">
                 Batal (Esc)
             </flux:button>
             <flux:button
                 type="button"
                 wire:click="processTransaction"
                 variant="primary"
+                size="sm"
                 class="bg-emerald-600 hover:bg-emerald-700"
                 icon="check-circle"
                 :disabled="(float)$nominalBayar < $grandTotal">
@@ -462,7 +464,7 @@
     <flux:modal wire:model="showReceiptModal" class="md:w-[440px] space-y-4">
         <div class="no-print">
             <div class="flex items-center gap-2">
-                <flux:icon name="printer" class="size-6 text-emerald-600 dark:text-emerald-400" />
+                <flux:icon name="printer" class="size-5 text-emerald-600 dark:text-emerald-400" />
                 <flux:heading size="lg">Struk Transaksi Selesai</flux:heading>
             </div>
             <flux:subheading>Transaksi berhasil dibukukan. Struk kasir siap dicetak.</flux:subheading>
@@ -470,7 +472,7 @@
 
         @if($lastSale)
         <!-- Area Preview / Cetak Struk (Thermal 58mm/80mm) -->
-        <div id="receipt-print-area" class="p-4 bg-white text-zinc-900 border border-dashed border-zinc-300 rounded-lg shadow-inner font-mono text-xs leading-relaxed space-y-2">
+        <div id="receipt-print-area" class="p-4 bg-white text-zinc-900 border border-dashed border-zinc-300 rounded shadow-inner font-mono text-xs leading-relaxed space-y-2">
             <!-- Header Toko -->
             <div class="text-center space-y-0.5 pb-2 border-b border-dashed border-zinc-400">
                 <div class="text-base font-bold tracking-wider">MAPOS MINIMARKET</div>
@@ -549,19 +551,20 @@
         <div class="no-print space-y-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
             <div class="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400">
                 <span class="font-medium">Ukuran Kertas Thermal:</span>
-                <select id="pos-paper-size" class="text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded px-2.5 py-1 font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                <select id="pos-paper-size" class="text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded px-2.5 py-1 font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none">
                     <option value="80mm" selected>Thermal 80mm (Standar POS)</option>
                     <option value="58mm">Thermal 58mm (Mini POS)</option>
                 </select>
             </div>
             <div class="flex items-center justify-between gap-2">
-                <flux:button type="button" wire:click="closeReceiptModal" variant="subtle" icon="arrow-path">
+                <flux:button type="button" wire:click="closeReceiptModal" variant="subtle" size="sm" icon="arrow-path">
                     Transaksi Baru
                 </flux:button>
                 <flux:button
                     type="button"
                     onclick="const s = document.getElementById('pos-paper-size')?.value || '80mm'; window.printThermalReceipt('receipt-print-area', s);"
                     variant="primary"
+                    size="sm"
                     class="bg-emerald-600 hover:bg-emerald-700"
                     icon="printer">
                     Cetak Struk Sekarang
@@ -571,11 +574,11 @@
     </flux:modal>
 
     <!-- MODAL PENCARIAN MANUAL PRODUK (Search Modal F2) -->
-    <flux:modal wire:model="showSearchModal" class="md:w-[640px] space-y-4">
+    <flux:modal wire:model="showSearchModal" class="md:w-[640px] space-y-3">
         <div>
             <div class="flex items-center gap-2">
-                <flux:icon name="magnifying-glass" class="size-6 text-blue-600 dark:text-blue-400" />
-                <flux:heading size="lg">Cari Produk Manual (F2)</flux:heading>
+                <flux:icon name="magnifying-glass" class="size-5 text-zinc-700 dark:text-zinc-300" />
+                <flux:heading size="lg">Cari Produk Manual [F2]</flux:heading>
             </div>
             <flux:subheading>Gunakan jika barcode fisik barang rusak, kusam, atau tidak terbaca scanner.</flux:subheading>
         </div>
@@ -589,14 +592,14 @@
         </div>
 
         <!-- Hasil Pencarian -->
-        <div class="max-h-72 overflow-y-auto divide-y divide-zinc-200 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-lg">
+        <div class="max-h-72 overflow-y-auto divide-y divide-zinc-200 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded">
             @forelse($searchResults as $prod)
-            <div class="p-3 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition">
+            <div class="p-2.5 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition">
                 <div>
-                    <div class="font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
+                    <div class="font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
                         {{ $prod->nama }}
                     </div>
-                    <div class="flex items-center gap-2 text-xs text-zinc-400 font-mono">
+                    <div class="flex items-center gap-2 text-[11px] text-zinc-500 font-mono">
                         <span>{{ $prod->kode_produk }}</span>
                         <span>&bull;</span>
                         <span>{{ $prod->satuan }}</span>
@@ -607,24 +610,22 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span class="font-bold text-sm text-zinc-900 dark:text-zinc-100">
+                    <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100 font-mono">
                         Rp {{ number_format($prod->harga_retail, 0, ',', '.') }}
                     </span>
-                    <flux:button
+                    <button
                         type="button"
                         wire:click="selectProduct('{{ $prod->id }}')"
-                        size="sm"
-                        variant="primary"
-                        icon="plus"
-                        :disabled="$prod->stok <= 0">
+                        @disabled($prod->stok <= 0)
+                        class="px-2.5 py-1 rounded text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition">
                         Pilih
-                    </flux:button>
+                    </button>
                 </div>
             </div>
             @empty
-            <div class="py-8 text-center text-sm text-zinc-400">
+            <div class="py-6 text-center text-xs text-zinc-400">
                 @if(empty($searchKeyword))
-                Ketik nama barang atau kode produk di kolom pencarian di atas.
+                Ketik nama barang atau kode produk di kolom pencarian.
                 @else
                 Tidak ditemukan produk dengan kata kunci "<strong>{{ $searchKeyword }}</strong>".
                 @endif
@@ -632,11 +633,49 @@
             @endforelse
         </div>
 
-        <div class="flex justify-end pt-2">
-            <flux:button type="button" wire:click="closeSearchModal" variant="subtle">
-                Tutup
+        <div class="flex justify-end pt-1">
+            <flux:button type="button" wire:click="closeSearchModal" variant="subtle" size="sm">
+                Tutup (Esc)
             </flux:button>
         </div>
     </flux:modal>
+
+    <!-- MODAL PANDUAN SCANNER KAMERA HP (Barcode to PC) -->
+    <div
+        x-show="showGuide"
+        x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        @keydown.window.escape="showGuide = false">
+        <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 max-w-md w-full p-5 space-y-4 shadow-xl">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                <div class="flex items-center gap-2">
+                    <flux:icon name="device-phone-mobile" class="size-5 text-emerald-600 dark:text-emerald-400" />
+                    <h3 class="font-bold text-sm text-zinc-900 dark:text-zinc-100">Panduan Kamera HP (Barcode to PC)</h3>
+                </div>
+                <button type="button" @click="showGuide = false" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-lg font-bold">&times;</button>
+            </div>
+
+            <div class="text-xs text-zinc-600 dark:text-zinc-300 space-y-2 leading-relaxed">
+                <p>
+                    1. Pastikan HP dan PC kasir terhubung pada <strong>jaringan Wi-Fi yang sama</strong>.
+                </p>
+                <p>
+                    2. Buka aplikasi <strong>Barcode to PC</strong> di Android / iOS.
+                </p>
+                <p>
+                    3. Arahkan kamera HP ke barcode barang. Hasil scan otomatis dikirim ke kolom pemindai kasir ini dan menekan Enter.
+                </p>
+                <p class="text-zinc-400 text-[11px] pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    *Mendukung juga scanner fisik USB/Bluetooth atau pencarian manual <strong>[F2]</strong>.
+                </p>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" @click="showGuide = false" class="px-3.5 py-1.5 rounded text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 transition">
+                    Mengerti & Tutup
+                </button>
+            </div>
+        </div>
+    </div>
 
 </div>

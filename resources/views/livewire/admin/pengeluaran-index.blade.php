@@ -15,40 +15,40 @@
         </div>
     </div>
 
-    <!-- 3 Kartu Statistik Ringkasan -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <flux:card class="p-4 space-y-1 bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-zinc-900 border-amber-200/50">
-            <div class="flex items-center justify-between text-xs font-medium text-amber-700 dark:text-amber-400">
+    <!-- 3 Kartu Statistik Ringkasan (High-Density, Solid Neutral) -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 <span>Biaya Operasional Toko</span>
-                <flux:icon name="bolt" class="size-4" />
+                <flux:icon name="bolt" class="size-4 text-zinc-400" />
             </div>
             <div class="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
                 Rp {{ number_format($totalOperasional, 0, ',', '.') }}
             </div>
-            <div class="text-[11px] text-zinc-500">Listrik, air, kantong plastik, dsb.</div>
-        </flux:card>
+            <div class="text-[11px] text-zinc-400">Listrik, air, kantong plastik, dsb.</div>
+        </div>
 
-        <flux:card class="p-4 space-y-1 bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/20 dark:to-zinc-900 border-rose-200/50">
-            <div class="flex items-center justify-between text-xs font-medium text-rose-700 dark:text-rose-400">
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 <span>Kasbon Karyawan</span>
-                <flux:icon name="user-minus" class="size-4" />
+                <flux:icon name="user-minus" class="size-4 text-zinc-400" />
             </div>
             <div class="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
                 Rp {{ number_format($totalKasbon, 0, ',', '.') }}
             </div>
-            <div class="text-[11px] text-zinc-500">Pinjaman kasir / staf toko aktif</div>
-        </flux:card>
+            <div class="text-[11px] text-zinc-400">Pinjaman kasir / staf toko aktif</div>
+        </div>
 
-        <flux:card class="p-4 space-y-1 bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900/60 dark:to-zinc-900">
-            <div class="flex items-center justify-between text-xs font-medium text-zinc-600 dark:text-zinc-400">
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 <span>Total Pengeluaran Bulan Ini</span>
-                <flux:icon name="banknotes" class="size-4" />
+                <flux:icon name="banknotes" class="size-4 text-zinc-400" />
             </div>
             <div class="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
                 Rp {{ number_format($totalSemua, 0, ',', '.') }}
             </div>
-            <div class="text-[11px] text-zinc-500">Periode: {{ date('F Y', strtotime($filterBulan . '-01')) }}</div>
-        </flux:card>
+            <div class="text-[11px] text-zinc-400">Periode: {{ date('F Y', strtotime($filterBulan . '-01')) }}</div>
+        </div>
     </div>
 
     <!-- Filter & Pencarian -->
@@ -98,9 +98,9 @@
                             <div class="text-[11px] text-zinc-400">{{ $p->waktu->format('d/m/Y H:i') }}</div>
                         </td>
                         <td class="p-3">
-                            <flux:badge color="{{ $p->kategori->color() }}" size="sm">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
                                 {{ $p->kategori->label() }}
-                            </flux:badge>
+                            </span>
                         </td>
                         <td class="p-3">
                             <div class="font-medium text-zinc-900 dark:text-zinc-100">{{ $p->keterangan }}</div>
@@ -130,11 +130,8 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="p-8 text-center text-zinc-400">
-                            <div class="flex flex-col items-center gap-2">
-                                <flux:icon name="banknotes" class="size-8 text-zinc-300 dark:text-zinc-600" />
-                                <div class="font-medium">Belum ada catatan pengeluaran pada periode ini.</div>
-                            </div>
+                        <td colspan="6" class="p-6 text-center text-xs text-zinc-400">
+                            Belum ada catatan pengeluaran pada periode ini.
                         </td>
                     </tr>
                     @endforelse
