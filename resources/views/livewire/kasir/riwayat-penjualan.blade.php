@@ -5,7 +5,11 @@
             body * {
                 visibility: hidden !important;
             }
-            dialog, [data-flux-modal], flux-modal, [popover] {
+
+            dialog,
+            [data-flux-modal],
+            flux-modal,
+            [popover] {
                 position: static !important;
                 inset: auto !important;
                 margin: 0 !important;
@@ -18,9 +22,12 @@
                 max-width: none !important;
                 width: auto !important;
             }
-            #kasir-receipt-print-area, #kasir-receipt-print-area * {
+
+            #kasir-receipt-print-area,
+            #kasir-receipt-print-area * {
                 visibility: visible !important;
             }
+
             #kasir-receipt-print-area {
                 position: fixed !important;
                 left: 0 !important;
@@ -36,6 +43,7 @@
                 font-family: 'Courier New', Courier, monospace !important;
                 font-size: 11px !important;
             }
+
             @page {
                 size: 80mm auto;
                 margin: 0;
@@ -93,14 +101,12 @@
             <input
                 type="date"
                 wire:model.live="filterDate"
-                class="text-xs font-mono rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
-            />
+                class="text-xs font-mono rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100" />
         </div>
         <button
             type="button"
             wire:click="setToday"
-            class="px-2.5 py-1 rounded text-xs font-mono font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 border border-zinc-200 dark:border-zinc-700 transition"
-        >
+            class="px-2.5 py-1 rounded text-xs font-mono font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 border border-zinc-200 dark:border-zinc-700 transition">
             Kembali ke Hari Ini
         </button>
     </div>
@@ -122,50 +128,49 @@
                 </thead>
                 <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800 font-mono">
                     @forelse($sales as $s)
-                        <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition">
-                            <td class="py-2 px-3 font-bold text-zinc-900 dark:text-zinc-100">
-                                {{ $s->no_transaksi }}
-                            </td>
-                            <td class="py-2 px-3 text-[11px] text-zinc-500">
-                                {{ $s->waktu->format('H:i:s') }}
-                            </td>
-                            <td class="py-2 px-3 text-center text-zinc-600 dark:text-zinc-400">
-                                {{ $s->items->sum('qty') }} item
-                            </td>
-                            <td class="py-2 px-3 text-right font-bold text-zinc-900 dark:text-zinc-100">
-                                Rp {{ number_format($s->total, 0, ',', '.') }}
-                            </td>
-                            <td class="py-2 px-3 text-right text-zinc-500">
-                                Rp {{ number_format($s->bayar, 0, ',', '.') }}
-                            </td>
-                            <td class="py-2 px-3 text-right text-zinc-600 dark:text-zinc-300">
-                                Rp {{ number_format($s->kembali, 0, ',', '.') }}
-                            </td>
-                            <td class="py-2 px-3 text-center font-sans">
-                                <button
-                                    type="button"
-                                    wire:click="showReceipt('{{ $s->id }}')"
-                                    class="px-2 py-1 rounded text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 transition"
-                                >
-                                    Cetak Struk
-                                </button>
-                            </td>
-                        </tr>
+                    <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition">
+                        <td class="py-2 px-3 font-bold text-zinc-900 dark:text-zinc-100">
+                            {{ $s->no_transaksi }}
+                        </td>
+                        <td class="py-2 px-3 text-[11px] text-zinc-500">
+                            {{ $s->waktu->format('H:i:s') }}
+                        </td>
+                        <td class="py-2 px-3 text-center text-zinc-600 dark:text-zinc-400">
+                            {{ $s->items->sum('qty') }} item
+                        </td>
+                        <td class="py-2 px-3 text-right font-bold text-zinc-900 dark:text-zinc-100">
+                            Rp {{ number_format($s->total, 0, ',', '.') }}
+                        </td>
+                        <td class="py-2 px-3 text-right text-zinc-500">
+                            Rp {{ number_format($s->bayar, 0, ',', '.') }}
+                        </td>
+                        <td class="py-2 px-3 text-right text-zinc-600 dark:text-zinc-300">
+                            Rp {{ number_format($s->kembali, 0, ',', '.') }}
+                        </td>
+                        <td class="py-2 px-3 text-center font-sans">
+                            <button
+                                type="button"
+                                wire:click="showReceipt('{{ $s->id }}')"
+                                class="px-2 py-1 rounded text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 transition">
+                                Cetak Struk
+                            </button>
+                        </td>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="7" class="py-6 text-center text-xs text-zinc-400 font-sans">
-                                Belum ada transaksi penjualan pada tanggal terpilih.
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colspan="7" class="py-6 text-center text-xs text-zinc-400 font-sans">
+                            Belum ada transaksi penjualan pada tanggal terpilih.
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
         @if($sales->hasPages())
-            <div class="p-3 border-t border-zinc-200 dark:border-zinc-800 font-sans">
-                {{ $sales->links() }}
-            </div>
+        <div class="p-3 border-t border-zinc-200 dark:border-zinc-800 font-sans">
+            {{ $sales->links() }}
+        </div>
         @endif
     </div>
 
@@ -266,8 +271,7 @@
                     variant="primary"
                     size="sm"
                     class="bg-emerald-600 hover:bg-emerald-700"
-                    icon="printer"
-                >
+                    icon="printer">
                     Cetak Struk Sekarang
                 </flux:button>
             </div>
