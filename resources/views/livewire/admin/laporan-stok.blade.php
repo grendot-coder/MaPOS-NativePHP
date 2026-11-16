@@ -1,95 +1,88 @@
-<div class="space-y-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div class="space-y-5">
+    <!-- Header Halaman -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
-            <div class="flex items-center gap-2">
-                <flux:heading size="xl" level="1">Laporan Stok & Evaluasi Aset</flux:heading>
-                <flux:badge color="blue" size="sm">Audit Gudang</flux:badge>
-            </div>
+            <flux:heading size="xl" level="1">Laporan Stok & Evaluasi Aset</flux:heading>
             <flux:subheading>Pemantauan nilai modal barang, potensi omzet retail, dan peringatan dini stok menipis (*minimum stock*).</flux:subheading>
         </div>
         <div class="flex items-center gap-2">
-            <flux:button href="{{ route('admin.stok.penyesuaian') }}" variant="primary" icon="adjustments-horizontal" wire:navigate>
+            <flux:button href="{{ route('admin.stok.penyesuaian') }}" variant="primary" size="sm" icon="adjustments-horizontal" wire:navigate>
                 + Penyesuaian Stok
             </flux:button>
         </div>
     </div>
 
-    <!-- KPI Ringkasan Nilai Aset Modal & Potensi Omzet -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- KPI Ringkasan Nilai Aset Modal & Potensi Omzet (High-Density, Solid Neutral) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <!-- Nilai Modal Aset -->
-        <flux:card class="p-4 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 flex items-center gap-3">
-            <div class="size-11 flex items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-                <flux:icon name="archive-box" class="size-6" />
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Modal Aset (Harga Beli)</span>
+                <flux:icon name="archive-box" class="size-4 text-zinc-400" />
             </div>
-            <div>
-                <div class="text-xs text-zinc-500 font-medium">Estimasi Modal Aset (Beli)</div>
-                <div class="text-xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
-                    Rp {{ number_format($totalNilaiModal, 0, ',', '.') }}
-                </div>
+            <div class="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
+                Rp {{ number_format($totalNilaiModal, 0, ',', '.') }}
             </div>
-        </flux:card>
+            <div class="text-[11px] text-zinc-400">Total nilai modal stok saat ini</div>
+        </div>
 
         <!-- Potensi Omzet Retail -->
-        <flux:card class="p-4 bg-emerald-50/50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-center gap-3">
-            <div class="size-11 flex items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
-                <flux:icon name="banknotes" class="size-6" />
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Potensi Omzet Retail</span>
+                <flux:icon name="banknotes" class="size-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div>
-                <div class="text-xs text-emerald-800 dark:text-emerald-300 font-medium">Potensi Omzet Retail</div>
-                <div class="text-xl font-black font-mono text-emerald-700 dark:text-emerald-300">
-                    Rp {{ number_format($totalNilaiRetail, 0, ',', '.') }}
-                </div>
+            <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                Rp {{ number_format($totalNilaiRetail, 0, ',', '.') }}
             </div>
-        </flux:card>
+            <div class="text-[11px] text-zinc-400">Nilai jual total persediaan</div>
+        </div>
 
         <!-- Stok Menipis Warning -->
-        <flux:card class="p-4 flex items-center gap-3 border {{ $totalMenipis > 0 ? 'bg-amber-50/60 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700' : '' }}">
-            <div class="size-11 flex items-center justify-center rounded-xl bg-amber-500 text-white shadow-sm">
-                <flux:icon name="exclamation-triangle" class="size-6" />
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Stok Menipis (&le; Min)</span>
+                <flux:icon name="exclamation-triangle" class="size-4 text-amber-500" />
             </div>
-            <div>
-                <div class="text-xs text-amber-900 dark:text-amber-300 font-medium">Stok Menipis (<= Min)</div>
-                <div class="text-xl font-bold font-mono text-amber-700 dark:text-amber-400">
-                    {{ $totalMenipis }} Produk
-                </div>
+            <div class="text-2xl font-bold font-mono {{ $totalMenipis > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-900 dark:text-zinc-100' }}">
+                {{ $totalMenipis }}
             </div>
-        </flux:card>
+            <div class="text-[11px] text-zinc-400">Perlu restock segera</div>
+        </div>
 
         <!-- Stok Habis Alert -->
-        <flux:card class="p-4 flex items-center gap-3 border {{ $totalHabis > 0 ? 'bg-rose-50/60 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700' : '' }}">
-            <div class="size-11 flex items-center justify-center rounded-xl bg-rose-600 text-white shadow-sm">
-                <flux:icon name="x-circle" class="size-6" />
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Stok Kosong / Habis</span>
+                <flux:icon name="x-circle" class="size-4 text-rose-500" />
             </div>
-            <div>
-                <div class="text-xs text-rose-900 dark:text-rose-300 font-medium">Stok Kosong / Habis</div>
-                <div class="text-xl font-bold font-mono text-rose-700 dark:text-rose-400">
-                    {{ $totalHabis }} Produk
-                </div>
+            <div class="text-2xl font-bold font-mono {{ $totalHabis > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-900 dark:text-zinc-100' }}">
+                {{ $totalHabis }}
             </div>
-        </flux:card>
+            <div class="text-[11px] text-zinc-400">Stok 0 di etalase & gudang</div>
+        </div>
     </div>
 
-    <!-- Filter & Pencarian -->
-    <flux:card class="p-4 space-y-3">
+    <!-- Filter & Pencarian (Compact) -->
+    <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-3">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
             <!-- Search Keyword -->
             <div class="space-y-1">
-                <label class="block text-xs font-medium text-zinc-500">Cari Produk / Barcode</label>
+                <label class="block text-[11px] font-medium text-zinc-500">Cari Produk / Barcode</label>
                 <input
                     type="text"
                     wire:model.live.debounce.300ms="search"
                     placeholder="Ketik nama produk atau barcode..."
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 />
             </div>
 
             <!-- Filter Golongan -->
             <div class="space-y-1">
-                <label class="block text-xs font-medium text-zinc-500">Filter Golongan</label>
+                <label class="block text-[11px] font-medium text-zinc-500">Filter Golongan</label>
                 <select
                     wire:model.live="selectedGolongan"
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 >
                     <option value="">-- Semua Golongan --</option>
                     @foreach($golongans as $g)
@@ -100,79 +93,79 @@
 
             <!-- Filter Status Stok -->
             <div class="space-y-1">
-                <label class="block text-xs font-medium text-zinc-500">Status Stok</label>
+                <label class="block text-[11px] font-medium text-zinc-500">Status Stok</label>
                 <select
                     wire:model.live="statusFilter"
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 >
                     <option value="">Semua Kondisi Stok</option>
-                    <option value="menipis">⚠️ Stok Menipis (&lt;= Min Stok)</option>
-                    <option value="habis">❌ Stok Kosong (0)</option>
-                    <option value="aman">✅ Stok Aman (&gt; Min Stok)</option>
+                    <option value="menipis">Stok Menipis (&le; Min Stok)</option>
+                    <option value="habis">Stok Kosong (0)</option>
+                    <option value="aman">Stok Aman (&gt; Min Stok)</option>
                 </select>
             </div>
         </div>
-    </flux:card>
+    </div>
 
-    <!-- Tabel Data Laporan Stok -->
-    <flux:card class="p-0 overflow-hidden shadow-sm">
+    <!-- Tabel Data Laporan Stok (High-Density) -->
+    <div class="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead class="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold uppercase">
+            <table class="w-full text-left text-xs whitespace-nowrap">
+                <thead class="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-200 dark:border-zinc-800">
                     <tr>
-                        <th class="py-3 px-4">Produk & Barcode</th>
-                        <th class="py-3 px-4">Golongan</th>
-                        <th class="py-3 px-4 text-right">Harga Beli</th>
-                        <th class="py-3 px-4 text-right">Harga Retail</th>
-                        <th class="py-3 px-4 text-center">Etalase</th>
-                        <th class="py-3 px-4 text-center">Gudang</th>
-                        <th class="py-3 px-4 text-center">Total Stok</th>
-                        <th class="py-3 px-4 text-center">Status</th>
-                        <th class="py-3 px-4 text-center">Aksi</th>
+                        <th class="py-2.5 px-3">Produk & Barcode</th>
+                        <th class="py-2.5 px-3">Golongan</th>
+                        <th class="py-2.5 px-3 text-right">Harga Beli</th>
+                        <th class="py-2.5 px-3 text-right">Harga Retail</th>
+                        <th class="py-2.5 px-3 text-center">Etalase</th>
+                        <th class="py-2.5 px-3 text-center">Gudang</th>
+                        <th class="py-2.5 px-3 text-center">Total Stok</th>
+                        <th class="py-2.5 px-3 text-center">Status</th>
+                        <th class="py-2.5 px-3 text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800 font-mono">
                     @forelse($products as $p)
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition">
-                            <td class="py-3 px-4">
+                            <td class="py-2 px-3 font-sans">
                                 <div class="font-semibold text-zinc-900 dark:text-zinc-100">
                                     {{ $p->nama }}
                                 </div>
-                                <div class="text-xs font-mono text-zinc-400">
+                                <div class="text-[11px] font-mono text-zinc-400">
                                     {{ $p->kode_produk }} &bull; {{ $p->satuan }}
                                 </div>
                             </td>
-                            <td class="py-3 px-4 text-xs font-medium text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
+                            <td class="py-2 px-3 text-[11px] font-sans text-zinc-600 dark:text-zinc-400">
                                 {{ $p->golongan->nama_golongan ?? '-' }}
                             </td>
-                            <td class="py-3 px-4 text-right font-mono text-xs whitespace-nowrap">
+                            <td class="py-2 px-3 text-right text-zinc-500">
                                 Rp {{ number_format($p->harga_beli, 0, ',', '.') }}
                             </td>
-                            <td class="py-3 px-4 text-right font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+                            <td class="py-2 px-3 text-right font-bold text-zinc-900 dark:text-zinc-100">
                                 Rp {{ number_format($p->harga_retail, 0, ',', '.') }}
                             </td>
-                            <td class="py-3 px-4 text-center font-mono text-xs">
+                            <td class="py-2 px-3 text-center text-zinc-600 dark:text-zinc-400">
                                 {{ $p->stok_etalase }}
                             </td>
-                            <td class="py-3 px-4 text-center font-mono text-xs">
+                            <td class="py-2 px-3 text-center text-zinc-600 dark:text-zinc-400">
                                 {{ $p->stok_gudang }}
                             </td>
-                            <td class="py-3 px-4 text-center font-mono font-black text-sm whitespace-nowrap">
-                                {{ $p->stok }} <span class="text-xs font-normal text-zinc-400">{{ $p->satuan }}</span>
+                            <td class="py-2 px-3 text-center font-bold text-zinc-900 dark:text-zinc-100">
+                                {{ $p->stok }} <span class="text-[10px] font-normal text-zinc-400">{{ $p->satuan }}</span>
                             </td>
-                            <td class="py-3 px-4 text-center whitespace-nowrap">
+                            <td class="py-2 px-3 text-center">
                                 @if($p->stok <= 0)
-                                    <flux:badge size="sm" color="rose">Habis</flux:badge>
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800">[Habis]</span>
                                 @elseif($p->stok <= $p->min_stok)
-                                    <flux:badge size="sm" color="amber">Menipis (Min: {{ $p->min_stok }})</flux:badge>
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">[Menipis: {{ $p->min_stok }}]</span>
                                 @else
-                                    <flux:badge size="sm" color="emerald">Aman</flux:badge>
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono text-zinc-500 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">[Aman]</span>
                                 @endif
                             </td>
-                            <td class="py-3 px-4 text-center whitespace-nowrap">
+                            <td class="py-2 px-3 text-center font-sans">
                                 <flux:button
                                     href="{{ route('admin.stok.penyesuaian', ['productId' => $p->id]) }}"
-                                    size="sm"
+                                    size="xs"
                                     variant="subtle"
                                     icon="adjustments-horizontal"
                                     wire:navigate
@@ -183,7 +176,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="py-12 text-center text-zinc-400">
+                            <td colspan="9" class="py-6 text-center text-xs text-zinc-400 font-sans">
                                 Tidak ada data stok yang sesuai dengan filter.
                             </td>
                         </tr>
@@ -193,9 +186,9 @@
         </div>
 
         @if($products->hasPages())
-            <div class="p-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div class="p-3 border-t border-zinc-200 dark:border-zinc-800 font-sans">
                 {{ $products->links() }}
             </div>
         @endif
-    </flux:card>
+    </div>
 </div>

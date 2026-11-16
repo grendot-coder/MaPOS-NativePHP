@@ -1,73 +1,73 @@
-<div class="space-y-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div class="space-y-5">
+    <!-- Header Halaman -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
-            <div class="flex items-center gap-2">
-                <flux:heading size="xl" level="1">Buku Kartu Stok</flux:heading>
-                <flux:badge color="blue" size="sm">Audit Log Mutasi</flux:badge>
-            </div>
+            <flux:heading size="xl" level="1">Buku Kartu Stok</flux:heading>
             <flux:subheading>Riwayat lengkap aliran barang masuk, keluar kasir, dan penyesuaian stok per tanggal.</flux:subheading>
         </div>
         <div class="flex items-center gap-2">
-            <flux:button href="{{ route('admin.stok.penyesuaian') }}" variant="primary" icon="adjustments-horizontal" wire:navigate>
+            <flux:button href="{{ route('admin.stok.penyesuaian') }}" variant="primary" size="sm" icon="adjustments-horizontal" wire:navigate>
                 + Penyesuaian Stok
             </flux:button>
         </div>
     </div>
 
-    <!-- Ringkasan Statistik Mutasi -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <flux:card class="p-4 flex items-center gap-3">
-            <div class="size-10 flex items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
-                <flux:icon name="arrow-trending-up" class="size-6" />
+    <!-- Ringkasan Statistik Mutasi (High-Density, Solid Neutral) -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Total Stok Masuk</span>
+                <flux:icon name="arrow-trending-up" class="size-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div>
-                <div class="text-xs text-zinc-500">Total Stok Masuk</div>
-                <div class="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400">+{{ number_format($totalMasuk) }}</div>
+            <div class="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                +{{ number_format($totalMasuk) }}
             </div>
-        </flux:card>
+            <div class="text-[11px] text-zinc-400">Saldo awal & koreksi tambah</div>
+        </div>
 
-        <flux:card class="p-4 flex items-center gap-3">
-            <div class="size-10 flex items-center justify-center rounded-lg bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400">
-                <flux:icon name="arrow-trending-down" class="size-6" />
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Total Stok Keluar</span>
+                <flux:icon name="arrow-trending-down" class="size-4 text-rose-600 dark:text-rose-400" />
             </div>
-            <div>
-                <div class="text-xs text-zinc-500">Total Stok Keluar</div>
-                <div class="text-xl font-bold font-mono text-rose-600 dark:text-rose-400">-{{ number_format($totalKeluar) }}</div>
+            <div class="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
+                -{{ number_format($totalKeluar) }}
             </div>
-        </flux:card>
+            <div class="text-[11px] text-zinc-400">Penjualan kasir & koreksi kurang</div>
+        </div>
 
-        <flux:card class="p-4 flex items-center gap-3">
-            <div class="size-10 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
-                <flux:icon name="document-text" class="size-6" />
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Total Mutasi Tercatat</span>
+                <flux:icon name="document-text" class="size-4 text-zinc-400" />
             </div>
-            <div>
-                <div class="text-xs text-zinc-500">Total Mutasi Tercatat</div>
-                <div class="text-xl font-bold font-mono text-zinc-800 dark:text-zinc-200">{{ number_format($totalRecords) }} Log</div>
+            <div class="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
+                {{ number_format($totalRecords) }}
             </div>
-        </flux:card>
+            <div class="text-[11px] text-zinc-400">Log transaksi tersimpan</div>
+        </div>
     </div>
 
-    <!-- Filter & Pencarian -->
-    <flux:card class="p-4 space-y-3">
+    <!-- Filter & Pencarian (Compact) -->
+    <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-3">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 items-end">
             <!-- Search Keyword -->
             <div class="space-y-1">
-                <label class="block text-xs font-medium text-zinc-500">Cari Produk / Barcode</label>
+                <label class="block text-[11px] font-medium text-zinc-500">Cari Produk / Barcode</label>
                 <input
                     type="text"
                     wire:model.live.debounce.350ms="search"
                     placeholder="Nama atau barcode..."
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 />
             </div>
 
             <!-- Filter Produk Dropdown -->
             <div class="space-y-1">
-                <label class="block text-xs font-medium text-zinc-500">Filter Produk</label>
+                <label class="block text-[11px] font-medium text-zinc-500">Filter Produk</label>
                 <select
                     wire:model.live="selectedProduct"
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 >
                     <option value="">-- Semua Produk --</option>
                     @foreach($productList as $p)
@@ -78,10 +78,10 @@
 
             <!-- Filter Jenis Mutasi -->
             <div class="space-y-1">
-                <label class="block text-xs font-medium text-zinc-500">Jenis Mutasi</label>
+                <label class="block text-[11px] font-medium text-zinc-500">Jenis Mutasi</label>
                 <select
                     wire:model.live="selectedJenis"
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 >
                     <option value="">-- Semua Jenis --</option>
                     @foreach($jenisList as $j)
@@ -92,74 +92,65 @@
 
             <!-- Rentang Tanggal Mulai -->
             <div class="space-y-1">
-                <label class="block text-xs font-medium text-zinc-500">Dari Tanggal</label>
+                <label class="block text-[11px] font-medium text-zinc-500">Dari Tanggal</label>
                 <input
                     type="date"
                     wire:model.live="startDate"
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 />
             </div>
 
             <!-- Rentang Tanggal Selesai & Reset -->
             <div class="space-y-1">
                 <div class="flex items-center justify-between">
-                    <label class="block text-xs font-medium text-zinc-500">Sampai Tanggal</label>
-                    <button type="button" wire:click="resetFilters" class="text-[11px] text-blue-600 dark:text-blue-400 hover:underline">Reset</button>
+                    <label class="block text-[11px] font-medium text-zinc-500">Sampai Tanggal</label>
+                    <button type="button" wire:click="resetFilters" class="text-[10px] text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 underline font-mono">Reset</button>
                 </div>
                 <input
                     type="date"
                     wire:model.live="endDate"
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 />
             </div>
         </div>
-    </flux:card>
+    </div>
 
-    <!-- Tabel Buku Kartu Stok -->
-    <flux:card class="p-0 overflow-hidden shadow-sm">
+    <!-- Tabel Buku Kartu Stok (High-Density) -->
+    <div class="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead class="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold uppercase">
+            <table class="w-full text-left text-xs whitespace-nowrap">
+                <thead class="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-200 dark:border-zinc-800">
                     <tr>
-                        <th class="py-3 px-4 whitespace-nowrap">Waktu</th>
-                        <th class="py-3 px-4">Produk & Barcode</th>
-                        <th class="py-3 px-4 text-center">Jenis Mutasi</th>
-                        <th class="py-3 px-4 text-center">Perubahan</th>
-                        <th class="py-3 px-4 text-center">Saldo Akhir</th>
-                        <th class="py-3 px-4">Keterangan</th>
+                        <th class="py-2.5 px-3">Waktu</th>
+                        <th class="py-2.5 px-3">Produk & Barcode</th>
+                        <th class="py-2.5 px-3 text-center">Jenis Mutasi</th>
+                        <th class="py-2.5 px-3 text-center">Perubahan</th>
+                        <th class="py-2.5 px-3 text-center">Saldo Akhir</th>
+                        <th class="py-2.5 px-3">Keterangan</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800 font-mono">
                     @forelse($movements as $m)
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition">
-                            <td class="py-3 px-4 text-xs font-mono text-zinc-500 whitespace-nowrap">
+                            <td class="py-2 px-3 text-[11px] text-zinc-500">
                                 {{ $m->created_at->format('d/m/Y H:i:s') }}
                             </td>
-                            <td class="py-3 px-4">
+                            <td class="py-2 px-3 font-sans">
                                 <div class="font-semibold text-zinc-900 dark:text-zinc-100">
                                     {{ $m->product->nama ?? 'Produk Dihapus' }}
                                 </div>
-                                <div class="text-xs font-mono text-zinc-400 flex items-center gap-2">
+                                <div class="text-[11px] font-mono text-zinc-400 flex items-center gap-2">
                                     <span>{{ $m->product->kode_produk ?? '-' }}</span>
                                     <span>&bull;</span>
                                     <span>{{ $m->product->satuan ?? 'pcs' }}</span>
                                 </div>
                             </td>
-                            <td class="py-3 px-4 text-center whitespace-nowrap">
-                                @php
-                                    $badgeColor = match($m->jenis) {
-                                        \App\Enums\StockMovementType::Penjualan => 'rose',
-                                        \App\Enums\StockMovementType::Penyesuaian => 'amber',
-                                        \App\Enums\StockMovementType::Pembelian => 'emerald',
-                                        \App\Enums\StockMovementType::Retur => 'purple',
-                                        default => 'zinc',
-                                    };
-                                @endphp
-                                <flux:badge size="sm" color="{{ $badgeColor }}">
-                                    {{ $m->jenis->label() }}
-                                </flux:badge>
+                            <td class="py-2 px-3 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                                    [{{ $m->jenis->label() }}]
+                                </span>
                             </td>
-                            <td class="py-3 px-4 text-center whitespace-nowrap font-mono font-bold text-sm">
+                            <td class="py-2 px-3 text-center font-bold">
                                 @if($m->jumlah > 0)
                                     <span class="text-emerald-600 dark:text-emerald-400">+{{ $m->jumlah }}</span>
                                 @elseif($m->jumlah < 0)
@@ -168,19 +159,16 @@
                                     <span class="text-zinc-400">0</span>
                                 @endif
                             </td>
-                            <td class="py-3 px-4 text-center font-mono font-black text-sm text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+                            <td class="py-2 px-3 text-center font-black text-zinc-900 dark:text-zinc-100">
                                 {{ $m->saldo_sesudah }}
                             </td>
-                            <td class="py-3 px-4 text-xs text-zinc-600 dark:text-zinc-400">
+                            <td class="py-2 px-3 text-xs font-sans text-zinc-600 dark:text-zinc-400">
                                 {{ $m->keterangan }}
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-zinc-400">
-                                <div class="size-10 mx-auto flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mb-2">
-                                    <flux:icon name="inbox" class="size-5" />
-                                </div>
+                            <td colspan="6" class="py-6 text-center text-xs text-zinc-400 font-sans">
                                 Tidak ada catatan mutasi stok yang sesuai dengan filter.
                             </td>
                         </tr>
@@ -190,9 +178,9 @@
         </div>
 
         @if($movements->hasPages())
-            <div class="p-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div class="p-3 border-t border-zinc-200 dark:border-zinc-800 font-sans">
                 {{ $movements->links() }}
             </div>
         @endif
-    </flux:card>
+    </div>
 </div>

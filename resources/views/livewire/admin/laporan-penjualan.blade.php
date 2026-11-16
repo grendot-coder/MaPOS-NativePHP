@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-5">
     <!-- CSS Cetak Struk Khusus (@media print fallback) -->
     <style>
         @media print {
@@ -43,146 +43,122 @@
         }
     </style>
 
-    <!-- Header -->
-    <div class="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <!-- Header Halaman -->
+    <div class="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
-            <div class="flex items-center gap-2">
-                <flux:heading size="xl" level="1">Laporan Penjualan</flux:heading>
-                <flux:badge color="emerald" size="sm">Omzet & Rekap Nota</flux:badge>
-            </div>
+            <flux:heading size="xl" level="1">Laporan Penjualan</flux:heading>
             <flux:subheading>Rekapitulasi penjualan kasir, total pendapatan, rincian nota, dan cetak ulang struk belanja.</flux:subheading>
         </div>
         <div class="flex items-center gap-2">
-            <flux:button href="{{ route('kasir.pos') }}" variant="subtle" icon="shopping-cart" wire:navigate>
+            <flux:button href="{{ route('kasir.pos') }}" variant="subtle" size="sm" icon="shopping-cart" wire:navigate>
                 Buka Kasir POS
             </flux:button>
         </div>
     </div>
 
-    <!-- KPI Ringkasan Statistik -->
-    <div class="no-print grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- KPI Ringkasan Statistik (High-Density, Solid Neutral) -->
+    <div class="no-print grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <!-- Total Omzet -->
-        <flux:card class="p-4 bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-center gap-3">
-            <div class="size-11 flex items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
-                <flux:icon name="banknotes" class="size-6" />
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Total Omzet Penjualan</span>
+                <flux:icon name="banknotes" class="size-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div>
-                <div class="text-xs text-emerald-800 dark:text-emerald-300 font-medium">Total Omzet Penjualan</div>
-                <div class="text-xl font-black font-mono text-emerald-700 dark:text-emerald-300">
-                    Rp {{ number_format($totalOmzet, 0, ',', '.') }}
-                </div>
+            <div class="text-2xl font-black font-mono text-zinc-900 dark:text-zinc-100">
+                Rp {{ number_format($totalOmzet, 0, ',', '.') }}
             </div>
-        </flux:card>
-
-        <!-- Total Transaksi -->
-        <flux:card class="p-4 flex items-center gap-3">
-            <div class="size-11 flex items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
-                <flux:icon name="receipt-percent" class="size-6" />
-            </div>
-            <div>
-                <div class="text-xs text-zinc-500">Total Transaksi (Nota)</div>
-                <div class="text-xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
-                    {{ number_format($totalTransaksi) }} Transaksi
-                </div>
-            </div>
-        </flux:card>
-
-        <!-- Total Item Terjual -->
-        <flux:card class="p-4 flex items-center gap-3">
-            <div class="size-11 flex items-center justify-center rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400">
-                <flux:icon name="shopping-bag" class="size-6" />
-            </div>
-            <div>
-                <div class="text-xs text-zinc-500">Total Barang Terjual</div>
-                <div class="text-xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
-                    {{ number_format($totalItemTerjual) }} Pcs / Item
-                </div>
-            </div>
-        </flux:card>
-
-        <!-- Rata-rata Belanja -->
-        <flux:card class="p-4 flex items-center gap-3">
-            <div class="size-11 flex items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400">
-                <flux:icon name="calculator" class="size-6" />
-            </div>
-            <div>
-                <div class="text-xs text-zinc-500">Rata-Rata per Transaksi</div>
-                <div class="text-xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
-                    Rp {{ number_format($rataRataBelanja, 0, ',', '.') }}
-                </div>
-            </div>
-        </flux:card>
-    </div>
-
-    <!-- Filter & Pilihan Periode -->
-    <flux:card class="no-print p-4 space-y-3">
-        <!-- Preset Tombol Cepat Periode -->
-        <div class="flex flex-wrap items-center gap-2">
-            <span class="text-xs font-semibold text-zinc-500">Periode:</span>
-            <button
-                type="button"
-                wire:click="setPeriod('today')"
-                class="px-3 py-1 rounded-md text-xs font-semibold border {{ $period === 'today' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200' }} transition"
-            >
-                Hari Ini
-            </button>
-            <button
-                type="button"
-                wire:click="setPeriod('yesterday')"
-                class="px-3 py-1 rounded-md text-xs font-semibold border {{ $period === 'yesterday' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200' }} transition"
-            >
-                Kemarin
-            </button>
-            <button
-                type="button"
-                wire:click="setPeriod('this_week')"
-                class="px-3 py-1 rounded-md text-xs font-semibold border {{ $period === 'this_week' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200' }} transition"
-            >
-                Minggu Ini
-            </button>
-            <button
-                type="button"
-                wire:click="setPeriod('this_month')"
-                class="px-3 py-1 rounded-md text-xs font-semibold border {{ $period === 'this_month' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200' }} transition"
-            >
-                Bulan Ini
-            </button>
-            <button
-                type="button"
-                wire:click="setPeriod('last_month')"
-                class="px-3 py-1 rounded-md text-xs font-semibold border {{ $period === 'last_month' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200' }} transition"
-            >
-                Bulan Lalu
-            </button>
+            <div class="text-[11px] text-zinc-400">Pendapatan kotor kasir</div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 border-t border-zinc-200 dark:border-zinc-800 items-end">
+        <!-- Total Transaksi -->
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Total Transaksi (Nota)</span>
+                <flux:icon name="receipt-percent" class="size-4 text-zinc-400" />
+            </div>
+            <div class="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
+                {{ number_format($totalTransaksi) }}
+            </div>
+            <div class="text-[11px] text-zinc-400">Struk / nota belanja terbit</div>
+        </div>
+
+        <!-- Total Item Terjual -->
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Total Barang Terjual</span>
+                <flux:icon name="shopping-bag" class="size-4 text-zinc-400" />
+            </div>
+            <div class="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
+                {{ number_format($totalItemTerjual) }}
+            </div>
+            <div class="text-[11px] text-zinc-400">Pcs / kemasan barang</div>
+        </div>
+
+        <!-- Rata-rata Belanja -->
+        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <span>Rata-Rata per Transaksi</span>
+                <flux:icon name="calculator" class="size-4 text-zinc-400" />
+            </div>
+            <div class="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
+                Rp {{ number_format($rataRataBelanja, 0, ',', '.') }}
+            </div>
+            <div class="text-[11px] text-zinc-400">Basket size per pelanggan</div>
+        </div>
+    </div>
+
+    <!-- Filter & Pilihan Periode (Compact) -->
+    <div class="no-print p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-3">
+        <!-- Preset Tombol Cepat Periode -->
+        <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-[11px] font-semibold text-zinc-500 mr-1 uppercase tracking-wide">Periode:</span>
+            @php
+                $periods = [
+                    'today' => 'Hari Ini',
+                    'yesterday' => 'Kemarin',
+                    'this_week' => 'Minggu Ini',
+                    'this_month' => 'Bulan Ini',
+                    'last_month' => 'Bulan Lalu',
+                ];
+            @endphp
+            @foreach($periods as $key => $label)
+                <button
+                    type="button"
+                    wire:click="setPeriod('{{ $key }}')"
+                    class="px-2.5 py-1 rounded text-xs font-mono {{ $period === $key ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-bold' : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200' }} border transition"
+                >
+                    {{ $label }}
+                </button>
+            @endforeach
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-zinc-200 dark:border-zinc-800 items-end">
             <!-- Dari Tanggal -->
             <div class="space-y-1">
-                <label class="block text-xs font-medium text-zinc-500">Dari Tanggal</label>
+                <label class="block text-[11px] font-medium text-zinc-500">Dari Tanggal</label>
                 <input
                     type="date"
                     wire:model.live="startDate"
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 />
             </div>
 
             <!-- Sampai Tanggal -->
             <div class="space-y-1">
-                <label class="block text-xs font-medium text-zinc-500">Sampai Tanggal</label>
+                <label class="block text-[11px] font-medium text-zinc-500">Sampai Tanggal</label>
                 <input
                     type="date"
                     wire:model.live="endDate"
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 />
             </div>
 
             <!-- Filter Kasir -->
             <div class="space-y-1">
-                <label class="block text-xs font-medium text-zinc-500">Filter Kasir</label>
+                <label class="block text-[11px] font-medium text-zinc-500">Filter Kasir</label>
                 <select
                     wire:model.live="selectedKasir"
-                    class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+                    class="w-full text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-900 dark:text-zinc-100"
                 >
                     <option value="">-- Semua Kasir --</option>
                     @foreach($kasirList as $k)
@@ -191,66 +167,61 @@
                 </select>
             </div>
         </div>
-    </flux:card>
+    </div>
 
-    <!-- Tabel Daftar Penjualan -->
-    <flux:card class="no-print p-0 overflow-hidden shadow-sm">
+    <!-- Tabel Daftar Penjualan (High-Density) -->
+    <div class="no-print rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead class="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold uppercase">
+            <table class="w-full text-left text-xs whitespace-nowrap">
+                <thead class="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 uppercase text-[11px] font-semibold border-b border-zinc-200 dark:border-zinc-800">
                     <tr>
-                        <th class="py-3 px-4">No. Transaksi</th>
-                        <th class="py-3 px-4">Waktu</th>
-                        <th class="py-3 px-4">Kasir</th>
-                        <th class="py-3 px-4 text-center">Item</th>
-                        <th class="py-3 px-4 text-right">Total Belanja</th>
-                        <th class="py-3 px-4 text-right">Bayar</th>
-                        <th class="py-3 px-4 text-right">Kembalian</th>
-                        <th class="py-3 px-4 text-center">Aksi</th>
+                        <th class="py-2.5 px-3">No. Transaksi</th>
+                        <th class="py-2.5 px-3">Waktu</th>
+                        <th class="py-2.5 px-3">Kasir</th>
+                        <th class="py-2.5 px-3 text-center">Item</th>
+                        <th class="py-2.5 px-3 text-right">Total Belanja</th>
+                        <th class="py-2.5 px-3 text-right">Bayar</th>
+                        <th class="py-2.5 px-3 text-right">Kembalian</th>
+                        <th class="py-2.5 px-3 text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800 font-mono">
                     @forelse($sales as $s)
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition">
-                            <td class="py-3 px-4 font-mono font-bold text-xs text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                            <td class="py-2 px-3 font-bold text-zinc-900 dark:text-zinc-100">
                                 {{ $s->no_transaksi }}
                             </td>
-                            <td class="py-3 px-4 text-xs font-mono text-zinc-500 whitespace-nowrap">
+                            <td class="py-2 px-3 text-[11px] text-zinc-500">
                                 {{ $s->waktu->format('d/m/Y H:i') }}
                             </td>
-                            <td class="py-3 px-4 font-medium text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+                            <td class="py-2 px-3 font-sans font-medium text-zinc-800 dark:text-zinc-200">
                                 {{ $s->kasir->name ?? 'Kasir Dihapus' }}
                             </td>
-                            <td class="py-3 px-4 text-center font-mono">
-                                <flux:badge size="sm" color="zinc">{{ $s->items->sum('qty') }} item</flux:badge>
+                            <td class="py-2 px-3 text-center">
+                                <span class="font-mono text-zinc-600 dark:text-zinc-400">{{ $s->items->sum('qty') }} item</span>
                             </td>
-                            <td class="py-3 px-4 text-right font-mono font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+                            <td class="py-2 px-3 text-right font-bold text-zinc-900 dark:text-zinc-100">
                                 Rp {{ number_format($s->total, 0, ',', '.') }}
                             </td>
-                            <td class="py-3 px-4 text-right font-mono text-xs text-zinc-500 whitespace-nowrap">
+                            <td class="py-2 px-3 text-right text-zinc-500">
                                 Rp {{ number_format($s->bayar, 0, ',', '.') }}
                             </td>
-                            <td class="py-3 px-4 text-right font-mono text-xs text-emerald-600 dark:text-emerald-400 font-semibold whitespace-nowrap">
+                            <td class="py-2 px-3 text-right text-zinc-600 dark:text-zinc-300">
                                 Rp {{ number_format($s->kembali, 0, ',', '.') }}
                             </td>
-                            <td class="py-3 px-4 text-center whitespace-nowrap">
-                                <flux:button
+                            <td class="py-2 px-3 text-center font-sans">
+                                <button
                                     type="button"
                                     wire:click="showReceipt('{{ $s->id }}')"
-                                    size="sm"
-                                    variant="subtle"
-                                    icon="document-magnifying-glass"
+                                    class="px-2 py-1 rounded text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 transition"
                                 >
                                     Struk / Detail
-                                </flux:button>
+                                </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="py-12 text-center text-zinc-400">
-                                <div class="size-10 mx-auto flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mb-2">
-                                    <flux:icon name="receipt-percent" class="size-5" />
-                                </div>
+                            <td colspan="8" class="py-6 text-center text-xs text-zinc-400 font-sans">
                                 Tidak ada transaksi penjualan yang tercatat pada periode ini.
                             </td>
                         </tr>
@@ -260,119 +231,111 @@
         </div>
 
         @if($sales->hasPages())
-            <div class="p-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div class="p-3 border-t border-zinc-200 dark:border-zinc-800 font-sans">
                 {{ $sales->links() }}
             </div>
         @endif
-    </flux:card>
+    </div>
 
-    <!-- Modal Detail & Cetak Ulang Struk -->
+    <!-- MODAL CETAK STRUK PEMBAYARAN KASIR -->
     <flux:modal wire:model="showReceiptModal" class="md:w-[440px] space-y-4">
         <div class="no-print">
             <div class="flex items-center gap-2">
-                <flux:icon name="printer" class="size-6 text-emerald-600 dark:text-emerald-400" />
-                <flux:heading size="lg">Salinan Struk Penjualan</flux:heading>
+                <flux:icon name="printer" class="size-5 text-emerald-600 dark:text-emerald-400" />
+                <flux:heading size="lg">Detail & Cetak Ulang Struk</flux:heading>
             </div>
-            <flux:subheading>Detail nota belanja pelanggan & cetak ulang (*reprint*).</flux:subheading>
+            <flux:subheading>Pratinjau struk kasir untuk transaksi yang dipilih.</flux:subheading>
         </div>
 
         @if($selectedSale)
-            <!-- Area Preview / Cetak Struk (Thermal 58mm/80mm) -->
-            <div id="laporan-receipt-print-area" class="p-4 bg-white text-zinc-900 border border-dashed border-zinc-300 rounded-lg shadow-inner font-mono text-xs leading-relaxed space-y-2">
-                <!-- Header Toko -->
-                <div class="text-center space-y-0.5 pb-2 border-b border-dashed border-zinc-400">
-                    <div class="text-base font-bold tracking-wider">MAPOS MINIMARKET</div>
-                    <div class="text-[10px] text-zinc-600">Sistem Kasir & Manajemen POS</div>
-                    <div class="text-[10px] text-zinc-500">Jl. Pelajar PKL No. 10 - Telp: (021) 555-MAPOS</div>
-                    <div class="text-[9px] uppercase tracking-widest text-zinc-400 font-bold mt-1">*** SALINAN / REPRINT ***</div>
-                </div>
+        <!-- Area Struk Thermal 80mm/58mm -->
+        <div id="laporan-receipt-print-area" class="p-4 bg-white text-zinc-900 border border-dashed border-zinc-300 rounded shadow-inner font-mono text-xs leading-relaxed space-y-2">
+            <!-- Header Toko -->
+            <div class="text-center space-y-0.5 pb-2 border-b border-dashed border-zinc-400">
+                <div class="text-base font-bold tracking-wider">MAPOS MINIMARKET</div>
+                <div class="text-[10px] text-zinc-600">Sistem Kasir & Manajemen POS</div>
+                <div class="text-[10px] text-zinc-500">Jl. Soedirman No. 10 - Telp: (085) 555-555-555</div>
+            </div>
 
-                <!-- Info Transaksi -->
-                <div class="text-[11px] space-y-0.5 pb-1 border-b border-dashed border-zinc-300">
-                    <div class="flex justify-between">
-                        <span>No. Transaksi:</span>
-                        <span class="font-bold">{{ $selectedSale->no_transaksi }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Waktu:</span>
-                        <span>{{ $selectedSale->waktu->format('d/m/Y H:i:s') }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Kasir:</span>
-                        <span>{{ $selectedSale->kasir->name ?? 'Kasir' }}</span>
-                    </div>
+            <!-- Info Transaksi -->
+            <div class="text-[11px] space-y-0.5 pb-1 border-b border-dashed border-zinc-300">
+                <div class="flex justify-between">
+                    <span>No. Transaksi:</span>
+                    <span class="font-bold">{{ $selectedSale->no_transaksi }}</span>
                 </div>
-
-                <!-- Daftar Item Belanja -->
-                <div class="space-y-1.5 py-1 border-b border-dashed border-zinc-300">
-                    @foreach($selectedSale->items as $item)
-                        <div>
-                            <div class="font-semibold">{{ $item->nama_produk }}</div>
-                            <div class="flex justify-between text-[11px] text-zinc-600">
-                                <span>{{ $item->qty }} x {{ number_format($item->harga_satuan, 0, ',', '.') }}</span>
-                                <span class="font-bold text-zinc-900">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
-                            </div>
-                            @php
-                                $normalSubtotal = $item->qty * $item->harga_satuan;
-                                $hematItem = $normalSubtotal - $item->subtotal;
-                            @endphp
-                            @if($hematItem > 0)
-                            <div class="flex justify-between text-[10px] text-emerald-700 italic">
-                                <span>* Diskon item</span>
-                                <span>-Rp {{ number_format($hematItem, 0, ',', '.') }}</span>
-                            </div>
-                            @endif
-                        </div>
-                    @endforeach
+                <div class="flex justify-between">
+                    <span>Waktu:</span>
+                    <span>{{ $selectedSale->waktu->format('d/m/Y H:i:s') }}</span>
                 </div>
-
-                <!-- Rincian Total, Bayar & Kembali -->
-                <div class="space-y-1 pt-1 pb-2 border-b border-dashed border-zinc-400 text-xs">
-                    <div class="flex justify-between text-[11px] text-zinc-600">
-                        <span>Total Item / Qty:</span>
-                        <span>{{ $selectedSale->items->count() }} jenis ({{ $selectedSale->items->sum('qty') }} pcs)</span>
-                    </div>
-                    <div class="flex justify-between font-bold text-sm">
-                        <span>TOTAL</span>
-                        <span>Rp {{ number_format($selectedSale->total, 0, ',', '.') }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Tunai / Bayar</span>
-                        <span>Rp {{ number_format($selectedSale->bayar, 0, ',', '.') }}</span>
-                    </div>
-                    <div class="flex justify-between font-bold">
-                        <span>Kembali</span>
-                        <span>Rp {{ number_format($selectedSale->kembali, 0, ',', '.') }}</span>
-                    </div>
-                </div>
-
-                <!-- Footer Struk -->
-                <div class="text-center text-[10px] text-zinc-500 pt-2 space-y-0.5">
-                    <div>*** TERIMA KASIH ATAS KUNJUNGAN ANDA ***</div>
-                    <div>Barang yang sudah dibeli tidak dapat ditukar/dikembalikan</div>
+                <div class="flex justify-between">
+                    <span>Kasir:</span>
+                    <span>{{ $selectedSale->kasir->name ?? 'Kasir' }}</span>
                 </div>
             </div>
+
+            <!-- Daftar Item Belanja -->
+            <div class="space-y-1.5 py-1 border-b border-dashed border-zinc-300">
+                @foreach($selectedSale->items as $item)
+                <div>
+                    <div class="font-semibold">{{ $item->nama_produk }}</div>
+                    <div class="flex justify-between text-[11px] text-zinc-600">
+                        <span>{{ $item->qty }} x {{ number_format($item->harga_satuan, 0, ',', '.') }}</span>
+                        <span class="font-bold text-zinc-900">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <!-- Rincian Total, Bayar & Kembali -->
+            <div class="space-y-1 pt-1 pb-2 border-b border-dashed border-zinc-400 text-xs">
+                <div class="flex justify-between text-[11px] text-zinc-600">
+                    <span>Total Item / Qty:</span>
+                    <span>{{ $selectedSale->items->count() }} jenis ({{ $selectedSale->items->sum('qty') }} pcs)</span>
+                </div>
+                <div class="flex justify-between font-bold text-sm">
+                    <span>TOTAL</span>
+                    <span>Rp {{ number_format($selectedSale->total, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Tunai / Bayar</span>
+                    <span>Rp {{ number_format($selectedSale->bayar, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between font-bold">
+                    <span>Kembali</span>
+                    <span>Rp {{ number_format($selectedSale->kembali, 0, ',', '.') }}</span>
+                </div>
+            </div>
+
+            <!-- Footer Struk -->
+            <div class="text-center text-[10px] text-zinc-500 pt-2 space-y-0.5">
+                <div>*** TERIMA KASIH ATAS KUNJUNGAN ANDA ***</div>
+                <div>Barang yang sudah dibeli tidak dapat ditukar/dikembalikan</div>
+            </div>
+        </div>
         @endif
 
+        <!-- Tombol Aksi Modal Struk -->
         <div class="no-print space-y-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
             <div class="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400">
-                <span class="font-medium">Ukuran Kertas Thermal:</span>
-                <select id="laporan-paper-size" class="text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded px-2.5 py-1 font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                    <option value="80mm" selected>Thermal 80mm (Standar POS)</option>
-                    <option value="58mm">Thermal 58mm (Mini POS)</option>
+                <span class="font-medium">Ukuran Kertas:</span>
+                <select id="laporan-paper-size" class="text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded px-2.5 py-1 font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none">
+                    <option value="80mm" selected>Thermal 80mm</option>
+                    <option value="58mm">Thermal 58mm</option>
                 </select>
             </div>
             <div class="flex items-center justify-between gap-2">
-                <flux:button type="button" wire:click="closeReceiptModal" variant="subtle">
+                <flux:button type="button" wire:click="closeReceiptModal" variant="subtle" size="sm">
                     Tutup
                 </flux:button>
                 <flux:button
                     type="button"
                     onclick="const s = document.getElementById('laporan-paper-size')?.value || '80mm'; window.printThermalReceipt('laporan-receipt-print-area', s);"
                     variant="primary"
+                    size="sm"
                     class="bg-emerald-600 hover:bg-emerald-700"
-                    icon="printer">
-                    Cetak Ulang Struk
+                    icon="printer"
+                >
+                    Cetak Struk
                 </flux:button>
             </div>
         </div>
