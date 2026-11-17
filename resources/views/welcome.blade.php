@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,6 +11,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @fluxAppearance
 </head>
+
 <body class="min-h-screen bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans flex flex-col justify-between p-6">
 
     <!-- Header Terminal Minimalis -->
@@ -20,7 +22,7 @@
             </div>
             <div>
                 <div class="font-bold text-sm tracking-wide leading-tight">MaPOS WORKSTATION</div>
-                <div class="text-[11px] text-zinc-500 font-mono">Retail Point of Sale v1.0</div>
+                <div class="text-[11px] text-zinc-500 font-mono">Retail Point of Sale v1.1.0</div>
             </div>
         </div>
 
@@ -123,4 +125,5 @@
     </footer>
 
 </body>
+
 </html>

@@ -16,7 +16,7 @@ class NativeAppServiceProvider implements ProvidesPhpIni
     {
         // 1. Buka jendela utama aplikasi desktop
         Window::open()
-            ->title('MaPOS - Manajemen Point of Sale v1.0')
+            ->title('MaPOS - Manajemen POS v1.1.0')
             ->width(1280)
             ->height(800)
             ->minWidth(1024)
@@ -41,8 +41,12 @@ class NativeAppServiceProvider implements ProvidesPhpIni
     {
         return [
             'memory_limit' => '512M',
-            'display_errors' => '1',
-            'error_reporting' => 'E_ALL',
+            'display_errors' => app()->environment('local') ? '1' : '0',
+            'error_reporting' => app()->environment('local') ? 'E_ALL' : 'E_NONE',
+            'opcache.enable' => '1',
+            'opcache.enable_cli' => '1',
+            'opcache.memory_consumption' => '128',
+            'opcache.max_accelerated_files' => '10000',
         ];
     }
 }
