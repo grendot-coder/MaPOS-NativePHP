@@ -6,14 +6,15 @@ use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\GolonganIndex;
 use App\Livewire\Admin\LaporanPenjualan;
 use App\Livewire\Admin\LaporanStok;
+use App\Livewire\Admin\PengeluaranIndex;
 use App\Livewire\Admin\ProdukForm;
 use App\Livewire\Admin\ProdukIndex;
+use App\Livewire\Admin\ProfilToko;
 use App\Livewire\Admin\StokPenyesuaian;
 use App\Livewire\Admin\StokRiwayat;
 use App\Livewire\Kasir\PosIndex as KasirPosIndex;
 use App\Livewire\Kasir\RiwayatPenjualan;
 use Illuminate\Support\Facades\Route;
-use App\Livewire\Admin\PengeluaranIndex;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -49,6 +50,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('/pengeluaran', PengeluaranIndex::class)->name('pengeluaran.index');
         Route::get('/laporan/penjualan', LaporanPenjualan::class)->name('laporan.penjualan');
         Route::get('/laporan/stok', LaporanStok::class)->name('laporan.stok');
+        Route::get('/profil-toko', ProfilToko::class)->name('profil-toko');
     });
 
 Route::middleware(['auth', 'verified', 'role:kasir,admin'])

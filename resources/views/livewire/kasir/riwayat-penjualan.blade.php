@@ -185,14 +185,17 @@
         </div>
 
         @if($selectedSale)
+        @php $storeProfile = \App\Models\StoreProfile::getProfile(); @endphp
         <!-- Area Cetak Struk (Thermal 80mm/58mm) -->
         <div id="kasir-receipt-print-area" class="p-4 bg-white text-zinc-900 border border-dashed border-zinc-300 rounded shadow-inner font-mono text-xs leading-relaxed space-y-2">
             <!-- Header Toko -->
             <div class="text-center space-y-0.5 pb-2 border-b border-dashed border-zinc-400">
-                <div class="text-base font-bold tracking-wider">MAPOS MINIMARKET</div>
+                <div class="text-base font-bold tracking-wider">{{ $storeProfile->nama_toko }}</div>
                 <div class="text-[10px] text-zinc-600 font-bold">*** SALINAN / REPRINT ***</div>
-                <div class="text-[10px] text-zinc-600">Sistem Kasir & Manajemen POS</div>
-                <div class="text-[10px] text-zinc-500">Jl. Soedirman No. 10 - Telp: (085) 555-555-555</div>
+                @if($storeProfile->slogan)
+                <div class="text-[10px] text-zinc-600">{{ $storeProfile->slogan }}</div>
+                @endif
+                <div class="text-[10px] text-zinc-500">{{ $storeProfile->alamat }} {{ filled($storeProfile->telepon) ? '- Telp: '.$storeProfile->telepon : '' }}</div>
             </div>
 
             <!-- Info Transaksi -->
@@ -247,7 +250,7 @@
             <!-- Footer Struk -->
             <div class="text-center text-[10px] text-zinc-500 pt-2 space-y-0.5">
                 <div>*** TERIMA KASIH ATAS KUNJUNGAN ANDA ***</div>
-                <div>Barang yang sudah dibeli tidak dapat ditukar/dikembalikan</div>
+                <div>{{ $storeProfile->footer_struk ?: 'Barang yang sudah dibeli tidak dapat ditukar/dikembalikan' }}</div>
             </div>
         </div>
         @endif

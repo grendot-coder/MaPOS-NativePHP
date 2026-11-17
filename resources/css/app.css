@@ -61,6 +61,25 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
+/* Indikator Loading & Progress Bar Navigasi POS Workstation (Bukan Template Laravel) */
+[data-livewire-navigate-progress],
+#nprogress .bar,
+.livewire-navigation-progress-bar,
+div[role="progressbar"] {
+    background: #059669 !important; /* Emerald 600 */
+    height: 2.5px !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+#nprogress .peg {
+    box-shadow: none !important;
+}
+
+#nprogress .spinner {
+    display: none !important;
+}
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
