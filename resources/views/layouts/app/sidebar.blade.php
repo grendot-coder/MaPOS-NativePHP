@@ -143,17 +143,6 @@
 
     {{ $slot }}
 
-    <!-- Workstation Subtle Loading Status (Non-overkill, Clean POS indicator) -->
-    <div wire:loading.delay.200ms class="fixed top-3 right-4 z-50 pointer-events-none transition-opacity duration-150">
-        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-zinc-900/90 dark:bg-zinc-100/90 text-zinc-100 dark:text-zinc-900 text-[11px] font-mono font-medium shadow-sm border border-zinc-700/50 dark:border-zinc-300/50">
-            <svg class="animate-spin size-3" viewBox="0 0 24 24" fill="none">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-            </svg>
-            <span>Memproses...</span>
-        </div>
-    </div>
-
     @persist('toast')
     <flux:toast.group>
         <flux:toast />
