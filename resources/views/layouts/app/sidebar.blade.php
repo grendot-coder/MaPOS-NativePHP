@@ -39,6 +39,9 @@
                 <flux:sidebar.item icon="shopping-cart" :href="route('kasir.pos')" :current="request()->routeIs('kasir.pos')" wire:navigate>
                     Layar Kasir (POS)
                 </flux:sidebar.item>
+                <flux:sidebar.item icon="arrow-down-tray" :href="route('admin.pembelian.index')" :current="request()->routeIs('admin.pembelian.*')" wire:navigate>
+                    Pembelian (Restock)
+                </flux:sidebar.item>
                 <flux:sidebar.item icon="banknotes" :href="route('admin.pengeluaran.index')" :current="request()->routeIs('admin.pengeluaran.index')" wire:navigate>
                     Pengeluaran & Kasbon
                 </flux:sidebar.item>

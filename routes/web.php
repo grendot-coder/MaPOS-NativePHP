@@ -6,6 +6,8 @@ use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\GolonganIndex;
 use App\Livewire\Admin\LaporanPenjualan;
 use App\Livewire\Admin\LaporanStok;
+use App\Livewire\Admin\PembelianForm;
+use App\Livewire\Admin\PembelianIndex;
 use App\Livewire\Admin\PengeluaranIndex;
 use App\Livewire\Admin\ProdukForm;
 use App\Livewire\Admin\ProdukIndex;
@@ -47,6 +49,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('/barcode/print-label', BarcodePrintLabel::class)->name('barcode.print-label');
         Route::get('/stok/penyesuaian', StokPenyesuaian::class)->name('stok.penyesuaian');
         Route::get('/stok/riwayat', StokRiwayat::class)->name('stok.riwayat');
+        Route::get('/pembelian', PembelianIndex::class)->name('pembelian.index');
+        Route::get('/pembelian/create', PembelianForm::class)->name('pembelian.create');
         Route::get('/pengeluaran', PengeluaranIndex::class)->name('pengeluaran.index');
         Route::get('/laporan/penjualan', LaporanPenjualan::class)->name('laporan.penjualan');
         Route::get('/laporan/stok', LaporanStok::class)->name('laporan.stok');
