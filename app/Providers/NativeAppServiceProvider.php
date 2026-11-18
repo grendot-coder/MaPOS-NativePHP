@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Native\Desktop\Contracts\ProvidesPhpIni;
+use Native\Desktop\Facades\Menu;
 use Native\Desktop\Facades\Window;
 
 class NativeAppServiceProvider implements ProvidesPhpIni
@@ -14,17 +15,21 @@ class NativeAppServiceProvider implements ProvidesPhpIni
      */
     public function boot(): void
     {
-        // 1. Buka jendela utama aplikasi desktop
+        // 1. Sembunyikan menu bar bawaan Electron (File, Edit, View, dsb) agar border garis putih hilang
+        Menu::create();
+
+        // 2. Buka jendela utama aplikasi desktop
         Window::open()
             ->title('MaPOS - Manajemen POS v1.1.0')
             ->width(1280)
             ->height(800)
             ->minWidth(1024)
             ->minHeight(700)
+            ->hideMenu()
             ->rememberState()
             ->showDevTools(app()->environment('local'));
 
-        // 2. Auto-seed data awal jika database lokal desktop masih kosong
+        // 3. Auto-seed data awal jika database lokal desktop masih kosong
         try {
             if (User::count() === 0) {
                 Artisan::call('db:seed', ['--force' => true]);
