@@ -92,6 +92,8 @@ return [
      * You may use glob / wildcard patterns here.
      */
     'cleanup_exclude_files' => [
+        '.git*',
+        '.github*',
         'build*',
         'temp*',
         'content*',
@@ -195,6 +197,9 @@ return [
      */
     'prebuild' => [
         'npm run build',
+        'php artisan config:cache',
+        'php artisan route:cache',
+        'php artisan view:cache',
     ],
 
     'postbuild' => [

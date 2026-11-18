@@ -42,6 +42,11 @@ return [
             'journal_mode' => env('DB_JOURNAL_MODE', 'WAL'),
             'synchronous' => env('DB_SYNCHRONOUS', 'NORMAL'),
             'transaction_mode' => 'DEFERRED',
+            'pragmas' => [
+                'temp_store' => 'MEMORY',
+                'cache_size' => -64000,
+                'mmap_size' => 268435456,
+            ],
         ],
 
         'mysql' => [
