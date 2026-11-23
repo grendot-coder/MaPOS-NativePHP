@@ -9,7 +9,7 @@
         </div>
         <div class="flex items-center gap-2">
             <flux:button href="{{ route('admin.produk.create') }}" variant="primary" icon="plus" wire:navigate>
-                Tambah Produk (F8)
+                Tambah Produk
             </flux:button>
         </div>
     </div>
@@ -47,13 +47,13 @@
                     <option value="25">25 Baris (Default)</option>
                     <option value="50">50 Baris</option>
                     <option value="100">100 Baris</option>
-                    <option value="200">200 Baris (MaPOS Max)</option>
+                    <option value="200">200 Baris</option>
                 </select>
             </div>
         </div>
     </flux:card>
 
-    <!-- Tabel Data Produk SmartPos -->
+    <!-- Tabel Data Produk MaPOS -->
     <flux:card class="p-0 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs whitespace-nowrap">
@@ -97,7 +97,7 @@
                                 {{ $products->firstItem() + $index }}
                             </td>
                             <td class="py-2.5 px-3 font-mono font-bold text-zinc-900 dark:text-zinc-100">
-                                <button type="button" wire:click="showBarcode('{{ $p->id }}')" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-200/60 dark:bg-zinc-700/60 hover:bg-indigo-100 dark:hover:bg-indigo-950/60 text-xs transition cursor-pointer group" title="Klik untuk pratinjau barcode">
+                                <button type="button" wire:click="showBarcode('{{ $p->id }}')" class="inline-flex items-center gap-1.5 font-mono font-medium text-xs text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer group" title="Klik untuk pratinjau barcode">
                                     <flux:icon name="qr-code" class="size-3.5 text-zinc-400 group-hover:text-indigo-500" />
                                     <span>{{ $p->kode_produk }}</span>
                                 </button>
@@ -142,7 +142,9 @@
                             <td class="py-2.5 px-3 text-right font-mono font-bold {{ $isLowStock ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-900 dark:text-zinc-100' }}">
                                 {{ $p->stok }}
                                 @if($isLowStock)
-                                <span class="text-xs text-amber-500" title="Stok kritis &le; minimum">⚠️</span>
+                                <span class="inline-flex items-center ml-1 text-amber-500" title="Stok kritis &le; minimum">
+                                    <flux:icon name="exclamation-triangle" class="size-3.5 inline-block" />
+                                </span>
                                 @endif
                             </td>
                             <td class="py-2.5 px-3 text-right text-zinc-400 font-mono">
@@ -150,8 +152,8 @@
                             </td>
                             <td class="py-2.5 px-3 text-center space-x-1">
                                 <flux:button href="{{ route('admin.barcode.print-label', ['product_id' => $p->id]) }}" size="xs" variant="subtle" icon="printer" wire:navigate title="Cetak Label Barcode" />
-                                <flux:button href="{{ route('admin.produk.edit', $p->id) }}" size="xs" variant="subtle" icon="pencil-square" wire:navigate title="Edit Produk (F9)" />
-                                <flux:button wire:click="delete('{{ $p->id }}')" wire:confirm="Yakin ingin menghapus produk {{ $p->nama }}?" size="xs" variant="danger" icon="trash" title="Hapus Produk (F10)" />
+                                <flux:button href="{{ route('admin.produk.edit', $p->id) }}" size="xs" variant="subtle" icon="pencil-square" wire:navigate title="Edit Produk" />
+                                <flux:button wire:click="delete('{{ $p->id }}')" wire:confirm="Yakin ingin menghapus produk {{ $p->nama }}?" size="xs" variant="danger" icon="trash" title="Hapus Produk" />
                             </td>
                         </tr>
                         @empty

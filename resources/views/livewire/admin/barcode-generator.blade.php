@@ -38,7 +38,7 @@
                 </div>
             </flux:card>
 
-            <!-- 2. Pembuat Kode Internal (Format Acuan PKL) -->
+            <!-- 2. Pembuat Kode Internal -->
             <flux:card class="space-y-4 bg-zinc-50 dark:bg-zinc-800/40">
                 <div>
                     <flux:heading size="md">Buat Barcode Internal</flux:heading>
@@ -69,7 +69,7 @@
                         <flux:icon name="qr-code" class="size-5 text-indigo-500" />
                         <span class="text-sm font-semibold">Tampilan Visual Barcode</span>
                     </div>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
+                    <span class="text-xs font-mono text-zinc-500">
                         Format: {{ $detectedType }}
                     </span>
                 </div>
@@ -91,8 +91,15 @@
                 </div>
 
                 <!-- Status Validasi -->
-                <div class="p-3 rounded-lg text-sm text-center {{ $isValidEan13 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300' }}">
-                    {{ $validationMessage }}
+                <div class="flex items-center justify-center gap-2 p-3 rounded-lg text-sm text-center {{ $validationStatus === 'success' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : ($validationStatus === 'warning' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300') }}">
+                    @if($validationStatus === 'success')
+                        <flux:icon name="check-circle" class="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    @elseif($validationStatus === 'warning')
+                        <flux:icon name="exclamation-triangle" class="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    @else
+                        <flux:icon name="information-circle" class="size-4 shrink-0 text-zinc-400" />
+                    @endif
+                    <span>{{ $validationMessage }}</span>
                 </div>
 
                 <!-- Metadata Teknis Barcode -->
@@ -118,7 +125,7 @@
                 </div>
             </flux:card>
 
-            <!-- Card Aturan Barcode SmartPos Acuan PKL -->
+            <!-- Card Panduan Format Barcode -->
             <flux:card class="space-y-3 bg-zinc-50 dark:bg-zinc-800/30 text-xs text-zinc-600 dark:text-zinc-400">
                 <flux:heading size="sm" class="text-zinc-700 dark:text-zinc-300">Guide Barcode:</flux:heading>
                 <ul class="list-disc list-inside space-y-1">

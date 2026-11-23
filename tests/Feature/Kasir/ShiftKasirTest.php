@@ -7,7 +7,6 @@ use App\Models\Pengeluaran;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
-use Carbon\Carbon;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -30,6 +29,26 @@ test('kasir sees shift indicator and can open shift with starting cash', functio
     $shift = CashShift::where('user_id', $kasir->id)->where('status', 'open')->first();
     expect($shift)->not->toBeNull();
     expect((float) $shift->saldo_awal)->toEqual(150000.0);
+});
+
+test('kasir cannot open multiple active shifts simultaneously', function () {
+    $kasir = User::where('role', UserRole::Kasir)->first();
+
+    Livewire::actingAs($kasir)
+        ->test(PosIndex::class)
+        ->set('saldoAwalInput', 100000)
+        ->call('openShift');
+
+    expect(CashShift::where('user_id', $kasir->id)->where('status', 'open')->count())->toBe(1);
+
+    // Attempt to open another shift while one is already active
+    Livewire::actingAs($kasir)
+        ->test(PosIndex::class)
+        ->set('saldoAwalInput', 200000)
+        ->call('openShift');
+
+    // Count must remain 1
+    expect(CashShift::where('user_id', $kasir->id)->where('status', 'open')->count())->toBe(1);
 });
 
 test('sales transaction during active shift is linked to that shift', function () {

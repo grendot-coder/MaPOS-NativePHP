@@ -50,6 +50,8 @@ class ProdukForm extends Component
 
     public string $barcodeNotice = '';
 
+    public string $barcodeNoticeType = 'info';
+
     public function mount(?string $id = null): void
     {
         if ($id) {
@@ -112,32 +114,40 @@ class ProdukForm extends Component
         $this->kode_produk = trim($this->kode_produk);
         if (empty($this->kode_produk)) {
             $this->barcodeNotice = '';
+            $this->barcodeNoticeType = 'info';
 
             return;
         }
 
         $service = app(BarcodeService::class);
         $type = $service->detectBarcodeType($this->kode_produk);
+        $isWarning = false;
+        $isSuccess = false;
 
         if (strlen($this->kode_produk) === 13 && ctype_digit($this->kode_produk)) {
             if ($service->validateEan13($this->kode_produk)) {
-                $this->barcodeNotice = '✅ Barcode EAN-13 valid (Check digit sesuai).';
+                $this->barcodeNotice = 'Barcode EAN-13 valid (Check digit sesuai).';
+                $isSuccess = true;
             } else {
                 $expected = $service->calculateEan13CheckDigit(substr($this->kode_produk, 0, 12));
-                $this->barcodeNotice = "⚠️ Check digit EAN-13 tidak cocok! Digit terakhir seharusnya {$expected}.";
+                $this->barcodeNotice = "Check digit EAN-13 tidak cocok! Digit terakhir seharusnya {$expected}.";
+                $isWarning = true;
             }
         } else {
-            $this->barcodeNotice = "ℹ️ Format terdeteksi: {$type}";
+            $this->barcodeNotice = "Format terdeteksi: {$type}";
         }
 
         // Cek apakah barcode sudah terdaftar di produk lain
         $existing = Product::where('kode_produk', $this->kode_produk)
-            ->when($this->productId, fn($q) => $q->where('id', '!=', $this->productId))
+            ->when($this->productId, fn ($q) => $q->where('id', '!=', $this->productId))
             ->first();
 
         if ($existing) {
-            $this->barcodeNotice .= " ⚠️ PERHATIAN: Barcode ini sudah terdaftar pada produk [{$existing->nama}]!";
+            $this->barcodeNotice .= " PERHATIAN: Barcode ini sudah terdaftar pada produk [{$existing->nama}]!";
+            $isWarning = true;
         }
+
+        $this->barcodeNoticeType = $isWarning ? 'warning' : ($isSuccess ? 'success' : 'info');
     }
 
     public function save(ProductRepository $repository): void

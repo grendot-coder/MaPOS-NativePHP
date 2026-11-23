@@ -2,12 +2,7 @@
     <!-- Header Halaman: Bersih & Profesional -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
-            <div class="flex items-center gap-3">
-                <flux:heading size="xl" level="1">Profil Toko & Struk Kasir</flux:heading>
-                <span class="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
-                    SETTING RETAIL
-                </span>
-            </div>
+            <flux:heading size="xl" level="1">Profil Toko & Struk Kasir</flux:heading>
             <flux:subheading class="mt-0.5">
                 Konfigurasi identitas gerai, kontak layanan, dan format cetak nota kasir thermal.
             </flux:subheading>

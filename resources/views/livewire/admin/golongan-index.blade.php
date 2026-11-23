@@ -2,7 +2,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <flux:heading size="xl" level="1">Master Golongan Produk</flux:heading>
-            <flux:subheading>Klasifikasi kategori produk untuk penomoran kode barcode internal dan filter SmartPos.</flux:subheading>
+            <flux:subheading>Klasifikasi kategori produk untuk penomoran kode barcode internal dan filter kategori produk.</flux:subheading>
         </div>
         <div>
             <flux:button wire:click="create" variant="primary" icon="plus">

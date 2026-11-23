@@ -28,7 +28,10 @@
                 visibility: hidden !important;
             }
 
-            dialog, [data-flux-modal], flux-modal, [popover] {
+            dialog,
+            [data-flux-modal],
+            flux-modal,
+            [popover] {
                 position: static !important;
                 inset: auto !important;
                 margin: 0 !important;
@@ -76,24 +79,18 @@
     <!-- Header Kasir: Status Bar Bersih & Profesional -->
     <div class="no-print flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
-            <div class="flex items-center gap-3">
-                <flux:heading size="xl" level="1">Point of Sale (Kasir)</flux:heading>
-                <span class="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
-                    TRX: <strong class="text-zinc-900 dark:text-zinc-100">{{ $nextTransactionNumber }}</strong>
-                </span>
-            </div>
+            <flux:heading size="xl" level="1">Point of Sale (Kasir)</flux:heading>
             <flux:subheading class="mt-0.5">
                 Kasir: <strong>{{ auth()->user()->name }}</strong> &bull;
                 {{ now()->translatedFormat('l, d F Y') }}
             </flux:subheading>
         </div>
 
-        <!-- Tombol Aksi Cepat Header, Status Shift Laci & Bantuan HP Scanner -->
+        <!-- Tombol Aksi Cepat Header, Status Shift Laci & Bantuan Scanner -->
         <div class="flex flex-wrap items-center gap-2">
             @if($activeShift)
             <div class="flex items-center gap-2.5 px-3 py-1.5 rounded bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-xs font-mono">
                 <div class="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400">
-                    <span class="inline-block size-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span>Modal: <strong class="text-zinc-900 dark:text-zinc-100">Rp {{ number_format($saldoAwal, 0, ',', '.') }}</strong></span>
                 </div>
                 <div class="h-3 w-px bg-zinc-300 dark:bg-zinc-700"></div>
@@ -152,7 +149,6 @@
                         <flux:icon name="qr-code" class="size-4 text-emerald-600 dark:text-emerald-400" />
                         <span>Pemindai Barcode</span>
                     </label>
-                    <span class="text-[11px] text-zinc-400 font-mono">Autofocus aktif &bull; Tekan Enter setelah scan</span>
                 </div>
 
                 <form wire:submit.prevent="scanBarcode" @submit="focusScanner()" class="flex items-center gap-2">
@@ -399,9 +395,9 @@
                         <span>Laci Kasir (Shift)</span>
                     </div>
                     @if($activeShift)
-                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-semibold border border-emerald-300 dark:border-emerald-800">AKTIF</span>
+                    <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">Aktif</span>
                     @else
-                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-semibold border border-amber-300 dark:border-amber-800">BELUM BUKA</span>
+                    <span class="text-[11px] font-semibold text-amber-600 dark:text-amber-400">Belum Buka</span>
                     @endif
                 </div>
 
@@ -712,8 +708,8 @@
                         type="button"
                         wire:click="selectProduct('{{ $prod->id }}')"
                         @disabled($prod->stok <= 0)
-                        class="px-2.5 py-1 rounded text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition">
-                        Pilih
+                            class="px-2.5 py-1 rounded text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition">
+                            Pilih
                     </button>
                 </div>
             </div>
@@ -910,11 +906,11 @@
                     <span class="font-bold">STATUS REKONSILIASI:</span>
                     <div class="text-[11px]">
                         @if($diffKas == 0)
-                            Uang Pas / Seimbang
+                        Uang Pas / Seimbang
                         @elseif($diffKas > 0)
-                            Surplus / Uang Fisik Lebih
+                        Surplus / Uang Fisik Lebih
                         @else
-                            Defisit / Uang Fisik Kurang
+                        Defisit / Uang Fisik Kurang
                         @endif
                     </div>
                 </div>

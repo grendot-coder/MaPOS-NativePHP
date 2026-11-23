@@ -14,7 +14,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Layout('layouts.app')]
-#[Title('Master Produk - SmartPos MaPOS')]
+#[Title('Master Produk - MaPOS')]
 class ProdukIndex extends Component
 {
     use WithPagination;

@@ -42,3 +42,5 @@ yarn-error.log
 /nativephp/electron/dist
 /dist
 dist/
+/dist-inno
+*.exe

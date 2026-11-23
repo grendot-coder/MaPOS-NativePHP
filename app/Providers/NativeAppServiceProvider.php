@@ -20,14 +20,14 @@ class NativeAppServiceProvider implements ProvidesPhpIni
 
         // 2. Buka jendela utama aplikasi desktop
         Window::open()
-            ->title('MaPOS - Manajemen POS v1.1.0')
+            ->title('MaPOS - Manajemen POS v1.1.1')
             ->width(1280)
             ->height(800)
             ->minWidth(1024)
             ->minHeight(700)
             ->hideMenu()
             ->rememberState()
-            ->showDevTools(app()->environment('local'));
+            ->showDevTools(false);
 
         // 3. Auto-seed data awal jika database lokal desktop masih kosong
         try {
@@ -50,8 +50,6 @@ class NativeAppServiceProvider implements ProvidesPhpIni
             'error_reporting' => app()->environment('local') ? 'E_ALL' : 'E_NONE',
             'opcache.enable' => '1',
             'opcache.enable_cli' => '1',
-            'opcache.memory_consumption' => '128',
-            'opcache.max_accelerated_files' => '10000',
         ];
     }
 }

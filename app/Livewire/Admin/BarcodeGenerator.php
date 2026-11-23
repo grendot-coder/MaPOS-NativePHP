@@ -26,6 +26,8 @@ class BarcodeGenerator extends Component
 
     public string $validationMessage = '';
 
+    public string $validationStatus = 'info';
+
     public string $barcodeSvg = '';
 
     public function mount(BarcodeService $service): void
@@ -81,6 +83,7 @@ class BarcodeGenerator extends Component
             $this->detectedType = '-';
             $this->isValidEan13 = false;
             $this->validationMessage = 'Silakan masukkan kode barcode.';
+            $this->validationStatus = 'info';
 
             return;
         }
@@ -90,13 +93,16 @@ class BarcodeGenerator extends Component
 
         if (strlen($this->barcode) === 13 && ctype_digit($this->barcode)) {
             if ($this->isValidEan13) {
-                $this->validationMessage = '✅ Barcode EAN-13 Valid (Check digit sesuai bobot 1 & 3)';
+                $this->validationMessage = 'Barcode EAN-13 valid (Check digit sesuai bobot 1 & 3)';
+                $this->validationStatus = 'success';
             } else {
                 $expected = $service->calculateEan13CheckDigit(substr($this->barcode, 0, 12));
-                $this->validationMessage = "⚠️ Check digit EAN-13 tidak valid! Digit terakhir seharusnya [{$expected}]";
+                $this->validationMessage = "Check digit EAN-13 tidak valid! Digit terakhir seharusnya [{$expected}]";
+                $this->validationStatus = 'warning';
             }
         } else {
-            $this->validationMessage = "ℹ️ Terdeteksi sebagai format {$this->detectedType}";
+            $this->validationMessage = "Terdeteksi sebagai format {$this->detectedType}";
+            $this->validationStatus = 'info';
         }
 
         try {
@@ -104,6 +110,7 @@ class BarcodeGenerator extends Component
         } catch (\Throwable $e) {
             $this->barcodeSvg = '';
             $this->validationMessage = 'Gagal merender barcode: '.$e->getMessage();
+            $this->validationStatus = 'warning';
         }
     }
 

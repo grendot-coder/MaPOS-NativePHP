@@ -54,12 +54,7 @@
     <!-- Header Kasir -->
     <div class="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
-            <div class="flex items-center gap-3">
-                <flux:heading size="xl" level="1">Riwayat Transaksi Saya</flux:heading>
-                <span class="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
-                    Kasir: <strong>{{ auth()->user()->name }}</strong>
-                </span>
-            </div>
+            <flux:heading size="xl" level="1">Riwayat Transaksi Saya</flux:heading>
             <flux:subheading class="mt-0.5">Daftar nota transaksi penjualan pada shift Anda dan cetak ulang struk pelanggan.</flux:subheading>
         </div>
         <div class="flex items-center gap-2">

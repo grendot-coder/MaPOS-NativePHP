@@ -19,7 +19,6 @@
                 <flux:icon name="qr-code" class="size-4 text-emerald-600 dark:text-emerald-400" />
                 <span>1. Pilih Produk yang Akan Disesuaikan</span>
             </span>
-            <span class="text-[11px] font-mono text-zinc-400">Scanner USB / Barcode to PC aktif</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
@@ -65,9 +64,10 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800 gap-4">
                 <div>
                     <div class="flex items-center gap-2 text-xs font-mono">
-                        <span class="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                        <span class="text-xs text-zinc-500">
                             {{ $selectedProduct->golongan->nama_golongan ?? 'Umum' }}
                         </span>
+                        <span class="text-zinc-400">•</span>
                         <span class="text-zinc-900 dark:text-zinc-100 font-bold">
                             {{ $selectedProduct->kode_produk }}
                         </span>

@@ -3,7 +3,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
             <flux:heading size="xl" level="1">Laporan Stok & Evaluasi Aset</flux:heading>
-            <flux:subheading>Pemantauan nilai modal barang, potensi omzet retail, dan peringatan dini stok menipis (*minimum stock*).</flux:subheading>
+            <flux:subheading>Pemantauan nilai modal barang, potensi omzet retail, dan peringatan dini stok menipis.</flux:subheading>
         </div>
         <div class="flex items-center gap-2">
             <flux:button href="{{ route('admin.stok.penyesuaian') }}" variant="primary" size="sm" icon="adjustments-horizontal" wire:navigate>

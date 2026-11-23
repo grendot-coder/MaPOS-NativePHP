@@ -22,16 +22,11 @@
             </div>
             <div>
                 <div class="font-bold text-sm tracking-wide leading-tight">MaPOS WORKSTATION</div>
-                <div class="text-[11px] text-zinc-500 font-mono">Retail Point of Sale v1.1.0</div>
+                <div class="text-[11px] text-zinc-500 font-mono">Retail Point of Sale v1.1.2</div>
             </div>
         </div>
 
         <div class="flex items-center gap-3">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                <span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Sistem Siap Operasional</span>
-            </span>
-
             @auth
             <a
                 href="{{ route('dashboard') }}"
@@ -120,7 +115,7 @@
 
     <!-- Footer Copyright Workstation -->
     <footer class="w-full max-w-5xl mx-auto flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 font-mono">
-        <div>MaPOS &bull; Point of Sale PKL Retail</div>
+        <div>MaPOS &bull; Point of Sale & Retail Management</div>
         <div>{{ config('app.name') }} &copy; {{ date('Y') }}</div>
     </footer>
 

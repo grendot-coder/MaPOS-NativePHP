@@ -32,6 +32,7 @@ class Sale extends Model
         'total',
         'bayar',
         'kembali',
+        'synced_at',
     ];
 
     protected function casts(): array
@@ -41,6 +42,7 @@ class Sale extends Model
             'total' => 'decimal:2',
             'bayar' => 'decimal:2',
             'kembali' => 'decimal:2',
+            'synced_at' => 'datetime',
         ];
     }
 

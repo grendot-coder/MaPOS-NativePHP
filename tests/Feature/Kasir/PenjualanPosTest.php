@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\StockMovement;
 use App\Models\User;
+use App\Services\SaleService;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -43,7 +44,7 @@ test('kasir can scan barcode with upc-a fallback', function () {
     $product = Product::where('stok', '>', 5)->first();
 
     // If product code is 13-digit starting with 0, or prepend 0 to match fallback
-    $upcCode = strlen($product->kode_produk) === 12 ? '0' . $product->kode_produk : $product->kode_produk;
+    $upcCode = strlen($product->kode_produk) === 12 ? '0'.$product->kode_produk : $product->kode_produk;
 
     Livewire::actingAs($kasir)
         ->test(PosIndex::class)
@@ -149,4 +150,33 @@ test('kasir transaction rejected when payment is insufficient', function () {
         ->assertSet('showReceiptModal', false);
 
     expect(count($test->get('cart')))->toBe(1);
+});
+
+test('sale service generates sequential and length-aware transaction numbers', function () {
+    $saleService = app(SaleService::class);
+    $kasir = User::where('role', UserRole::Kasir)->first();
+    $todayPrefix = 'TRX-'.now()->format('Ymd').'-';
+
+    // Create a high-number sale to test length-aware sorting (past 9999)
+    Sale::create([
+        'no_transaksi' => $todayPrefix.'9999',
+        'kasir_id' => $kasir->id,
+        'waktu' => now(),
+        'total' => 10000,
+        'bayar' => 10000,
+        'kembali' => 0,
+    ]);
+
+    expect($saleService->generateTransactionNumber())->toBe($todayPrefix.'10000');
+
+    Sale::create([
+        'no_transaksi' => $todayPrefix.'10000',
+        'kasir_id' => $kasir->id,
+        'waktu' => now(),
+        'total' => 10000,
+        'bayar' => 10000,
+        'kembali' => 0,
+    ]);
+
+    expect($saleService->generateTransactionNumber())->toBe($todayPrefix.'10001');
 });

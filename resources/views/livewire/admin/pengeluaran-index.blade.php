@@ -3,7 +3,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <flux:heading size="xl" level="1">Pengeluaran Biaya & Kasbon</flux:heading>
-            <flux:subheading>Catat operasional toko (listrik, air, kresek) dan kasbon karyawan agar uang laci kasir selalu seimbang (*balance*).</flux:subheading>
+            <flux:subheading>Catat operasional toko (listrik, air, kantong plastik) dan kasbon karyawan agar pembukuan kas kasir selalu seimbang.</flux:subheading>
         </div>
         <div class="flex items-center gap-2">
             <flux:button type="button" wire:click="openCreateModal('operasional')" variant="primary" icon="plus" class="bg-amber-600 hover:bg-amber-700">

@@ -19,12 +19,17 @@ class PurchaseService
      */
     public function generateInvoiceNumber(): string
     {
-        $todayPrefix = 'PB-' . Carbon::now()->format('Ymd') . '-';
+        $todayPrefix = 'PB-'.Carbon::now()->format('Ymd').'-';
 
-        $lastPurchase = Purchase::withTrashed()
+        $query = Purchase::withTrashed()
             ->where('no_faktur', 'like', "{$todayPrefix}%")
-            ->orderBy('no_faktur', 'desc')
-            ->first();
+            ->orderByRaw('LENGTH(no_faktur) DESC, no_faktur DESC');
+
+        if (DB::transactionLevel() > 0) {
+            $query->lockForUpdate();
+        }
+
+        $lastPurchase = $query->first();
 
         if ($lastPurchase) {
             $lastNumber = (int) substr($lastPurchase->no_faktur, strlen($todayPrefix));
@@ -33,7 +38,7 @@ class PurchaseService
             $nextNumber = 1;
         }
 
-        return $todayPrefix . str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
+        return $todayPrefix.str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     /**

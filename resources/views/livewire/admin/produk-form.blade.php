@@ -1,7 +1,7 @@
 <div class="max-w-4xl mx-auto space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <flux:heading size="xl" level="1">{{ $isEditing ? 'Perbaiki Data Produk' : 'Tambah Produk Baru (F8)' }}</flux:heading>
+            <flux:heading size="xl" level="1">{{ $isEditing ? 'Perbaiki Data Produk' : 'Tambah Produk Baru' }}</flux:heading>
             <flux:subheading>Lengkapi identitas produk, barcode, harga beli & jual, serta alokasi stok etalase dan gudang.</flux:subheading>
         </div>
         <div>
@@ -46,7 +46,7 @@
                             type="text"
                             wire:model.live.debounce.300ms="kode_produk"
                             @keydown.enter.prevent="document.getElementById('input-nama-produk')?.focus()"
-                            placeholder="Arahkan scan dari HP (Barcode to PC) atau ketik kode..."
+                            placeholder="Scan barcode barang atau ketik kode produk..."
                             class="flex-1 font-mono text-sm rounded-lg border-2 border-emerald-500/30 dark:border-emerald-500/20 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200 focus:border-emerald-500 focus:outline-none"
                             {{ !$isEditing ? 'autofocus' : '' }} />
                         <flux:button type="button" wire:click="generateInternalBarcode" variant="filled" icon="qr-code">
@@ -54,8 +54,15 @@
                         </flux:button>
                     </div>
                     @if($barcodeNotice)
-                    <div class="text-xs font-mono {{ str_contains($barcodeNotice, '⚠️') ? 'text-amber-600 dark:text-amber-400 font-bold' : (str_contains($barcodeNotice, '✅') ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500') }}">
-                        {{ $barcodeNotice }}
+                    <div class="flex items-center gap-1.5 text-xs font-mono {{ $barcodeNoticeType === 'warning' ? 'text-amber-600 dark:text-amber-400 font-semibold' : ($barcodeNoticeType === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500') }}">
+                        @if($barcodeNoticeType === 'warning')
+                        <flux:icon name="exclamation-triangle" class="size-3.5 shrink-0 text-amber-500" />
+                        @elseif($barcodeNoticeType === 'success')
+                        <flux:icon name="check-circle" class="size-3.5 shrink-0 text-emerald-500" />
+                        @else
+                        <flux:icon name="information-circle" class="size-3.5 shrink-0 text-zinc-400" />
+                        @endif
+                        <span>{{ $barcodeNotice }}</span>
                     </div>
                     @endif
                     @error('kode_produk') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
@@ -75,7 +82,7 @@
             </div>
         </flux:card>
 
-        <!-- 2. Harga & Diskon (SmartPos Format) -->
+        <!-- 2. Harga & Diskon -->
         <flux:card class="space-y-4">
             <div class="flex items-center justify-between">
                 <flux:heading size="lg">2. Penetapan Harga & Diskon</flux:heading>
@@ -145,7 +152,7 @@
             </div>
         </flux:card>
 
-        <!-- 3. Stok Etalase, Gudang & Batas Minimum (SmartPos Format) -->
+        <!-- 3. Stok Etalase, Gudang & Batas Minimum -->
         <flux:card class="space-y-4">
             <div class="flex items-center justify-between">
                 <flux:heading size="lg">3. Inventaris & Pengaturan Stok</flux:heading>

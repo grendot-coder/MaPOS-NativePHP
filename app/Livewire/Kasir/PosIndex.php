@@ -3,7 +3,6 @@
 namespace App\Livewire\Kasir;
 
 use App\Models\CashShift;
-use App\Models\Golongan;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Services\SaleService;
@@ -18,12 +17,19 @@ class PosIndex extends Component
 {
     // Shift Laci Kasir (Cash Drawer Settlement)
     public ?string $activeShiftId = null;
+
     public $saldoAwalInput = 100000;
+
     public bool $showOpenShiftModal = false;
+
     public bool $showCloseShiftModal = false;
+
     public $saldoFisikInput = 0;
+
     public string $catatanShift = '';
+
     public bool $showShiftReceiptModal = false;
+
     public ?string $lastClosedShiftId = null;
 
     // Input Barcode Scanner (Autofocus)
@@ -32,26 +38,34 @@ class PosIndex extends Component
     /**
      * Keranjang belanja kasir:
      * [product_id => ['product_id', 'kode_produk', 'nama', 'satuan', 'harga_satuan', 'diskon', 'qty', 'subtotal', 'stok_max']]
+     *
      * @var array<string, array{product_id: string, kode_produk: string, nama: string, satuan: string, harga_satuan: float, diskon: float, qty: int, subtotal: float, stok_max: int}>
      */
     public array $cart = [];
 
     public float $subtotal = 0;
+
     public float $totalDiskon = 0;
+
     public float $grandTotal = 0;
 
     // Modal Pembayaran
     public bool $showPaymentModal = false;
+
     public string $paymentMethod = 'cash';
+
     public $nominalBayar = 0;
+
     public float $kembalian = 0;
 
     // Modal Struk / Cetak
     public bool $showReceiptModal = false;
+
     public ?string $lastSaleId = null;
 
     // Modal Pencarian Manual Barang
     public bool $showSearchModal = false;
+
     public string $searchKeyword = '';
 
     public function mount(): void
@@ -74,6 +88,22 @@ class PosIndex extends Component
 
     public function openShift(): void
     {
+        $existingShift = CashShift::where('user_id', auth()->id())
+            ->where('status', 'open')
+            ->first();
+
+        if ($existingShift) {
+            $this->activeShiftId = $existingShift->id;
+            $this->showOpenShiftModal = false;
+
+            try {
+                Flux::toast(variant: 'warning', text: 'Anda sudah memiliki shift kasir yang sedang aktif.');
+            } catch (\Throwable) {
+            }
+
+            return;
+        }
+
         $saldoAwal = max(0, (float) $this->saldoAwalInput);
 
         $shift = CashShift::create([
@@ -88,8 +118,9 @@ class PosIndex extends Component
         $this->showOpenShiftModal = false;
 
         try {
-            Flux::toast(variant: 'success', text: 'Shift kasir berhasil dibuka dengan modal Rp ' . number_format($saldoAwal, 0, ',', '.'));
-        } catch (\Throwable) {}
+            Flux::toast(variant: 'success', text: 'Shift kasir berhasil dibuka dengan modal Rp '.number_format($saldoAwal, 0, ',', '.'));
+        } catch (\Throwable) {
+        }
     }
 
     public function setSaldoAwalPreset(float $amount): void
@@ -119,6 +150,13 @@ class PosIndex extends Component
 
         $shift = CashShift::with(['sales', 'pengeluarans'])->findOrFail($this->activeShiftId);
 
+        if ($shift->status !== 'open') {
+            $this->activeShiftId = null;
+            $this->showCloseShiftModal = false;
+
+            return;
+        }
+
         $saldoSistem = (float) $shift->saldo_saat_ini;
         $saldoFisik = max(0, (float) $this->saldoFisikInput);
         $selisih = $saldoFisik - $saldoSistem;
@@ -139,7 +177,8 @@ class PosIndex extends Component
 
         try {
             Flux::toast(variant: 'success', text: 'Shift kasir berhasil ditutup dan direkap!');
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
     }
 
     public function closeShiftReceiptModal(): void
@@ -163,8 +202,10 @@ class PosIndex extends Component
                     variant: 'danger',
                     text: "Produk dengan barcode [{$barcode}] tidak terdaftar!"
                 );
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
             $this->barcodeInput = '';
+
             return;
         }
 
@@ -184,7 +225,9 @@ class PosIndex extends Component
                     variant: 'danger',
                     text: "Stok tidak mencukupi untuk [{$product->nama}]. Stok tersedia: {$product->stok} {$product->satuan}."
                 );
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
+
             return;
         }
 
@@ -215,6 +258,7 @@ class PosIndex extends Component
 
         if ($newQty <= 0) {
             $this->removeItem($productId);
+
             return;
         }
 
@@ -225,7 +269,8 @@ class PosIndex extends Component
                     variant: 'danger',
                     text: "Stok tidak mencukupi untuk [{$product->nama}]. Maksimal: {$product->stok} {$product->satuan}."
                 );
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
             $newQty = $product->stok;
         }
 
@@ -322,7 +367,9 @@ class PosIndex extends Component
         if (empty($this->cart)) {
             try {
                 Flux::toast(variant: 'warning', text: 'Keranjang belanja masih kosong.');
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
+
             return;
         }
 
@@ -355,7 +402,9 @@ class PosIndex extends Component
         if ($bayar < $this->grandTotal) {
             try {
                 Flux::toast(variant: 'danger', text: 'Uang pembayaran kurang dari total tagihan.');
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
+
             return;
         }
 
@@ -377,8 +426,9 @@ class PosIndex extends Component
             Flux::toast(variant: 'success', text: "Transaksi {$sale->no_transaksi} berhasil disimpan!");
         } catch (\Throwable $e) {
             try {
-                Flux::toast(variant: 'danger', text: 'Gagal memproses transaksi: ' . $e->getMessage());
-            } catch (\Throwable) {}
+                Flux::toast(variant: 'danger', text: 'Gagal memproses transaksi: '.$e->getMessage());
+            } catch (\Throwable) {
+            }
         }
     }
 
