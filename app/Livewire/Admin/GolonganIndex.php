@@ -14,6 +14,8 @@ use Livewire\Component;
 #[Title('Master Golongan - MaPOS')]
 class GolonganIndex extends Component
 {
+    public string $search = '';
+
     public ?string $selectedId = null;
 
     #[Rule('required|digits:2')]
@@ -62,10 +64,10 @@ class GolonganIndex extends Component
             'kode_golongan' => ['required', 'digits:2', $uniqueRule],
             'nama_golongan' => ['required', 'string', 'min:2', 'max:100'],
         ], [
-            'kode_golongan.required' => 'Kode golongan 2 digit wajib diisi.',
-            'kode_golongan.digits' => 'Kode golongan harus persis 2 digit angka (contoh: 01, 02).',
-            'kode_golongan.unique' => 'Kode golongan sudah digunakan.',
-            'nama_golongan.required' => 'Nama golongan wajib diisi.',
+            'kode_golongan.required' => 'Kode kategori 2 digit wajib diisi.',
+            'kode_golongan.digits' => 'Kode kategori harus persis 2 digit angka (contoh: 01, 02).',
+            'kode_golongan.unique' => 'Kode kategori sudah digunakan.',
+            'nama_golongan.required' => 'Nama kategori wajib diisi.',
         ]);
 
         if ($this->isEditing && $this->selectedId) {
@@ -74,13 +76,13 @@ class GolonganIndex extends Component
                 'kode_golongan' => $this->kode_golongan,
                 'nama_golongan' => $this->nama_golongan,
             ]);
-            Flux::toast(variant: 'success', text: 'Golongan berhasil diperbarui.');
+            Flux::toast(variant: 'success', text: 'Kategori berhasil diperbarui.');
         } else {
             $repository->create([
                 'kode_golongan' => $this->kode_golongan,
                 'nama_golongan' => $this->nama_golongan,
             ]);
-            Flux::toast(variant: 'success', text: 'Golongan baru berhasil ditambahkan.');
+            Flux::toast(variant: 'success', text: 'Kategori baru berhasil ditambahkan.');
         }
 
         $this->showModal = false;
@@ -94,19 +96,23 @@ class GolonganIndex extends Component
         if ($golongan->products_count > 0) {
             Flux::toast(
                 variant: 'danger',
-                text: "Tidak dapat menghapus golongan [{$golongan->nama_golongan}] karena masih memiliki {$golongan->products_count} produk terdaftar."
+                text: "Kategori [{$golongan->nama_golongan}] tidak dapat dihapus karena masih digunakan oleh {$golongan->products_count} produk."
             );
 
             return;
         }
 
         $repository->delete($golongan);
-        Flux::toast(variant: 'success', text: 'Golongan berhasil dihapus.');
+        Flux::toast(variant: 'success', text: 'Kategori berhasil dihapus.');
     }
 
     public function render()
     {
         $golongans = Golongan::withCount('products')
+            ->when($this->search, function ($q) {
+                $q->where('nama_golongan', 'like', '%'.$this->search.'%')
+                    ->orWhere('kode_golongan', 'like', '%'.$this->search.'%');
+            })
             ->orderBy('kode_golongan')
             ->get();
 

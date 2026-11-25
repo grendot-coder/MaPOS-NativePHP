@@ -118,10 +118,12 @@ class BarcodeGenerator extends Component
     {
         $products = Product::orderBy('nama')->get();
         $golongans = Golongan::orderBy('kode_golongan')->get();
+        $existingProduct = ! empty($this->barcode) ? Product::where('kode_produk', $this->barcode)->first() : null;
 
         return view('livewire.admin.barcode-generator', [
             'products' => $products,
             'golongans' => $golongans,
+            'existingProduct' => $existingProduct,
         ]);
     }
 }

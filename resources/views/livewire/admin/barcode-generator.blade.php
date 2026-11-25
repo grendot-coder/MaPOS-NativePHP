@@ -123,6 +123,55 @@
                         <span class="font-semibold text-emerald-600 dark:text-emerald-400">Siap Scan (USB/BT)</span>
                     </div>
                 </div>
+
+                <!-- Tombol Aksi Langsung (Action Bridge) -->
+                @if($barcodeSvg)
+                <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex flex-wrap items-center justify-center gap-2.5">
+                    @if($existingProduct)
+                        <flux:button 
+                            href="{{ route('admin.barcode.print-label', ['product_id' => $existingProduct->id]) }}" 
+                            variant="primary" 
+                            size="sm" 
+                            icon="printer">
+                            Cetak Label Barcode
+                        </flux:button>
+                        <flux:button 
+                            href="{{ route('admin.produk.edit', $existingProduct->id) }}" 
+                            variant="filled" 
+                            size="sm" 
+                            icon="pencil-square">
+                            Edit Produk: {{ \Illuminate\Support\Str::limit($existingProduct->nama, 20) }}
+                        </flux:button>
+                    @else
+                        <flux:button 
+                            href="{{ route('admin.barcode.print-label', ['code' => $barcode]) }}" 
+                            variant="primary" 
+                            size="sm" 
+                            icon="printer">
+                            Cetak Label Barcode
+                        </flux:button>
+                        <flux:button 
+                            href="{{ route('admin.produk.create', ['barcode' => $barcode]) }}" 
+                            variant="filled" 
+                            size="sm" 
+                            icon="plus">
+                            Daftarkan Produk Baru
+                        </flux:button>
+                    @endif
+
+                    <div x-data="{ copied: false }">
+                        <flux:button 
+                            type="button" 
+                            variant="subtle" 
+                            size="sm" 
+                            icon="clipboard-document"
+                            @click="navigator.clipboard.writeText('{{ $barcode }}'); copied = true; setTimeout(() => copied = false, 2000)">
+                            <span x-show="!copied">Salin Kode</span>
+                            <span x-show="copied" class="text-emerald-600 dark:text-emerald-400 font-semibold">Tersalin!</span>
+                        </flux:button>
+                    </div>
+                </div>
+                @endif
             </flux:card>
 
             <!-- Card Panduan Format Barcode -->

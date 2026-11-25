@@ -194,9 +194,27 @@
             Barcode vektor SVG tajam siap dipindai menggunakan scanner USB/Bluetooth.
         </div>
 
-        <div class="flex justify-end gap-2 pt-2">
+        <div class="flex flex-wrap items-center justify-end gap-2 pt-2">
+            @if($previewProductId)
+            <flux:button href="{{ route('admin.barcode.print-label', ['product_id' => $previewProductId]) }}" variant="primary" size="sm" icon="printer" wire:navigate>
+                Cetak Label
+            </flux:button>
+            @endif
+            @if($previewBarcode)
+            <div x-data="{ copied: false }">
+                <flux:button
+                    type="button"
+                    variant="subtle"
+                    size="sm"
+                    icon="clipboard-document"
+                    @click="navigator.clipboard.writeText('{{ $previewBarcode }}'); copied = true; setTimeout(() => copied = false, 2000)">
+                    <span x-show="!copied">Salin Kode</span>
+                    <span x-show="copied" class="text-emerald-600 dark:text-emerald-400 font-semibold">Tersalin!</span>
+                </flux:button>
+            </div>
+            @endif
             <flux:modal.close>
-                <flux:button variant="ghost">Tutup</flux:button>
+                <flux:button variant="ghost" size="sm">Tutup</flux:button>
             </flux:modal.close>
         </div>
     </flux:modal>

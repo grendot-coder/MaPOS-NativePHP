@@ -18,18 +18,25 @@ class PembelianIndex extends Component
     use WithPagination;
 
     public string $search = '';
+
     public string $filterBulan = '';
+
     public string $statusFilter = '';
 
     // Modal Detail Faktur
     public bool $showDetailModal = false;
+
     public ?string $selectedPurchaseId = null;
 
     // Modal Tambah Supplier
     public bool $showSupplierModal = false;
+
     public string $supplierNama = '';
+
     public string $supplierTelepon = '';
+
     public string $supplierAlamat = '';
+
     public string $supplierKontak = '';
 
     public function mount(): void
@@ -64,6 +71,21 @@ class PembelianIndex extends Component
         $this->selectedPurchaseId = null;
     }
 
+    public function markAsPaid(string $purchaseId): void
+    {
+        $purchase = Purchase::findOrFail($purchaseId);
+        if ($purchase->status_pembayaran === 'lunas') {
+            return;
+        }
+
+        $purchase->update(['status_pembayaran' => 'lunas']);
+
+        try {
+            Flux::toast(variant: 'success', text: "Faktur #{$purchase->no_faktur} berhasil ditandai LUNAS.");
+        } catch (\Throwable) {
+        }
+    }
+
     public function openSupplierModal(): void
     {
         $this->resetValidation();
@@ -96,7 +118,8 @@ class PembelianIndex extends Component
 
         try {
             Flux::toast(variant: 'success', text: 'Supplier baru berhasil ditambahkan.');
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
     }
 
     public function render()
@@ -113,8 +136,8 @@ class PembelianIndex extends Component
         }
 
         if (! empty($this->filterBulan)) {
-            $start = Carbon::parse($this->filterBulan . '-01')->startOfMonth();
-            $end = Carbon::parse($this->filterBulan . '-01')->endOfMonth();
+            $start = Carbon::parse($this->filterBulan.'-01')->startOfMonth();
+            $end = Carbon::parse($this->filterBulan.'-01')->endOfMonth();
             $query->whereBetween('tanggal', [$start, $end]);
         }
 
@@ -127,8 +150,8 @@ class PembelianIndex extends Component
         // KPI Ringkasan
         $kpiQuery = Purchase::query();
         if (! empty($this->filterBulan)) {
-            $start = Carbon::parse($this->filterBulan . '-01')->startOfMonth();
-            $end = Carbon::parse($this->filterBulan . '-01')->endOfMonth();
+            $start = Carbon::parse($this->filterBulan.'-01')->startOfMonth();
+            $end = Carbon::parse($this->filterBulan.'-01')->endOfMonth();
             $kpiQuery->whereBetween('tanggal', [$start, $end]);
         }
         $totalFaktur = $kpiQuery->count();

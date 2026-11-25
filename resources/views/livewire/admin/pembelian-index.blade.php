@@ -127,7 +127,18 @@
                         <td class="p-3 font-mono text-[11px] text-zinc-500">
                             {{ $p->user->name ?? '-' }}
                         </td>
-                        <td class="p-3 text-center">
+                        <td class="p-3 text-center space-x-1">
+                            @if($p->status_pembayaran === 'hutang')
+                            <button
+                                type="button"
+                                wire:click="markAsPaid('{{ $p->id }}')"
+                                wire:confirm="Tandai faktur #{{ $p->no_faktur }} sudah LUNAS dibayar ke supplier?"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 transition"
+                                title="Tandai Lunas">
+                                <flux:icon name="check" class="size-3.5" />
+                                <span>Lunasi</span>
+                            </button>
+                            @endif
                             <button
                                 type="button"
                                 wire:click="showDetail('{{ $p->id }}')"
@@ -246,7 +257,19 @@
             </div>
 
             <!-- Modal Footer -->
-            <div class="p-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 flex justify-end">
+            <div class="p-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 flex justify-end gap-2">
+                @if($selectedPurchase->status_pembayaran === 'hutang')
+                <flux:button
+                    type="button"
+                    wire:click="markAsPaid('{{ $selectedPurchase->id }}')"
+                    wire:confirm="Tandai faktur #{{ $selectedPurchase->no_faktur }} sudah LUNAS dibayar ke supplier?"
+                    variant="primary"
+                    size="sm"
+                    icon="check"
+                    class="bg-emerald-600 hover:bg-emerald-700">
+                    Tandai Lunas
+                </flux:button>
+                @endif
                 <flux:button type="button" wire:click="closeDetail" variant="subtle" size="sm">
                     Tutup
                 </flux:button>

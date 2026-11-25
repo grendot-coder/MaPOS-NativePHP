@@ -6,7 +6,6 @@ use App\Models\Product;
 use App\Models\Supplier;
 use App\Services\PurchaseService;
 use Flux\Flux;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -18,24 +17,36 @@ class PembelianForm extends Component
 {
     // Faktur Header
     public string $no_faktur = '';
+
     public string $tanggal = '';
+
     public ?string $supplier_id = null;
+
     public string $nama_supplier = 'Supplier Umum';
+
     public string $status_pembayaran = 'lunas';
+
     public string $catatan = '';
 
     // Barcode scanner & pencarian produk
     public string $barcodeInput = '';
+
     public string $searchProduct = '';
+
+    public string $missingBarcode = '';
 
     // Daftar barang faktur
     public array $items = [];
 
     // Modal Tambah Supplier Cepat
     public bool $showSupplierModal = false;
+
     public string $newSupplierNama = '';
+
     public string $newSupplierTelepon = '';
+
     public string $newSupplierAlamat = '';
+
     public string $newSupplierKontak = '';
 
     public function mount(PurchaseService $purchaseService): void
@@ -70,7 +81,9 @@ class PembelianForm extends Component
         if ($product) {
             $this->addItem($product);
             $this->barcodeInput = '';
+            $this->missingBarcode = '';
         } else {
+            $this->missingBarcode = $code;
             $this->addError('barcodeInput', "Produk dengan barcode [{$code}] tidak ditemukan.");
         }
     }
@@ -81,6 +94,7 @@ class PembelianForm extends Component
         if ($product) {
             $this->addItem($product);
             $this->searchProduct = '';
+            $this->missingBarcode = '';
             $this->resetErrorBag('barcodeInput');
         }
     }
@@ -92,6 +106,7 @@ class PembelianForm extends Component
             if ($item['product_id'] === $product->id) {
                 $this->items[$index]['qty']++;
                 $this->recalculateSubtotal($index);
+
                 return;
             }
         }
@@ -192,7 +207,8 @@ class PembelianForm extends Component
 
         try {
             Flux::toast(variant: 'success', text: "Supplier [{$supplier->nama}] berhasil ditambahkan.");
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
     }
 
     public function simpanFaktur(PurchaseService $purchaseService)
@@ -233,7 +249,7 @@ class PembelianForm extends Component
 
             return redirect()->route('admin.pembelian.index');
         } catch (\Throwable $e) {
-            $this->addError('faktur', 'Gagal membukukan faktur: ' . $e->getMessage());
+            $this->addError('faktur', 'Gagal membukukan faktur: '.$e->getMessage());
         }
     }
 

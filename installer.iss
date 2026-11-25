@@ -1,7 +1,7 @@
 ; Inno Setup Script for MaPOS Desktop (NativePHP / Electron Edition)
 #define MyAppName "MaPOS"
-#define MyAppVersion "1.1.1"
-#define MyAppPublisher "MaPOS Point of Sale"
+#define MyAppVersion "1.1.2"
+#define MyAppPublisher "Grendot"
 #define MyAppExeName "mapos.exe"
 
 [Setup]

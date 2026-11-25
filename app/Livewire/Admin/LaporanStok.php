@@ -6,6 +6,7 @@ use App\Models\Golongan;
 use App\Models\Product;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -16,7 +17,10 @@ class LaporanStok extends Component
     use WithPagination;
 
     public string $search = '';
+
     public string $selectedGolongan = '';
+
+    #[Url(as: 'status')]
     public string $statusFilter = ''; // 'all', 'menipis', 'habis', 'aman'
 
     public function updatingSearch(): void

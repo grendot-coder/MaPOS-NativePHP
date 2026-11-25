@@ -31,11 +31,14 @@ class NativeAppServiceProvider implements ProvidesPhpIni
 
         // 3. Auto-seed data awal jika database lokal desktop masih kosong
         try {
-            if (User::count() === 0) {
+            $userModel = extension_loaded('pdo_pgsql') && config('database.default') === 'pgsql'
+                ? User::class
+                : User::on('sqlite');
+            if ($userModel::count() === 0) {
                 Artisan::call('db:seed', ['--force' => true]);
             }
         } catch (\Throwable $e) {
-            // Lanjutkan jika tabel sedang dalam tahap migrasi awal
+            // Lanjutkan jika tabel sedang dalam tahap migrasi awal atau offline
         }
     }
 

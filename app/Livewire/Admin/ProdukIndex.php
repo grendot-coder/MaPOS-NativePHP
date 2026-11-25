@@ -38,6 +38,8 @@ class ProdukIndex extends Component
 
     public bool $showBarcodeModal = false;
 
+    public ?string $previewProductId = null;
+
     public string $previewBarcode = '';
 
     public string $previewNama = '';
@@ -49,6 +51,7 @@ class ProdukIndex extends Component
     public function showBarcode(string $id, BarcodeService $service): void
     {
         $product = Product::findOrFail($id);
+        $this->previewProductId = $product->id;
         $this->previewBarcode = $product->kode_produk;
         $this->previewNama = $product->nama;
         $this->previewHarga = 'Rp '.number_format($product->harga_retail, 0, ',', '.');

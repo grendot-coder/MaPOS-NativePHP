@@ -5,7 +5,6 @@ namespace App\Livewire\Admin;
 use App\Enums\StockMovementType;
 use App\Models\Product;
 use App\Models\StockMovement;
-use App\Services\BarcodeService;
 use App\Services\StockService;
 use Flux\Flux;
 use Livewire\Attributes\Layout;
@@ -24,7 +23,9 @@ class StokPenyesuaian extends Component
 
     // Form nilai penyesuaian
     public $stok_etalase_baru = 0;
+
     public $stok_gudang_baru = 0;
+
     public string $keterangan = 'Stock Opname Fisik';
 
     // Preset alasan cepat
@@ -39,8 +40,10 @@ class StokPenyesuaian extends Component
 
     public function mount(?string $productId = null): void
     {
-        if ($productId) {
-            $this->selectProduct($productId);
+        $targetProductId = $productId ?? request()->query('productId');
+
+        if ($targetProductId) {
+            $this->selectProduct($targetProductId);
         }
     }
 
@@ -61,8 +64,10 @@ class StokPenyesuaian extends Component
         if (! $product) {
             try {
                 Flux::toast(variant: 'danger', text: "Produk dengan barcode [{$code}] tidak ditemukan!");
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
             $this->barcodeInput = '';
+
             return;
         }
 
@@ -71,7 +76,8 @@ class StokPenyesuaian extends Component
 
         try {
             Flux::toast(variant: 'success', text: "Produk [{$product->nama}] terpilih.");
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
     }
 
     public function selectProduct(string $productId): void
@@ -96,7 +102,9 @@ class StokPenyesuaian extends Component
         if (! $this->selectedProductId) {
             try {
                 Flux::toast(variant: 'warning', text: 'Pilih produk yang akan disesuaikan terlebih dahulu.');
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
+
             return;
         }
 
@@ -137,8 +145,9 @@ class StokPenyesuaian extends Component
             $this->selectProduct($product->id);
         } catch (\Throwable $e) {
             try {
-                Flux::toast(variant: 'danger', text: 'Gagal menyimpan penyesuaian: ' . $e->getMessage());
-            } catch (\Throwable) {}
+                Flux::toast(variant: 'danger', text: 'Gagal menyimpan penyesuaian: '.$e->getMessage());
+            } catch (\Throwable) {
+            }
         }
     }
 

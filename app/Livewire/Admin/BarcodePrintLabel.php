@@ -15,26 +15,52 @@ use Livewire\Component;
 class BarcodePrintLabel extends Component
 {
     public string $search = '';
+
     public string $selectedGolongan = '';
 
     /**
      * Antrean produk yang akan dicetak labelnya:
      * id => ['id', 'kode_produk', 'nama', 'harga_retail', 'copies', 'svg']
+     *
      * @var array<string, array{id: string, kode_produk: string, nama: string, harga_retail: float, copies: int, svg: string}>
      */
     public array $printQueue = [];
 
     // Pengaturan Tampilan Label
     public string $labelFormat = 'grid3'; // 'grid3' (3 kolom), 'grid2' (2 kolom), 'thermal' (1 kolom roll)
+
     public bool $showPrice = true;
+
     public bool $showStoreName = true;
+
     public string $storeName = 'MaPOS MART';
 
     public function mount(BarcodeService $service, ?string $product_id = null): void
     {
-        // Jika ada parameter product_id dari tabel produk, langsung masukkan ke antrean
-        if ($product_id) {
-            $this->addToQueue($product_id, $service);
+        $productId = $product_id ?? request()->query('product_id');
+        $code = request()->query('code');
+
+        if ($productId) {
+            $this->addToQueue($productId, $service);
+        } elseif ($code) {
+            $product = Product::where('kode_produk', $code)->first();
+            if ($product) {
+                $this->addToQueue($product->id, $service);
+            } else {
+                $svg = $service->renderSvg($code, 2, 45);
+                $this->printQueue['custom_'.$code] = [
+                    'id' => 'custom_'.$code,
+                    'kode_produk' => $code,
+                    'nama' => 'Barcode: '.$code,
+                    'harga_retail' => 0,
+                    'copies' => 5,
+                    'svg' => $svg,
+                ];
+                try {
+                    Flux::toast(variant: 'success', text: "Barcode [{$code}] ditambahkan ke antrean cetak.");
+                } catch (\Throwable) {
+                }
+            }
         }
     }
 
@@ -92,7 +118,7 @@ class BarcodePrintLabel extends Component
         }
 
         try {
-            Flux::toast(variant: 'success', text: count($products) . ' produk ditambahkan ke antrean cetak.');
+            Flux::toast(variant: 'success', text: count($products).' produk ditambahkan ke antrean cetak.');
         } catch (\Throwable) {
             // Silently continue
         }

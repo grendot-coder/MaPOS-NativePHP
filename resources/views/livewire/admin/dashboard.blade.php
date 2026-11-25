@@ -39,7 +39,7 @@
             <div class="text-[11px] text-zinc-400">Kategori produk aktif</div>
         </div>
 
-        <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
+        <a href="{{ route('admin.laporan.stok', ['status' => 'menipis']) }}" wire:navigate class="block p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-amber-400 dark:hover:border-amber-600 shadow-sm space-y-1 transition">
             <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 <span>Stok Menipis / Kritis</span>
                 <flux:icon name="exclamation-triangle" class="size-4 text-amber-500" />
@@ -47,8 +47,8 @@
             <div class="text-2xl font-bold font-mono {{ $stokMenipisCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-900 dark:text-zinc-100' }}">
                 {{ number_format($stokMenipisCount) }}
             </div>
-            <div class="text-[11px] text-zinc-400">Stok &le; batas minimum</div>
-        </div>
+            <div class="text-[11px] text-zinc-400">Stok &le; batas minimum &bull; Klik untuk lihat</div>
+        </a>
 
         <div class="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-1">
             <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -72,6 +72,9 @@
                         <span class="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">({{ $stokMenipisCount }} Produk)</span>
                     @endif
                 </div>
+                <a href="{{ route('admin.pembelian.create') }}" wire:navigate class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                    + Buat Faktur Restock &rarr;
+                </a>
             </div>
 
             @if($lowStockProducts->isEmpty())
@@ -87,6 +90,7 @@
                                 <th class="py-2 px-3">Golongan</th>
                                 <th class="py-2 px-3 text-right">Stok</th>
                                 <th class="py-2 px-3 text-right">Min Stok</th>
+                                <th class="py-2 px-3 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800 font-mono">
@@ -103,6 +107,11 @@
                                     <td class="py-2 px-3 text-right text-zinc-400">
                                         {{ $p->min_stok }} <span class="text-[10px] font-normal text-zinc-400">{{ $p->satuan }}</span>
                                     </td>
+                                    <td class="py-2 px-3 text-center font-sans">
+                                        <a href="{{ route('admin.stok.penyesuaian', ['productId' => $p->id]) }}" wire:navigate class="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 underline">
+                                            Opname
+                                        </a>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -115,7 +124,9 @@
         <div class="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm space-y-0">
             <div class="p-3 bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                 <span class="font-bold text-xs uppercase tracking-wider text-zinc-800 dark:text-zinc-200">Aktivitas Stok Terakhir</span>
-                <span class="text-[11px] font-mono text-zinc-400">5 Transaksi Terkini</span>
+                <a href="{{ route('admin.stok.riwayat') }}" wire:navigate class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                    Lihat Semua &rarr;
+                </a>
             </div>
 
             @if($recentMovements->isEmpty())

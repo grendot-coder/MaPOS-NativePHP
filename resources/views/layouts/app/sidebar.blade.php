@@ -25,7 +25,7 @@
                     Master Produk
                 </flux:sidebar.item>
                 <flux:sidebar.item icon="tag" :href="route('admin.golongan.index')" :current="request()->routeIs('admin.golongan.*')" wire:navigate>
-                    Golongan Produk
+                    Kategori Produk
                 </flux:sidebar.item>
                 <flux:sidebar.item icon="qr-code" :href="route('admin.barcode.index')" :current="request()->routeIs('admin.barcode.index')" wire:navigate>
                     Generator Barcode

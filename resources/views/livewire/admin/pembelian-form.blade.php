@@ -116,7 +116,14 @@
                     </flux:button>
                 </form>
                 @error('barcodeInput')
-                <div class="text-rose-500 text-[11px] mt-1">{{ $message }}</div>
+                <div class="text-rose-500 text-[11px] mt-1 flex flex-wrap items-center gap-2">
+                    <span>{{ $message }}</span>
+                    @if($missingBarcode)
+                    <a href="{{ route('admin.produk.create', ['barcode' => $missingBarcode]) }}" class="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline" wire:navigate>
+                        + Daftarkan Produk Baru ({{ $missingBarcode }}) &rarr;
+                    </a>
+                    @endif
+                </div>
                 @enderror
             </div>
 

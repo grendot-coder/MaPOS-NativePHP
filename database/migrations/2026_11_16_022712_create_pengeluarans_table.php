@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('nama_karyawan')->nullable(); // Diisi jika kategori = kasbon / gaji
             $table->decimal('nominal', 15, 2);
             $table->string('keterangan');
-            $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete(); // Kasir/Admin yang mencatat
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete(); // Kasir/Admin yang mencatat
             $table->timestamp('waktu');
             $table->timestamps();
             $table->softDeletes();

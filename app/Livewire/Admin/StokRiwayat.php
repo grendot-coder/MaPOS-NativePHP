@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\StockMovement;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -17,9 +18,14 @@ class StokRiwayat extends Component
     use WithPagination;
 
     public string $search = '';
+
+    #[Url(as: 'product')]
     public string $selectedProduct = '';
+
     public string $selectedJenis = '';
+
     public string $startDate = '';
+
     public string $endDate = '';
 
     public function mount(): void

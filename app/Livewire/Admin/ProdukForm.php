@@ -80,6 +80,12 @@ class ProdukForm extends Component
             if ($first) {
                 $this->golongan_id = $first->id;
             }
+
+            $barcodeParam = $barcode ?? request()->query('barcode');
+            if ($barcodeParam) {
+                $this->kode_produk = trim($barcodeParam);
+                $this->checkBarcodeValidity();
+            }
         }
     }
 
