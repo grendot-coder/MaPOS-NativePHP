@@ -16,5 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('sync.auth')->prefix('sync')->group(function () {
     Route::get('/ping', [SyncController::class, 'ping'])->name('api.sync.ping');
     Route::post('/sales', [SyncController::class, 'syncSales'])->name('api.sync.sales');
+    Route::post('/batch', [SyncController::class, 'syncBatch'])->name('api.sync.batch');
     Route::get('/catalog', [SyncController::class, 'getCatalog'])->name('api.sync.catalog');
 });

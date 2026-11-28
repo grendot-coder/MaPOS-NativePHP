@@ -2,6 +2,7 @@
 
 use App\Enums\UserRole;
 use App\Livewire\Kasir\RiwayatPenjualan;
+use App\Models\Dropshipper;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
@@ -83,4 +84,64 @@ test('kasir can open receipt modal to reprint receipt', function () {
         ->assertSet('selectedSaleId', $sale->id)
         ->assertSee('TRX-REPRINT-01')
         ->assertSee('SALINAN / REPRINT');
+});
+
+test('kasir can reset date filter with setToday and reprint dropship label', function () {
+    $kasir = User::where('role', UserRole::Kasir)->first();
+    $admin = User::where('role', UserRole::Admin)->first();
+    $product = Product::first();
+
+    $dropshipper = Dropshipper::create([
+        'kode_dropshipper' => 'DRP-RIW-1',
+        'nama' => 'Mitra Kasir Dropship',
+        'telepon' => '08123450000',
+        'status_aktif' => true,
+    ]);
+
+    $sale = Sale::create([
+        'no_transaksi' => 'TRX-KASIR-DRP-01',
+        'kasir_id' => $kasir->id,
+        'waktu' => now(),
+        'total' => 25000,
+        'bayar' => 25000,
+        'kembali' => 0,
+        'metode_pembayaran' => 'qris',
+        'is_dropship' => true,
+        'dropshipper_id' => $dropshipper->id,
+        'dropship_penerima_nama' => 'Budi Penerima Kasir',
+    ]);
+
+    SaleItem::create([
+        'sale_id' => $sale->id,
+        'product_id' => $product->id,
+        'kode_produk' => $product->kode_produk,
+        'nama_produk' => $product->nama,
+        'qty' => 2,
+        'harga_satuan' => 12500,
+        'subtotal' => 25000,
+    ]);
+
+    $otherSale = Sale::create([
+        'no_transaksi' => 'TRX-OTHER-USER',
+        'kasir_id' => $admin->id,
+        'waktu' => now(),
+        'total' => 10000,
+        'bayar' => 10000,
+        'kembali' => 0,
+    ]);
+
+    Livewire::actingAs($kasir)
+        ->test(RiwayatPenjualan::class)
+        ->set('filterDate', '2020-01-01')
+        ->assertDontSee('TRX-KASIR-DRP-01')
+        ->call('setToday')
+        ->assertSet('filterDate', now()->format('Y-m-d'))
+        ->assertSee('TRX-KASIR-DRP-01')
+        ->assertSee('Dropship: Mitra Kasir Dropship')
+        ->call('showReceipt', $otherSale->id)
+        ->assertSet('showReceiptModal', false)
+        ->call('showReceipt', $sale->id)
+        ->assertSet('showReceiptModal', true)
+        ->assertSee('Cetak Label Dropship')
+        ->assertSee('Budi Penerima Kasir');
 });

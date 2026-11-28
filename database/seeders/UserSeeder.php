@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Akun Admin
+        // 1. Akun Admin Utama
         User::updateOrCreate(
             ['email' => 'admin@mapos.test'],
             [
@@ -25,11 +25,22 @@ class UserSeeder extends Seeder
             ]
         );
 
-        // 2. Akun Kasir
+        // 2. Akun Kasir 1: Choerul Nuril Huda
         User::updateOrCreate(
-            ['email' => 'kasir@mapos.test'],
+            ['email' => 'choerul@mapos.test'],
             [
-                'name' => 'Kasir Utama MaPOS',
+                'name' => 'Choerul Nuril Huda',
+                'password' => Hash::make('password'),
+                'role' => UserRole::Kasir,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // 3. Akun Kasir 2: Raihaan Adian
+        User::updateOrCreate(
+            ['email' => 'raihaan@mapos.test'],
+            [
+                'name' => 'Raihaan Adian',
                 'password' => Hash::make('password'),
                 'role' => UserRole::Kasir,
                 'email_verified_at' => now(),

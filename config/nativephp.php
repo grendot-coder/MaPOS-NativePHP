@@ -94,7 +94,10 @@ return [
     'cleanup_exclude_files' => [
         '.git*',
         '.github*',
+        '.agents*',
         'build*',
+        'dist-inno*',
+        'storage/app/backups*',
         'temp*',
         'content*',
         '*node_modules*',
@@ -106,6 +109,8 @@ return [
         'vendor/nativephp/desktop/vendor*',
         '*.md',
         '*.log',
+        '*.iss',
+        '*.bat',
     ],
 
     /**

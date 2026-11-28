@@ -13,22 +13,38 @@ beforeEach(function () {
     $this->seed();
 });
 
-test('kasir sees shift indicator and can open shift with starting cash', function () {
+test('kasir sees shift indicator and can open shift with starting cash and officer name', function () {
     $kasir = User::where('role', UserRole::Kasir)->first();
 
     // Verify initial state has no active shift
     Livewire::actingAs($kasir)
         ->test(PosIndex::class)
         ->assertSee('Buka Shift Kasir')
+        ->set('namaPetugasInput', 'Rina')
         ->set('saldoAwalInput', 150000)
         ->set('catatanShift', 'Shift Pagi Reguler')
         ->call('openShift')
         ->assertSet('showOpenShiftModal', false)
-        ->assertSee('150.000');
+        ->assertSee('150.000')
+        ->assertSee('Rina');
 
     $shift = CashShift::where('user_id', $kasir->id)->where('status', 'open')->first();
     expect($shift)->not->toBeNull();
+    expect($shift->nama_petugas)->toEqual('Rina');
     expect((float) $shift->saldo_awal)->toEqual(150000.0);
+});
+
+test('kasir must provide officer name when opening a shift', function () {
+    $kasir = User::where('role', UserRole::Kasir)->first();
+
+    Livewire::actingAs($kasir)
+        ->test(PosIndex::class)
+        ->set('namaPetugasInput', '')
+        ->set('saldoAwalInput', 100000)
+        ->call('openShift')
+        ->assertHasErrors(['namaPetugasInput' => 'required']);
+
+    expect(CashShift::where('user_id', $kasir->id)->where('status', 'open')->count())->toBe(0);
 });
 
 test('kasir cannot open multiple active shifts simultaneously', function () {
@@ -36,6 +52,7 @@ test('kasir cannot open multiple active shifts simultaneously', function () {
 
     Livewire::actingAs($kasir)
         ->test(PosIndex::class)
+        ->set('namaPetugasInput', 'Rina')
         ->set('saldoAwalInput', 100000)
         ->call('openShift');
 
@@ -44,11 +61,45 @@ test('kasir cannot open multiple active shifts simultaneously', function () {
     // Attempt to open another shift while one is already active
     Livewire::actingAs($kasir)
         ->test(PosIndex::class)
+        ->set('namaPetugasInput', 'Budi')
         ->set('saldoAwalInput', 200000)
         ->call('openShift');
 
     // Count must remain 1
     expect(CashShift::where('user_id', $kasir->id)->where('status', 'open')->count())->toBe(1);
+});
+
+test('sales transaction and shift settlement receipt display shift officer name instead of generic account name', function () {
+    $kasir = User::where('role', UserRole::Kasir)->first();
+    $product = Product::where('stok', '>', 5)->first();
+
+    $shift = CashShift::create([
+        'user_id' => $kasir->id,
+        'nama_petugas' => 'Siti Aminah',
+        'waktu_buka' => now()->subHours(2),
+        'saldo_awal' => 100000,
+        'saldo_akhir_sistem' => 100000,
+        'status' => 'open',
+    ]);
+
+    $test = Livewire::actingAs($kasir)
+        ->test(PosIndex::class)
+        ->call('selectProduct', $product->id)
+        ->call('openPayment');
+
+    $grandTotal = $test->get('grandTotal');
+
+    $test->set('nominalBayar', $grandTotal)
+        ->call('processTransaction')
+        ->assertSet('showReceiptModal', true)
+        ->assertSee('Siti Aminah');
+
+    $test->call('closeReceiptModal')
+        ->call('confirmCloseShift')
+        ->set('saldoFisikInput', 100000 + $grandTotal)
+        ->call('closeShift')
+        ->assertSet('showShiftReceiptModal', true)
+        ->assertSee('Siti Aminah');
 });
 
 test('sales transaction during active shift is linked to that shift', function () {

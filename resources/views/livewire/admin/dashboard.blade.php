@@ -62,6 +62,30 @@
         </div>
     </div>
 
+    <!-- Alert Hutang & Piutang Aktif (Jika Ada) -->
+    @if($totalHutangSupplier > 0 || $totalPiutangPelanggan > 0)
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        @if($totalPiutangPelanggan > 0)
+        <a href="{{ route('admin.pelanggan.index', ['filter' => 'piutang']) }}" wire:navigate class="p-3 rounded-lg border border-amber-200 dark:border-amber-800/60 bg-amber-50/70 dark:bg-amber-950/30 flex items-center justify-between hover:border-amber-400 transition">
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Piutang / Bon Pelanggan</div>
+                <div class="text-base font-black font-mono text-zinc-900 dark:text-zinc-100">Rp {{ number_format($totalPiutangPelanggan, 0, ',', '.') }}</div>
+            </div>
+            <span class="text-xs font-semibold text-amber-700 dark:text-amber-300">Kelola Bon &rarr;</span>
+        </a>
+        @endif
+        @if($totalHutangSupplier > 0)
+        <a href="{{ route('admin.pembelian.index') }}" wire:navigate class="p-3 rounded-lg border border-rose-200 dark:border-rose-800/60 bg-rose-50/70 dark:bg-rose-950/30 flex items-center justify-between hover:border-rose-400 transition">
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">Sisa Hutang Supplier</div>
+                <div class="text-base font-black font-mono text-zinc-900 dark:text-zinc-100">Rp {{ number_format($totalHutangSupplier, 0, ',', '.') }}</div>
+            </div>
+            <span class="text-xs font-semibold text-rose-700 dark:text-rose-300">Bayar Hutang &rarr;</span>
+        </a>
+        @endif
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <!-- Peringatan Stok Kritis (High-Density) -->
         <div class="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm space-y-0">

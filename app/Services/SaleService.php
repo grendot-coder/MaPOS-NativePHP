@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\StockMovementType;
+use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
@@ -55,31 +56,109 @@ class SaleService
         float $total,
         float $bayar,
         float $kembali,
-        ?string $cashShiftId = null
+        ?string $cashShiftId = null,
+        string $metodePembayaran = 'cash',
+        ?string $customerId = null,
+        int $poinDipakai = 0,
+        float $potonganPoin = 0,
+        array $dropshipData = []
     ): Sale {
         if (empty($cartItems)) {
             throw new InvalidArgumentException('Keranjang belanja kasir tidak boleh kosong.');
         }
 
-        if ($bayar < $total) {
+        if (! in_array($metodePembayaran, ['cash', 'qris', 'transfer', 'tempo'], true)) {
+            throw new InvalidArgumentException('Metode pembayaran tidak valid.');
+        }
+
+        if ($metodePembayaran === 'cash' && $bayar < $total) {
             throw new InvalidArgumentException('Uang bayar kurang dari total belanja.');
+        }
+
+        if ($metodePembayaran === 'tempo' && empty($customerId)) {
+            throw new InvalidArgumentException('Pembayaran Bon / Tempo wajib memilih pelanggan terdaftar.');
         }
 
         $attempts = 0;
         while ($attempts < 3) {
             try {
-                return DB::transaction(function () use ($kasir, $cartItems, $total, $bayar, $kembali, $cashShiftId) {
+                return DB::transaction(function () use (
+                    $kasir,
+                    $cartItems,
+                    $total,
+                    $bayar,
+                    $kembali,
+                    $cashShiftId,
+                    $metodePembayaran,
+                    $customerId,
+                    $poinDipakai,
+                    $potonganPoin,
+                    $dropshipData
+                ) {
                     $noTransaksi = $this->generateTransactionNumber();
+
+                    $customer = null;
+                    if ($customerId) {
+                        /** @var Customer $customer */
+                        $customer = Customer::lockForUpdate()->findOrFail($customerId);
+
+                        if ($poinDipakai > 0) {
+                            if ($customer->poin < $poinDipakai) {
+                                throw new InvalidArgumentException("Poin member tidak mencukupi (tersedia: {$customer->poin} poin).");
+                            }
+                            $customer->poin -= $poinDipakai;
+                        }
+                    }
+
+                    $statusPembayaran = 'lunas';
+                    $sisaPiutang = 0.0;
+
+                    if ($metodePembayaran === 'tempo') {
+                        $statusPembayaran = 'piutang';
+                        $sisaPiutang = $total;
+                        $bayar = 0.0;
+                        $kembali = 0.0;
+
+                        if ($customer->limit_kredit <= 0 || ($customer->piutang_berjalan + $total) > $customer->limit_kredit) {
+                            throw new InvalidArgumentException('Limit kredit pelanggan tidak mencukupi untuk transaksi bon/tempo ini.');
+                        }
+
+                        $customer->piutang_berjalan += $total;
+                    } elseif (in_array($metodePembayaran, ['qris', 'transfer'], true)) {
+                        $bayar = $total;
+                        $kembali = 0.0;
+                    }
+
+                    $poinDidapat = ($customer && $statusPembayaran === 'lunas' && $total >= 10000)
+                        ? (int) floor($total / 10000)
+                        : 0;
+
+                    if ($customer) {
+                        $customer->poin += $poinDidapat;
+                        $customer->save();
+                    }
 
                     // 1. Buat record transaksi penjualan utama
                     $sale = Sale::create([
                         'no_transaksi' => $noTransaksi,
                         'kasir_id' => $kasir->id,
                         'cash_shift_id' => $cashShiftId,
+                        'customer_id' => $customer?->id,
                         'waktu' => now(),
                         'total' => $total,
                         'bayar' => $bayar,
                         'kembali' => $kembali,
+                        'metode_pembayaran' => $metodePembayaran,
+                        'status_pembayaran' => $statusPembayaran,
+                        'sisa_piutang' => $sisaPiutang,
+                        'poin_didapat' => $poinDidapat,
+                        'poin_dipakai' => $poinDipakai,
+                        'potongan_poin' => $potonganPoin,
+                        'is_dropship' => (bool) ($dropshipData['is_dropship'] ?? false),
+                        'dropshipper_id' => $dropshipData['dropshipper_id'] ?? null,
+                        'dropship_penerima_nama' => $dropshipData['penerima_nama'] ?? null,
+                        'dropship_penerima_telepon' => $dropshipData['penerima_telepon'] ?? null,
+                        'dropship_penerima_alamat' => $dropshipData['penerima_alamat'] ?? null,
                     ]);
 
                     // 2. Loop setiap item belanja, kunci record produk, potong stok, dan catat pergerakan stok
@@ -140,7 +219,7 @@ class SaleService
                         ]);
                     }
 
-                    return $sale->load(['items.product', 'kasir']);
+                    return $sale->load(['items.product', 'kasir', 'customer', 'cashShift', 'dropshipper']);
                 });
             } catch (UniqueConstraintViolationException $e) {
                 $attempts++;

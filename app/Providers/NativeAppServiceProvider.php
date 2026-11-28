@@ -20,7 +20,7 @@ class NativeAppServiceProvider implements ProvidesPhpIni
 
         // 2. Buka jendela utama aplikasi desktop
         Window::open()
-            ->title('MaPOS - Manajemen POS v1.1.1')
+            ->title('MaPOS - Manajemen POS v1.1.2')
             ->width(1280)
             ->height(800)
             ->minWidth(1024)
@@ -29,12 +29,13 @@ class NativeAppServiceProvider implements ProvidesPhpIni
             ->rememberState()
             ->showDevTools(false);
 
-        // 3. Auto-seed data awal jika database lokal desktop masih kosong
+        // 3. Pastikan migrasi terbaru berjalan & auto-seed data awal jika database desktop masih kosong
         try {
-            $userModel = extension_loaded('pdo_pgsql') && config('database.default') === 'pgsql'
-                ? User::class
-                : User::on('sqlite');
-            if ($userModel::count() === 0) {
+            if (config('nativephp-internal.running')) {
+                Artisan::call('migrate', ['--force' => true]);
+            }
+
+            if (User::count() === 0) {
                 Artisan::call('db:seed', ['--force' => true]);
             }
         } catch (\Throwable $e) {

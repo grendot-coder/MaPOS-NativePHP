@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,9 +16,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $supplier_id
  * @property string $nama_supplier
  * @property int $user_id
- * @property \Carbon\Carbon $tanggal
+ * @property Carbon $tanggal
  * @property float $total
  * @property string $status_pembayaran
+ * @property Carbon|null $jatuh_tempo
+ * @property float $dibayar
  * @property string|null $catatan
  */
 class Purchase extends Model
@@ -34,6 +37,8 @@ class Purchase extends Model
         'tanggal',
         'total',
         'status_pembayaran',
+        'jatuh_tempo',
+        'dibayar',
         'catatan',
     ];
 
@@ -41,7 +46,9 @@ class Purchase extends Model
     {
         return [
             'tanggal' => 'date',
+            'jatuh_tempo' => 'date',
             'total' => 'float',
+            'dibayar' => 'float',
         ];
     }
 
@@ -61,6 +68,27 @@ class Purchase extends Model
     public function items(): HasMany
     {
         return $this->hasMany(PurchaseItem::class, 'purchase_id');
+    }
+
+    /** @return HasMany<PurchasePayment, $this> */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(PurchasePayment::class, 'purchase_id');
+    }
+
+    /** @return HasMany<PurchaseReturn, $this> */
+    public function returns(): HasMany
+    {
+        return $this->hasMany(PurchaseReturn::class, 'purchase_id');
+    }
+
+    public function getSisaHutangAttribute(): float
+    {
+        if ($this->status_pembayaran === 'lunas') {
+            return 0.0;
+        }
+
+        return max(0.0, (float) $this->total - (float) $this->dibayar);
     }
 
     public function getTotalPcsAttribute(): int

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Golongan;
 use App\Models\Product;
+use App\Models\StoreProfile;
 use App\Services\BarcodeService;
 use Flux\Flux;
 use Livewire\Attributes\Layout;
@@ -37,6 +38,8 @@ class BarcodePrintLabel extends Component
 
     public function mount(BarcodeService $service, ?string $product_id = null): void
     {
+        $this->storeName = StoreProfile::getProfile()->nama_toko;
+
         $productId = $product_id ?? request()->query('product_id');
         $code = request()->query('code');
 

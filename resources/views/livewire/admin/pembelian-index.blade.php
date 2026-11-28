@@ -119,9 +119,17 @@
                                 LUNAS
                             </span>
                             @else
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
-                                HUTANG
-                            </span>
+                            <div class="space-y-0.5">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
+                                    HUTANG: Rp {{ number_format($p->sisa_hutang, 0, ',', '.') }}
+                                </span>
+                                @if($p->jatuh_tempo)
+                                @php $isOverdue = $p->jatuh_tempo->isPast() && ! $p->jatuh_tempo->isToday(); @endphp
+                                <div class="text-[10px] font-mono {{ $isOverdue ? 'text-rose-600 font-bold' : 'text-zinc-400' }}">
+                                    JT: {{ $p->jatuh_tempo->format('d/m/Y') }}
+                                </div>
+                                @endif
+                            </div>
                             @endif
                         </td>
                         <td class="p-3 font-mono text-[11px] text-zinc-500">
@@ -129,6 +137,14 @@
                         </td>
                         <td class="p-3 text-center space-x-1">
                             @if($p->status_pembayaran === 'hutang')
+                            <button
+                                type="button"
+                                wire:click="openDebtModal('{{ $p->id }}')"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded border border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 transition"
+                                title="Bayar Cicilan / Pelunasan">
+                                <flux:icon name="banknotes" class="size-3.5" />
+                                <span>Cicil</span>
+                            </button>
                             <button
                                 type="button"
                                 wire:click="markAsPaid('{{ $p->id }}')"
@@ -314,6 +330,46 @@
                 <div class="flex justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
                     <flux:button type="button" wire:click="$set('showSupplierModal', false)" variant="subtle" size="sm">Batal</flux:button>
                     <flux:button type="submit" variant="primary" size="sm" class="bg-indigo-600 hover:bg-indigo-700">Simpan Supplier</flux:button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
+
+    <!-- Modal Bayar Cicilan Hutang Supplier -->
+    @if($showDebtModal && $payingPurchase)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl w-full max-w-md p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Bayar Hutang Faktur #{{ $payingPurchase->no_faktur }}</h3>
+                    <p class="text-[11px] text-zinc-500">Sisa hutang: <strong class="font-mono text-amber-600">Rp {{ number_format($payingPurchase->sisa_hutang, 0, ',', '.') }}</strong></p>
+                </div>
+                <button type="button" wire:click="$set('showDebtModal', false)" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+                    <flux:icon name="x-mark" class="size-4" />
+                </button>
+            </div>
+
+            <form wire:submit="saveDebtPayment" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Nominal Bayar (Rp) *</label>
+                    <flux:input type="number" step="100" min="100" wire:model="debtPaymentAmount" size="sm" class="font-mono font-bold" required />
+                    @error('debtPaymentAmount') <span class="text-rose-500 text-[11px]">{{ $message }}</span> @enderror
+                </div>
+                <div>
+                    <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Metode Pembayaran *</label>
+                    <select wire:model="debtPaymentMethod" class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2">
+                        <option value="cash">Tunai (Cash)</option>
+                        <option value="transfer">Transfer Bank</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Catatan (Opsional)</label>
+                    <flux:input wire:model="debtPaymentNote" size="sm" placeholder="Contoh: Cicilan 1 / Pelunasan" />
+                </div>
+                <div class="flex justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                    <flux:button type="button" wire:click="$set('showDebtModal', false)" variant="subtle" size="sm">Batal</flux:button>
+                    <flux:button type="submit" variant="primary" size="sm" class="bg-emerald-600 hover:bg-emerald-700">Simpan Pembayaran</flux:button>
                 </div>
             </form>
         </div>

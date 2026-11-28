@@ -36,11 +36,21 @@ class ProdukForm extends Component
 
     public $harga_grosir_1 = null;
 
+    public $min_qty_grosir_1 = null;
+
     public $harga_grosir_2 = null;
+
+    public $min_qty_grosir_2 = null;
 
     public $harga_grosir_3 = null;
 
+    public $min_qty_grosir_3 = null;
+
     public $diskon = 0;
+
+    public ?string $promo_mulai = null;
+
+    public ?string $promo_sampai = null;
 
     public $stok_etalase = 0;
 
@@ -66,9 +76,14 @@ class ProdukForm extends Component
             $this->harga_beli = $product->harga_beli;
             $this->harga_retail = $product->harga_retail;
             $this->harga_grosir_1 = $product->harga_grosir_1;
+            $this->min_qty_grosir_1 = $product->min_qty_grosir_1;
             $this->harga_grosir_2 = $product->harga_grosir_2;
+            $this->min_qty_grosir_2 = $product->min_qty_grosir_2;
             $this->harga_grosir_3 = $product->harga_grosir_3;
+            $this->min_qty_grosir_3 = $product->min_qty_grosir_3;
             $this->diskon = $product->diskon;
+            $this->promo_mulai = $product->promo_mulai?->format('Y-m-d');
+            $this->promo_sampai = $product->promo_sampai?->format('Y-m-d');
             $this->stok_etalase = $product->stok_etalase;
             $this->stok_gudang = $product->stok_gudang;
             $this->min_stok = $product->min_stok;
@@ -81,7 +96,7 @@ class ProdukForm extends Component
                 $this->golongan_id = $first->id;
             }
 
-            $barcodeParam = $barcode ?? request()->query('barcode');
+            $barcodeParam = request()->query('barcode');
             if ($barcodeParam) {
                 $this->kode_produk = trim($barcodeParam);
                 $this->checkBarcodeValidity();
@@ -171,9 +186,14 @@ class ProdukForm extends Component
             'harga_beli' => ['required', 'numeric', 'min:0'],
             'harga_retail' => ['required', 'numeric', 'min:0'],
             'harga_grosir_1' => ['nullable', 'numeric', 'min:0'],
+            'min_qty_grosir_1' => ['nullable', 'integer', 'min:2'],
             'harga_grosir_2' => ['nullable', 'numeric', 'min:0'],
+            'min_qty_grosir_2' => ['nullable', 'integer', 'min:2'],
             'harga_grosir_3' => ['nullable', 'numeric', 'min:0'],
+            'min_qty_grosir_3' => ['nullable', 'integer', 'min:2'],
             'diskon' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'promo_mulai' => ['nullable', 'date'],
+            'promo_sampai' => ['nullable', 'date', ...($this->promo_mulai ? ['after_or_equal:promo_mulai'] : [])],
             'stok_etalase' => ['required', 'integer', 'min:0'],
             'stok_gudang' => ['required', 'integer', 'min:0'],
             'min_stok' => ['required', 'integer', 'min:0'],
@@ -183,6 +203,10 @@ class ProdukForm extends Component
             'golongan_id.required' => 'Pilih golongan produk.',
             'nama.required' => 'Nama produk wajib diisi.',
             'satuan.required' => 'Satuan produk wajib diisi.',
+            'min_qty_grosir_1.min' => 'Minimal Qty Grosir 1 harus minimal 2.',
+            'min_qty_grosir_2.min' => 'Minimal Qty Grosir 2 harus minimal 2.',
+            'min_qty_grosir_3.min' => 'Minimal Qty Grosir 3 harus minimal 2.',
+            'promo_sampai.after_or_equal' => 'Tanggal selesai promo harus sama atau setelah tanggal mulai.',
         ]);
 
         $totalStok = (int) $this->stok_etalase + (int) $this->stok_gudang;
@@ -195,9 +219,14 @@ class ProdukForm extends Component
             'harga_beli' => (float) $this->harga_beli,
             'harga_retail' => (float) $this->harga_retail,
             'harga_grosir_1' => $this->harga_grosir_1 ? (float) $this->harga_grosir_1 : null,
+            'min_qty_grosir_1' => $this->min_qty_grosir_1 ? (int) $this->min_qty_grosir_1 : null,
             'harga_grosir_2' => $this->harga_grosir_2 ? (float) $this->harga_grosir_2 : null,
+            'min_qty_grosir_2' => $this->min_qty_grosir_2 ? (int) $this->min_qty_grosir_2 : null,
             'harga_grosir_3' => $this->harga_grosir_3 ? (float) $this->harga_grosir_3 : null,
+            'min_qty_grosir_3' => $this->min_qty_grosir_3 ? (int) $this->min_qty_grosir_3 : null,
             'diskon' => (float) $this->diskon,
+            'promo_mulai' => filled($this->promo_mulai) ? $this->promo_mulai : null,
+            'promo_sampai' => filled($this->promo_sampai) ? $this->promo_sampai : null,
             'stok_etalase' => (int) $this->stok_etalase,
             'stok_gudang' => (int) $this->stok_gudang,
             'stok' => $totalStok,

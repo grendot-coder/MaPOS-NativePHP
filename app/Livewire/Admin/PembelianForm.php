@@ -26,6 +26,8 @@ class PembelianForm extends Component
 
     public string $status_pembayaran = 'lunas';
 
+    public string $jatuh_tempo = '';
+
     public string $catatan = '';
 
     // Barcode scanner & pencarian produk
@@ -53,6 +55,13 @@ class PembelianForm extends Component
     {
         $this->no_faktur = $purchaseService->generateInvoiceNumber();
         $this->tanggal = date('Y-m-d');
+    }
+
+    public function updatedStatusPembayaran(string $value): void
+    {
+        if ($value === 'hutang' && empty($this->jatuh_tempo)) {
+            $this->jatuh_tempo = date('Y-m-d', strtotime('+30 days'));
+        }
     }
 
     public function updatedSupplierId(): void
@@ -218,6 +227,7 @@ class PembelianForm extends Component
             'nama_supplier' => ['required', 'string', 'max:150'],
             'tanggal' => ['required', 'date'],
             'status_pembayaran' => ['required', 'in:lunas,hutang'],
+            'jatuh_tempo' => ['nullable', 'date'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'string', 'exists:products,id'],
             'items.*.qty' => ['required', 'integer', 'min:1'],
@@ -236,6 +246,7 @@ class PembelianForm extends Component
                 'nama_supplier' => $this->nama_supplier,
                 'tanggal' => $this->tanggal,
                 'status_pembayaran' => $this->status_pembayaran,
+                'jatuh_tempo' => $this->status_pembayaran === 'hutang' ? $this->jatuh_tempo : null,
                 'catatan' => $this->catatan,
             ];
 

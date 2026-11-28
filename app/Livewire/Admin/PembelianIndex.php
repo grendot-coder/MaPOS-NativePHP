@@ -3,9 +3,12 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Purchase;
+use App\Models\PurchasePayment;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Flux\Flux;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -30,6 +33,17 @@ class PembelianIndex extends Component
 
     // Modal Tambah Supplier
     public bool $showSupplierModal = false;
+
+    // Modal Bayar Cicilan Hutang Supplier
+    public bool $showDebtModal = false;
+
+    public ?string $payingPurchaseId = null;
+
+    public $debtPaymentAmount = 0;
+
+    public string $debtPaymentMethod = 'cash';
+
+    public string $debtPaymentNote = '';
 
     public string $supplierNama = '';
 
@@ -73,16 +87,94 @@ class PembelianIndex extends Component
 
     public function markAsPaid(string $purchaseId): void
     {
-        $purchase = Purchase::findOrFail($purchaseId);
-        if ($purchase->status_pembayaran === 'lunas') {
-            return;
-        }
+        DB::transaction(function () use ($purchaseId): void {
+            /** @var Purchase $purchase */
+            $purchase = Purchase::lockForUpdate()->findOrFail($purchaseId);
+            if ($purchase->status_pembayaran === 'lunas') {
+                return;
+            }
 
-        $purchase->update(['status_pembayaran' => 'lunas']);
+            $sisa = $purchase->sisa_hutang;
+            if ($sisa > 0) {
+                PurchasePayment::create([
+                    'purchase_id' => $purchase->id,
+                    'user_id' => Auth::id(),
+                    'jumlah' => $sisa,
+                    'metode' => 'cash',
+                    'catatan' => 'Pelunasan penuh faktur',
+                    'waktu' => now(),
+                ]);
+            }
+
+            $purchase->update([
+                'dibayar' => (float) $purchase->total,
+                'status_pembayaran' => 'lunas',
+            ]);
+
+            try {
+                Flux::toast(variant: 'success', text: "Faktur #{$purchase->no_faktur} berhasil ditandai LUNAS.");
+            } catch (\Throwable) {
+            }
+        });
+    }
+
+    public function openDebtModal(string $purchaseId): void
+    {
+        $this->resetValidation();
+        $purchase = Purchase::findOrFail($purchaseId);
+        $this->payingPurchaseId = $purchase->id;
+        $this->debtPaymentAmount = $purchase->sisa_hutang;
+        $this->debtPaymentMethod = 'cash';
+        $this->debtPaymentNote = '';
+        $this->showDebtModal = true;
+    }
+
+    public function saveDebtPayment(): void
+    {
+        $this->validate([
+            'debtPaymentAmount' => ['required', 'numeric', 'min:100'],
+            'debtPaymentMethod' => ['required', 'in:cash,transfer'],
+        ], [
+            'debtPaymentAmount.min' => 'Nominal pembayaran minimal Rp 100.',
+        ]);
 
         try {
-            Flux::toast(variant: 'success', text: "Faktur #{$purchase->no_faktur} berhasil ditandai LUNAS.");
-        } catch (\Throwable) {
+            DB::transaction(function (): void {
+                /** @var Purchase $purchase */
+                $purchase = Purchase::lockForUpdate()->findOrFail($this->payingPurchaseId);
+                $sisa = $purchase->sisa_hutang;
+                if ($sisa <= 0) {
+                    throw new \InvalidArgumentException('Faktur ini sudah lunas.');
+                }
+
+                $bayar = min($sisa, (float) $this->debtPaymentAmount);
+
+                PurchasePayment::create([
+                    'purchase_id' => $purchase->id,
+                    'user_id' => Auth::id(),
+                    'jumlah' => $bayar,
+                    'metode' => $this->debtPaymentMethod,
+                    'catatan' => filled($this->debtPaymentNote) ? trim($this->debtPaymentNote) : null,
+                    'waktu' => now(),
+                ]);
+
+                $dibayarBaru = (float) $purchase->dibayar + $bayar;
+                $sisaBaru = max(0.0, (float) $purchase->total - $dibayarBaru);
+
+                $purchase->update([
+                    'dibayar' => $dibayarBaru,
+                    'status_pembayaran' => $sisaBaru <= 0 ? 'lunas' : 'hutang',
+                ]);
+            });
+
+            $this->showDebtModal = false;
+
+            try {
+                Flux::toast(variant: 'success', text: 'Pembayaran hutang supplier berhasil dicatat.');
+            } catch (\Throwable) {
+            }
+        } catch (\Throwable $e) {
+            $this->addError('debtPaymentAmount', $e->getMessage());
         }
     }
 
@@ -156,11 +248,19 @@ class PembelianIndex extends Component
         }
         $totalFaktur = $kpiQuery->count();
         $totalBelanja = (float) $kpiQuery->sum('total');
-        $totalHutang = (float) (clone $kpiQuery)->where('status_pembayaran', 'hutang')->sum('total');
+        $totalHutang = (float) (clone $kpiQuery)
+            ->where('status_pembayaran', 'hutang')
+            ->selectRaw('COALESCE(SUM(total - dibayar), 0) as sisa')
+            ->value('sisa');
 
         $selectedPurchase = null;
         if ($this->selectedPurchaseId) {
-            $selectedPurchase = Purchase::with(['supplier', 'user', 'items.product'])->find($this->selectedPurchaseId);
+            $selectedPurchase = Purchase::with(['supplier', 'user', 'items.product', 'payments.user'])->find($this->selectedPurchaseId);
+        }
+
+        $payingPurchase = null;
+        if ($this->showDebtModal && $this->payingPurchaseId) {
+            $payingPurchase = Purchase::find($this->payingPurchaseId);
         }
 
         return view('livewire.admin.pembelian-index', [
@@ -169,6 +269,7 @@ class PembelianIndex extends Component
             'totalBelanja' => $totalBelanja,
             'totalHutang' => $totalHutang,
             'selectedPurchase' => $selectedPurchase,
+            'payingPurchase' => $payingPurchase,
         ]);
     }
 }

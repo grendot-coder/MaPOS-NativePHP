@@ -92,3 +92,42 @@ test('laporan stok calculates total modal asset and filters properly', function 
     $component->set('statusFilter', 'aman')
         ->assertHasNoErrors();
 });
+
+test('laporan penjualan computes top products, peak hours, and exports csv cleanly', function () {
+    $admin = User::where('role', UserRole::Admin)->first();
+    $kasir = User::where('role', UserRole::Kasir)->first();
+    $product = Product::first();
+
+    $sale = Sale::create([
+        'no_transaksi' => 'TRX-ANLY-001',
+        'kasir_id' => $kasir->id,
+        'waktu' => now()->setTime(14, 15),
+        'total' => 30000,
+        'bayar' => 30000,
+        'kembali' => 0,
+    ]);
+
+    SaleItem::create([
+        'sale_id' => $sale->id,
+        'product_id' => $product->id,
+        'kode_produk' => $product->kode_produk,
+        'nama_produk' => $product->nama,
+        'qty' => 6,
+        'harga_satuan' => 5000,
+        'subtotal' => 30000,
+    ]);
+
+    $component = Livewire::actingAs($admin)
+        ->test(LaporanPenjualan::class)
+        ->call('setPeriod', 'today')
+        ->assertViewHas('topProducts', fn ($items) => $items->first()?->total_qty == 6)
+        ->assertViewHas('peakHours', fn ($hours) => count($hours) === 1 && $hours[0]['label'] === '14:00');
+
+    $component->call('exportCsv')
+        ->assertFileDownloaded('laporan-penjualan-'.now()->format('Y-m-d').'-sd-'.now()->format('Y-m-d').'.csv');
+
+    Livewire::actingAs($admin)
+        ->test(LaporanStok::class)
+        ->call('exportCsv')
+        ->assertFileDownloaded('laporan-stok-aset-'.date('Ymd').'.csv');
+});

@@ -3,6 +3,8 @@
 namespace App\Livewire\Admin;
 
 use App\Enums\PengeluaranKategori;
+use App\Models\CashShift;
+use App\Models\Employee;
 use App\Models\Pengeluaran;
 use Carbon\Carbon;
 use Flux\Flux;
@@ -19,15 +21,24 @@ class PengeluaranIndex extends Component
 
     // Filter
     public string $filterKategori = '';
+
     public string $filterBulan = '';
+
     public string $search = '';
 
     // Modal Form State
     public bool $showCreateModal = false;
+
     public string $kategori = 'operasional';
+
+    public string $selectedEmployeeId = '';
+
     public string $nama_karyawan = '';
+
     public $nominal = '';
+
     public string $keterangan = '';
+
     public string $waktu = '';
 
     public function mount(): void
@@ -55,11 +66,22 @@ class PengeluaranIndex extends Component
     {
         $this->resetValidation();
         $this->kategori = $defaultKategori;
+        $this->selectedEmployeeId = '';
         $this->nama_karyawan = '';
         $this->nominal = '';
         $this->keterangan = '';
         $this->waktu = now()->format('Y-m-d\TH:i');
         $this->showCreateModal = true;
+    }
+
+    public function updatedSelectedEmployeeId(string $employeeId): void
+    {
+        if (! empty($employeeId)) {
+            $emp = Employee::find($employeeId);
+            if ($emp) {
+                $this->nama_karyawan = $emp->nama;
+            }
+        }
     }
 
     public function save(): void
@@ -87,12 +109,13 @@ class PengeluaranIndex extends Component
         $countToday = Pengeluaran::whereDate('waktu', Carbon::parse($this->waktu)->toDateString())->count() + 1;
         $noRef = sprintf('%s-%s-%04d', $prefix, $dateCode, $countToday);
 
-        $activeShift = \App\Models\CashShift::activeShift(auth()->id())->first();
+        $activeShift = CashShift::activeShift(auth()->id())->first();
 
         Pengeluaran::create([
             'no_referensi' => $noRef,
             'kategori' => $this->kategori,
             'nama_karyawan' => in_array($this->kategori, ['kasbon', 'gaji']) ? trim($this->nama_karyawan) : null,
+            'employee_id' => (in_array($this->kategori, ['kasbon', 'gaji']) && filled($this->selectedEmployeeId)) ? $this->selectedEmployeeId : null,
             'nominal' => (float) $this->nominal,
             'keterangan' => trim($this->keterangan),
             'user_id' => auth()->id(),
@@ -103,7 +126,7 @@ class PengeluaranIndex extends Component
         $this->showCreateModal = false;
 
         $label = $this->kategori === 'kasbon' ? 'Kasbon karyawan' : 'Pengeluaran biaya';
-        Flux::toast(variant: 'success', text: "{$label} senilai Rp " . number_format((float)$this->nominal, 0, ',', '.') . " berhasil dicatat.");
+        Flux::toast(variant: 'success', text: "{$label} senilai Rp ".number_format((float) $this->nominal, 0, ',', '.').' berhasil dicatat.');
     }
 
     public function delete(string $id): void
@@ -118,7 +141,7 @@ class PengeluaranIndex extends Component
     {
         // Query untuk tabel dengan filter
         $query = Pengeluaran::with('user')
-            ->when($this->filterKategori, fn($q) => $q->where('kategori', $this->filterKategori))
+            ->when($this->filterKategori, fn ($q) => $q->where('kategori', $this->filterKategori))
             ->when($this->filterBulan, function ($q) {
                 [$year, $month] = explode('-', $this->filterBulan);
                 $q->whereYear('waktu', $year)->whereMonth('waktu', $month);
@@ -145,6 +168,7 @@ class PengeluaranIndex extends Component
         return view('livewire.admin.pengeluaran-index', [
             'pengeluarans' => $pengeluarans,
             'kategoriList' => PengeluaranKategori::cases(),
+            'employees' => Employee::where('status_aktif', true)->orderBy('nama')->get(),
             'totalOperasional' => $totalOperasional,
             'totalKasbon' => $totalKasbon,
             'totalSemua' => $totalSemua,

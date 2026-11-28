@@ -124,30 +124,62 @@
                 </div>
 
                 <!-- Grosir 1 -->
-                <div>
-                    <label class="block text-xs font-medium text-zinc-500 mb-1">Harga Grosir 1 (Opsional)</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs text-zinc-400">Rp</span>
-                        <input type="number" step="any" wire:model="harga_grosir_1" class="w-full text-sm font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 pl-8 pr-3 py-2 text-zinc-600 dark:text-zinc-300" />
+                <div class="space-y-1">
+                    <label class="block text-xs font-medium text-zinc-500">Harga Grosir 1 & Min. Qty</label>
+                    <div class="grid grid-cols-5 gap-1.5">
+                        <div class="relative col-span-3">
+                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-xs text-zinc-400">Rp</span>
+                            <input type="number" step="any" wire:model="harga_grosir_1" placeholder="Harga" class="w-full text-sm font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 pl-7 pr-2 py-2 text-zinc-600 dark:text-zinc-300" />
+                        </div>
+                        <div class="relative col-span-2">
+                            <input type="number" min="2" wire:model="min_qty_grosir_1" placeholder="Min Qty" title="Minimal Qty agar Harga Grosir 1 aktif" class="w-full text-sm font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2 py-2 text-zinc-600 dark:text-zinc-300" />
+                        </div>
                     </div>
+                    @error('min_qty_grosir_1') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
                 </div>
 
                 <!-- Grosir 2 -->
-                <div>
-                    <label class="block text-xs font-medium text-zinc-500 mb-1">Harga Grosir 2 (Opsional)</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs text-zinc-400">Rp</span>
-                        <input type="number" step="any" wire:model="harga_grosir_2" class="w-full text-sm font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 pl-8 pr-3 py-2 text-zinc-600 dark:text-zinc-300" />
+                <div class="space-y-1">
+                    <label class="block text-xs font-medium text-zinc-500">Harga Grosir 2 & Min. Qty</label>
+                    <div class="grid grid-cols-5 gap-1.5">
+                        <div class="relative col-span-3">
+                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-xs text-zinc-400">Rp</span>
+                            <input type="number" step="any" wire:model="harga_grosir_2" placeholder="Harga" class="w-full text-sm font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 pl-7 pr-2 py-2 text-zinc-600 dark:text-zinc-300" />
+                        </div>
+                        <div class="relative col-span-2">
+                            <input type="number" min="2" wire:model="min_qty_grosir_2" placeholder="Min Qty" title="Minimal Qty agar Harga Grosir 2 aktif" class="w-full text-sm font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2 py-2 text-zinc-600 dark:text-zinc-300" />
+                        </div>
                     </div>
+                    @error('min_qty_grosir_2') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
                 </div>
 
                 <!-- Grosir 3 -->
-                <div>
-                    <label class="block text-xs font-medium text-zinc-500 mb-1">Harga Grosir 3 (Opsional)</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs text-zinc-400">Rp</span>
-                        <input type="number" step="any" wire:model="harga_grosir_3" class="w-full text-sm font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 pl-8 pr-3 py-2 text-zinc-600 dark:text-zinc-300" />
+                <div class="space-y-1">
+                    <label class="block text-xs font-medium text-zinc-500">Harga Grosir 3 & Min. Qty</label>
+                    <div class="grid grid-cols-5 gap-1.5">
+                        <div class="relative col-span-3">
+                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-xs text-zinc-400">Rp</span>
+                            <input type="number" step="any" wire:model="harga_grosir_3" placeholder="Harga" class="w-full text-sm font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 pl-7 pr-2 py-2 text-zinc-600 dark:text-zinc-300" />
+                        </div>
+                        <div class="relative col-span-2">
+                            <input type="number" min="2" wire:model="min_qty_grosir_3" placeholder="Min Qty" title="Minimal Qty agar Harga Grosir 3 aktif" class="w-full text-sm font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2 py-2 text-zinc-600 dark:text-zinc-300" />
+                        </div>
                     </div>
+                    @error('min_qty_grosir_3') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            <!-- Periode Promo Diskon (Opsional) -->
+            <div class="pt-3 border-t border-zinc-200 dark:border-zinc-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-zinc-500 mb-1">Promo Diskon Berlaku Mulai (Opsional)</label>
+                    <input type="date" wire:model="promo_mulai" class="w-full text-xs font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200" />
+                    <span class="text-[11px] text-zinc-400">Kosongkan jika diskon berlaku terus tanpa jadwal.</span>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-zinc-500 mb-1">Promo Diskon Berakhir Sampai (Opsional)</label>
+                    <input type="date" wire:model="promo_sampai" class="w-full text-xs font-mono rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200" />
+                    @error('promo_sampai') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
                 </div>
             </div>
         </flux:card>

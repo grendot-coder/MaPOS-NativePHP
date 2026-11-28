@@ -12,7 +12,7 @@ class SyncCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'mapos:sync {--push-only : Only push pending local sales} {--pull-only : Only pull products catalog}';
+    protected $signature = 'mapos:sync {--push-only : Only push pending local sales} {--pull-only : Only pull products catalog} {--full : Also push operational shifts, purchases, returns, payrolls, and master data}';
 
     /**
      * The console command description.
@@ -40,10 +40,19 @@ class SyncCommand extends Command
 
         $this->info('✅ Server Online! Time: '.$ping['server_time']);
 
-        // 2. Push Sales
+        // 2. Push Operational & Sales
         if (! $this->option('pull-only')) {
             $this->line('');
-            $this->info('📤 [1/2] Pushing unsynced local sales...');
+            $this->info('📦 [0/2] Pushing master, products, shifts, & operational batch...');
+            $batchResult = $syncService->pushAllOperational();
+            if ($batchResult['success']) {
+                $this->info('   ✅ '.$batchResult['message']);
+            } else {
+                $this->warn('   ⚠️ '.$batchResult['message']);
+            }
+
+            $this->line('');
+            $this->info('📤 [1/2] Pushing remaining unsynced local sales...');
             $pushResult = $syncService->pushSales();
 
             if ($pushResult['success']) {

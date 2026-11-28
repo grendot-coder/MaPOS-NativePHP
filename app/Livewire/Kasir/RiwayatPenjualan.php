@@ -16,7 +16,9 @@ class RiwayatPenjualan extends Component
     use WithPagination;
 
     public string $filterDate = '';
+
     public bool $showReceiptModal = false;
+
     public ?string $selectedSaleId = null;
 
     public function mount(): void
@@ -29,9 +31,20 @@ class RiwayatPenjualan extends Component
         $this->resetPage();
     }
 
+    public function setToday(): void
+    {
+        $this->filterDate = Carbon::today()->format('Y-m-d');
+        $this->resetPage();
+    }
+
     public function showReceipt(string $saleId): void
     {
-        $this->selectedSaleId = $saleId;
+        $sale = Sale::where('kasir_id', auth()->id())->find($saleId);
+        if (! $sale) {
+            return;
+        }
+
+        $this->selectedSaleId = $sale->id;
         $this->showReceiptModal = true;
     }
 
@@ -45,7 +58,7 @@ class RiwayatPenjualan extends Component
     {
         $user = auth()->user();
 
-        $query = Sale::with(['items.product', 'kasir'])
+        $query = Sale::with(['items.product', 'kasir', 'cashShift', 'customer', 'dropshipper'])
             ->where('kasir_id', $user->id);
 
         if (! empty($this->filterDate)) {
@@ -61,7 +74,9 @@ class RiwayatPenjualan extends Component
 
         $selectedSale = null;
         if ($this->selectedSaleId) {
-            $selectedSale = Sale::with(['items', 'kasir'])->find($this->selectedSaleId);
+            $selectedSale = Sale::with(['items', 'kasir', 'cashShift', 'customer', 'dropshipper'])
+                ->where('kasir_id', $user->id)
+                ->find($this->selectedSaleId);
         }
 
         return view('livewire.kasir.riwayat-penjualan', [

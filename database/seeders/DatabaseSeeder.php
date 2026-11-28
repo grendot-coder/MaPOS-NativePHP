@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             GolonganSeeder::class,
             ProductSeeder::class,
+            MasterOperasionalSeeder::class,
         ]);
     }
 }

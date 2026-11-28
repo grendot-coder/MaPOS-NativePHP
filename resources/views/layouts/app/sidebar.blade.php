@@ -45,6 +45,27 @@
                 <flux:sidebar.item icon="banknotes" :href="route('admin.pengeluaran.index')" :current="request()->routeIs('admin.pengeluaran.index')" wire:navigate>
                     Pengeluaran & Kasbon
                 </flux:sidebar.item>
+                <flux:sidebar.item icon="users" :href="route('admin.pelanggan.index')" :current="request()->routeIs('admin.pelanggan.*')" wire:navigate>
+                    Pelanggan & Piutang
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="truck" :href="route('admin.dropshipper.index')" :current="request()->routeIs('admin.dropshipper.*')" wire:navigate>
+                    Mitra Dropshipper
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="arrow-uturn-left" :href="route('admin.retur.index')" :current="request()->routeIs('admin.retur.*')" wire:navigate>
+                    Retur Barang
+                </flux:sidebar.item>
+            </flux:sidebar.group>
+
+            <flux:sidebar.group heading="Kepegawaian" class="grid">
+                <flux:sidebar.item icon="briefcase" :href="route('admin.jabatan.index')" :current="request()->routeIs('admin.jabatan.*')" wire:navigate>
+                    Master Jabatan
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="identification" :href="route('admin.karyawan.index')" :current="request()->routeIs('admin.karyawan.*')" wire:navigate>
+                    Data Karyawan
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="wallet" :href="route('admin.penggajian.index')" :current="request()->routeIs('admin.penggajian.*')" wire:navigate>
+                    Penggajian (Payroll)
+                </flux:sidebar.item>
             </flux:sidebar.group>
 
             <flux:sidebar.group heading="Manajemen Stok" class="grid">
@@ -66,8 +87,14 @@
             </flux:sidebar.group>
 
             <flux:sidebar.group heading="Pengaturan" class="grid">
+                <flux:sidebar.item icon="user-group" :href="route('admin.pengguna.index')" :current="request()->routeIs('admin.pengguna.*')" wire:navigate>
+                    Akun Pengguna
+                </flux:sidebar.item>
                 <flux:sidebar.item icon="building-storefront" :href="route('admin.profil-toko')" :current="request()->routeIs('admin.profil-toko')" wire:navigate>
                     Profil Toko
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="arrow-path" :href="route('admin.sinkronisasi.index')" :current="request()->routeIs('admin.sinkronisasi.*')" wire:navigate>
+                    Sinkronisasi & Backup DB
                 </flux:sidebar.item>
             </flux:sidebar.group>
             @else

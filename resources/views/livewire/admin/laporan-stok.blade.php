@@ -6,6 +6,9 @@
             <flux:subheading>Pemantauan nilai modal barang, potensi omzet retail, dan peringatan dini stok menipis.</flux:subheading>
         </div>
         <div class="flex items-center gap-2">
+            <flux:button type="button" wire:click="exportCsv" variant="subtle" size="sm" icon="arrow-down-tray">
+                Export Excel (.csv)
+            </flux:button>
             <flux:button href="{{ route('admin.stok.penyesuaian') }}" variant="primary" size="sm" icon="adjustments-horizontal" wire:navigate>
                 + Penyesuaian Stok
             </flux:button>

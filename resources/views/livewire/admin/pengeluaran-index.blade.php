@@ -171,14 +171,27 @@
 
             <!-- Nama Karyawan (Kondisional Kasbon/Gaji) -->
             @if(in_array($kategori, ['kasbon', 'gaji']))
-            <div>
-                <label class="block text-xs font-medium text-rose-600 dark:text-rose-400 mb-1">Nama Karyawan yang Kasbon *</label>
-                <input
-                    type="text"
-                    wire:model="nama_karyawan"
-                    placeholder="Contoh: Budi (Kasir Shift Pagi)"
-                    class="w-full text-sm rounded-lg border border-rose-300 dark:border-rose-700/50 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200 focus:border-rose-500" />
-                @error('nama_karyawan') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
+            <div class="space-y-2">
+                @if($employees->isNotEmpty())
+                <div>
+                    <label class="block text-xs font-medium text-zinc-500 mb-1">Pilih dari Master Karyawan</label>
+                    <select wire:model.live="selectedEmployeeId" class="w-full text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200">
+                        <option value="">-- Ketik Nama Manual / Tidak Terdaftar --</option>
+                        @foreach($employees as $emp)
+                        <option value="{{ $emp->id }}">{{ $emp->nama }} ({{ $emp->kode_karyawan }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+                <div>
+                    <label class="block text-xs font-medium text-rose-600 dark:text-rose-400 mb-1">Nama Karyawan yang Kasbon / Gaji *</label>
+                    <input
+                        type="text"
+                        wire:model="nama_karyawan"
+                        placeholder="Contoh: Budi (Kasir Shift Pagi)"
+                        class="w-full text-sm rounded-lg border border-rose-300 dark:border-rose-700/50 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-800 dark:text-zinc-200 focus:border-rose-500" />
+                    @error('nama_karyawan') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
+                </div>
             </div>
             @endif
 

@@ -1,8 +1,18 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Livewire\Admin\BarcodePrintLabel;
+use App\Livewire\Admin\LaporanPenjualan;
 use App\Livewire\Admin\ProfilToko;
+use App\Livewire\Kasir\RiwayatPenjualan;
+use App\Models\Customer;
+use App\Models\Dropshipper;
+use App\Models\Employee;
+use App\Models\Jabatan;
+use App\Models\Product;
+use App\Models\Sale;
 use App\Models\StoreProfile;
+use App\Models\Supplier;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -70,4 +80,50 @@ test('profil toko validates required nama_toko and valid ukuran_kertas', functio
         ->set('ukuran_kertas', 'invalid-size')
         ->call('save')
         ->assertHasErrors(['nama_toko', 'ukuran_kertas']);
+});
+
+test('store profile nama_toko and ukuran_kertas propagate to print views', function () {
+    $admin = User::where('role', UserRole::Admin)->first();
+    $kasir = User::where('role', UserRole::Kasir)->first();
+
+    StoreProfile::getProfile()->update([
+        'nama_toko' => 'TOKO SINAR HARAPAN',
+        'ukuran_kertas' => '58mm',
+    ]);
+
+    Livewire::actingAs($admin)
+        ->test(BarcodePrintLabel::class)
+        ->assertSet('storeName', 'TOKO SINAR HARAPAN');
+
+    $sale = Sale::create([
+        'no_transaksi' => 'TRX-PAPER-01',
+        'kasir_id' => $kasir->id,
+        'waktu' => now(),
+        'total' => 10000,
+        'bayar' => 10000,
+        'kembali' => 0,
+    ]);
+
+    Livewire::actingAs($admin)
+        ->test(LaporanPenjualan::class)
+        ->call('showReceipt', $sale->id)
+        ->assertSeeHtml('<option value="58mm" selected>Thermal 58mm</option>');
+
+    Livewire::actingAs($kasir)
+        ->test(RiwayatPenjualan::class)
+        ->call('showReceipt', $sale->id)
+        ->assertSeeHtml('<option value="58mm" selected>Thermal 58mm</option>');
+});
+
+test('database seeder seeds master operasional tables idempotently', function () {
+    // Seed twice to verify idempotency
+    $this->seed();
+
+    expect(Jabatan::count())->toBeGreaterThanOrEqual(3);
+    expect(Employee::count())->toBeGreaterThanOrEqual(2);
+    expect(Customer::count())->toBeGreaterThanOrEqual(2);
+    expect(Supplier::count())->toBeGreaterThanOrEqual(2);
+    expect(Dropshipper::count())->toBeGreaterThanOrEqual(1);
+    expect(Product::count())->toBeGreaterThanOrEqual(15);
+    expect(StoreProfile::count())->toBe(1);
 });

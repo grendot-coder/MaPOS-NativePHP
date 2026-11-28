@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,8 +13,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * @property string $id
  * @property int $user_id
- * @property \Carbon\Carbon $waktu_buka
- * @property \Carbon\Carbon|null $waktu_tutup
+ * @property string|null $nama_petugas
+ * @property Carbon $waktu_buka
+ * @property Carbon|null $waktu_tutup
  * @property float $saldo_awal
  * @property float $saldo_akhir_sistem
  * @property float|null $saldo_akhir_fisik
@@ -29,6 +31,8 @@ class CashShift extends Model
 
     protected $fillable = [
         'user_id',
+        'employee_id',
+        'nama_petugas',
         'waktu_buka',
         'waktu_tutup',
         'saldo_awal',
@@ -56,6 +60,11 @@ class CashShift extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class, 'cash_shift_id');
@@ -66,14 +75,27 @@ class CashShift extends Model
         return $this->hasMany(Pengeluaran::class, 'cash_shift_id');
     }
 
+    public function saleReturns(): HasMany
+    {
+        return $this->hasMany(SaleReturn::class, 'cash_shift_id');
+    }
+
     public function getTotalPenjualanAttribute(): float
     {
-        return (float) $this->sales()->sum('total');
+        return (float) $this->sales()
+            ->where(function ($q) {
+                $q->where('metode_pembayaran', 'cash')
+                    ->orWhereNull('metode_pembayaran');
+            })
+            ->sum('total');
     }
 
     public function getTotalPengeluaranAttribute(): float
     {
-        return (float) $this->pengeluarans()->sum('nominal');
+        $pengeluaran = (float) $this->pengeluarans()->sum('nominal');
+        $refundTunai = (float) $this->saleReturns()->where('metode_refund', 'cash')->sum('total_refund');
+
+        return $pengeluaran + $refundTunai;
     }
 
     public function getSaldoSaatIniAttribute(): float
@@ -88,6 +110,13 @@ class CashShift extends Model
         }
 
         return $this->selisih > 0 ? 'lebih' : 'kurang';
+    }
+
+    public function getNamaPetugasDisplayAttribute(): string
+    {
+        return filled($this->nama_petugas)
+            ? $this->nama_petugas
+            : ($this->user->name ?? 'Kasir');
     }
 
     public function scopeActiveShift($query, int $userId)

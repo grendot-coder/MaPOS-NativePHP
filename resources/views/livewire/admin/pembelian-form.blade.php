@@ -86,9 +86,17 @@
             </div>
         </div>
 
-        <div>
-            <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1 text-xs">Catatan Faktur (Opsional)</label>
-            <input type="text" wire:model="catatan" placeholder="Nomor resi, jatuh tempo tempo pembayaran, kondisi barang, dsb." class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-800 dark:text-zinc-200" />
+        <div class="grid grid-cols-1 {{ $status_pembayaran === 'hutang' ? 'md:grid-cols-2' : '' }} gap-4">
+            @if($status_pembayaran === 'hutang')
+            <div>
+                <label class="block font-medium text-amber-700 dark:text-amber-400 mb-1 text-xs">Tanggal Jatuh Tempo Hutang</label>
+                <input type="date" wire:model="jatuh_tempo" class="w-full text-xs rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-800 dark:text-zinc-200 font-mono" />
+            </div>
+            @endif
+            <div>
+                <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1 text-xs">Catatan Faktur (Opsional)</label>
+                <input type="text" wire:model="catatan" placeholder="Nomor resi, jatuh tempo pembayaran, kondisi barang, dsb." class="w-full text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-zinc-800 dark:text-zinc-200" />
+            </div>
         </div>
     </flux:card>
 

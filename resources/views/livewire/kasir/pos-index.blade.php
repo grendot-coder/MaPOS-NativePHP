@@ -81,7 +81,7 @@
         <div>
             <flux:heading size="xl" level="1">Point of Sale (Kasir)</flux:heading>
             <flux:subheading class="mt-0.5">
-                Kasir: <strong>{{ auth()->user()->name }}</strong> &bull;
+                Kasir: <strong>{{ $activeShift ? $activeShift->nama_petugas_display : auth()->user()->name }}</strong> &bull;
                 {{ now()->translatedFormat('l, d F Y') }}
             </flux:subheading>
         </div>
@@ -110,7 +110,7 @@
             @else
             <button
                 type="button"
-                wire:click="$set('showOpenShiftModal', true)"
+                wire:click="openShiftModal"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold text-white bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition">
                 <flux:icon name="lock-open" class="size-3.5" />
                 <span>+ Buka Shift Kasir</span>
@@ -226,6 +226,9 @@
                                         <span>{{ $item['kode_produk'] }}</span>
                                         <span>&bull;</span>
                                         <span>{{ $item['satuan'] }}</span>
+                                        @if(!empty($item['tier_harga']))
+                                        <span class="px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-semibold font-sans">{{ $item['tier_harga'] }}</span>
+                                        @endif
                                         @if($item['diskon'] > 0)
                                         <span class="text-rose-600 dark:text-rose-400 font-semibold font-sans">Disc {{ $item['diskon'] }}%</span>
                                         @endif
@@ -337,6 +340,90 @@
         <!-- PANEL KANAN (lg:col-span-4): Total Tagihan & Konsol Kasir (Sticky) -->
         <div class="lg:col-span-4 space-y-3 sticky top-4">
 
+            <!-- Card Member & Poin (Opsional) -->
+            <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-3 shadow-sm space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
+                        <flux:icon name="user" class="size-3.5" />
+                        <span>Pelanggan / Member</span>
+                    </span>
+                    @if($selectedCustomer)
+                    <button type="button" wire:click="clearCustomer" class="text-[11px] text-rose-500 hover:underline">Lepas</button>
+                    @endif
+                </div>
+
+                @if($selectedCustomer)
+                <div class="p-2 rounded bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 text-xs space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-zinc-900 dark:text-zinc-100">{{ $selectedCustomer->nama }}</span>
+                        <span class="font-mono text-[10px] text-zinc-400">{{ $selectedCustomer->kode_member }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] font-mono">
+                        <span class="text-indigo-600 dark:text-indigo-400 font-semibold">Poin: {{ number_format($selectedCustomer->poin) }} pts</span>
+                        <span class="text-zinc-500">Sisa Limit Bon: Rp {{ number_format($selectedCustomer->sisa_limit_kredit, 0, ',', '.') }}</span>
+                    </div>
+                    @if($selectedCustomer->poin > 0 && !empty($cart))
+                    <label class="flex items-center gap-2 pt-1 border-t border-zinc-200 dark:border-zinc-700 cursor-pointer text-[11px]">
+                        <input type="checkbox" wire:model.live="usePoints" class="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500" />
+                        <span>Tukar poin (1 pts = Rp 100)</span>
+                    </label>
+                    @endif
+                </div>
+                @else
+                <div class="relative">
+                    <input
+                        type="text"
+                        wire:model.live.debounce.250ms="customerSearch"
+                        placeholder="Cari nama / kode member / HP..."
+                        class="w-full py-1.5 px-2.5 text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100" />
+                    @if($customerResults->isNotEmpty())
+                    <div class="absolute left-0 right-0 z-30 mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded shadow-lg max-h-40 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800">
+                        @foreach($customerResults as $cust)
+                        <button type="button" wire:click="selectCustomer('{{ $cust->id }}')" class="w-full text-left p-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">{{ $cust->nama }}</div>
+                                <div class="text-[10px] font-mono text-zinc-400">{{ $cust->kode_member }} &bull; {{ $cust->poin }} pts</div>
+                            </div>
+                            <span class="text-[11px] font-semibold text-indigo-600">Pilih</span>
+                        </button>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+                @endif
+            </div>
+
+            <!-- Kartu Mode Dropshipper (OSPOS-style) -->
+            <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-3 shadow-sm space-y-2">
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">
+                        <input type="checkbox" wire:model.live="isDropship" class="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500" />
+                        <span>Order Dropshipper</span>
+                    </label>
+                    @if($isDropship)
+                    <button type="button" wire:click="clearDropship" class="text-[11px] text-rose-500 hover:underline">Reset</button>
+                    @endif
+                </div>
+
+                @if($isDropship)
+                <div class="space-y-2 pt-1 border-t border-zinc-100 dark:border-zinc-800 text-xs">
+                    <div>
+                        <select wire:model.live="selectedDropshipperId" class="w-full py-1.5 px-2 text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100">
+                            <option value="">-- Pilih Pengirim (Dropshipper) * --</option>
+                            @foreach($activeDropshippers as $drp)
+                            <option value="{{ $drp->id }}">
+                                {{ $drp->nama }}@if((float)$drp->diskon_khusus > 0) (Diskon {{ number_format((float)$drp->diskon_khusus, 1) }}%)@endif
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <input type="text" wire:model="dropshipPenerimaNama" placeholder="Nama Penerima Paket *" class="w-full py-1.5 px-2 text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100" />
+                    <input type="text" wire:model="dropshipPenerimaTelepon" placeholder="Telepon Penerima (Opsional)" class="w-full py-1.5 px-2 text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100" />
+                    <textarea wire:model="dropshipPenerimaAlamat" rows="2" placeholder="Alamat Pengiriman Lengkap..." class="w-full py-1.5 px-2 text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"></textarea>
+                </div>
+                @endif
+            </div>
+
             <!-- Card Utama Total Tagihan -->
             <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm space-y-4">
                 <div class="text-center pb-3 border-b border-zinc-200 dark:border-zinc-800">
@@ -356,6 +443,18 @@
                     <div class="flex items-center justify-between text-rose-600 dark:text-rose-400">
                         <span>Potongan Diskon</span>
                         <span>- Rp {{ number_format($totalDiskon, 0, ',', '.') }}</span>
+                    </div>
+                    @endif
+                    @if($diskonDropship > 0)
+                    <div class="flex items-center justify-between text-indigo-600 dark:text-indigo-400">
+                        <span>Diskon Dropship</span>
+                        <span>- Rp {{ number_format($diskonDropship, 0, ',', '.') }}</span>
+                    </div>
+                    @endif
+                    @if($potonganPoin > 0)
+                    <div class="flex items-center justify-between text-indigo-600 dark:text-indigo-400">
+                        <span>Tukar Poin ({{ $poinDipakai }} pts)</span>
+                        <span>- Rp {{ number_format($potonganPoin, 0, ',', '.') }}</span>
                     </div>
                     @endif
                     <div class="flex items-center justify-between text-zinc-500 text-[11px] pt-1 border-t border-zinc-100 dark:border-zinc-800">
@@ -395,7 +494,7 @@
                         <span>Laci Kasir (Shift)</span>
                     </div>
                     @if($activeShift)
-                    <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">Aktif</span>
+                    <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">Aktif ({{ $activeShift->nama_petugas_display }})</span>
                     @else
                     <span class="text-[11px] font-semibold text-amber-600 dark:text-amber-400">Belum Buka</span>
                     @endif
@@ -435,7 +534,7 @@
                     <p class="leading-relaxed">Shift kasir belum dibuka. Buka shift sekarang untuk mencatat modal kasir dan melacak kas laci.</p>
                     <button
                         type="button"
-                        wire:click="$set('showOpenShiftModal', true)"
+                        wire:click="openShiftModal"
                         class="w-full py-2 px-3 rounded text-xs font-bold text-white bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition flex items-center justify-center gap-1.5">
                         <flux:icon name="lock-open" class="size-3.5" />
                         <span>Buka Shift Kasir Baru</span>
@@ -478,6 +577,22 @@
             </div>
         </div>
 
+        <!-- Pilihan Metode Pembayaran -->
+        <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Metode Pembayaran:</label>
+            <div class="grid grid-cols-4 gap-1.5 text-xs">
+                @foreach(['cash' => 'Tunai', 'qris' => 'QRIS', 'transfer' => 'Transfer', 'tempo' => 'Bon / Tempo'] as $mKey => $mLabel)
+                <button
+                    type="button"
+                    wire:click="$set('paymentMethod', '{{ $mKey }}')"
+                    class="py-2 px-2 rounded border font-semibold transition {{ $paymentMethod === $mKey ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100' : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200' }}">
+                    {{ $mLabel }}
+                </button>
+                @endforeach
+            </div>
+        </div>
+
+        @if($paymentMethod === 'cash')
         <!-- Tombol Pecahan Cepat Tunai -->
         <div class="space-y-1">
             <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Pecahan Cepat:</label>
@@ -529,6 +644,81 @@
                 Rp {{ number_format(abs((float)$nominalBayar - $grandTotal), 0, ',', '.') }}
             </span>
         </div>
+        @elseif($paymentMethod === 'tempo')
+            @if($selectedCustomer)
+            <div class="p-3 rounded border {{ $selectedCustomer->sisa_limit_kredit >= $grandTotal && $selectedCustomer->limit_kredit > 0 ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700' : 'bg-rose-50 dark:bg-rose-950/30 border-rose-300 dark:border-rose-700' }} text-xs space-y-1 font-mono">
+                <div class="font-bold text-zinc-900 dark:text-zinc-100">Bon Member: {{ $selectedCustomer->nama }}</div>
+                <div class="flex justify-between">
+                    <span>Sisa Limit Kredit:</span>
+                    <span class="font-bold">Rp {{ number_format($selectedCustomer->sisa_limit_kredit, 0, ',', '.') }}</span>
+                </div>
+                @if($selectedCustomer->limit_kredit <= 0 || $selectedCustomer->sisa_limit_kredit < $grandTotal)
+                <div class="text-rose-600 dark:text-rose-400 font-sans font-semibold pt-1">
+                    Limit kredit tidak mencukupi untuk transaksi bon ini.
+                </div>
+                @endif
+            </div>
+            @else
+            <div class="p-3 rounded border border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-950/30 text-xs text-rose-700 dark:text-rose-300">
+                Pembayaran <strong>Bon / Tempo</strong> wajib memilih Pelanggan / Member terlebih dahulu di panel sebelah kanan.
+            </div>
+            @endif
+        @elseif($paymentMethod === 'qris')
+            @if($midtransConfigured)
+                @if($midtransOrderId)
+                <div @if($midtransStatus === 'pending') wire:poll.3s="checkMidtransStatus" @endif class="p-3 rounded border border-indigo-200 dark:border-indigo-800 bg-zinc-50 dark:bg-zinc-800/60 text-center space-y-2.5">
+                    <div class="flex items-center justify-between text-[11px] font-mono">
+                        <span class="text-zinc-500">Order: <strong class="text-zinc-900 dark:text-zinc-100">{{ $midtransOrderId }}</strong></span>
+                        <span class="px-1.5 py-0.5 rounded font-bold uppercase {{ $midtransStatus === 'pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300' : 'bg-rose-100 text-rose-700' }}">
+                            {{ $midtransStatus ?: 'pending' }}
+                        </span>
+                    </div>
+
+                    @if($midtransQrUrl)
+                    <div class="inline-block p-2 bg-white rounded border border-zinc-200 mx-auto">
+                        <img src="{{ $midtransQrUrl }}" alt="QRIS Midtrans" class="w-44 h-44 mx-auto object-contain" />
+                    </div>
+                    @endif
+
+                    @if($midtransQrString)
+                    <div x-data="{ copiedQr: false }" class="text-[11px]">
+                        <button type="button" @click="navigator.clipboard.writeText(@js($midtransQrString)); copiedQr = true; setTimeout(() => copiedQr = false, 2000)" class="text-indigo-600 dark:text-indigo-400 hover:underline font-mono">
+                            <span x-show="!copiedQr">Salin QR String (Untuk Simulator Midtrans)</span>
+                            <span x-show="copiedQr" class="text-emerald-600 font-bold">QR String Tersalin!</span>
+                        </button>
+                    </div>
+                    @endif
+
+                    <div class="flex items-center justify-center gap-2 pt-1">
+                        <flux:button type="button" wire:click="checkMidtransStatus" variant="primary" size="xs" icon="arrow-path">
+                            Cek Status Bayar
+                        </flux:button>
+                        <flux:button type="button" wire:click="cancelMidtransQris" variant="subtle" size="xs">
+                            Batalkan QRIS
+                        </flux:button>
+                    </div>
+                </div>
+                @else
+                <div class="p-3 rounded border border-indigo-200 dark:border-indigo-800 bg-indigo-50/70 dark:bg-indigo-950/30 space-y-2.5 text-xs">
+                    <div class="text-indigo-800 dark:text-indigo-200">
+                        Klik tombol di bawah untuk membuat kode <strong>QRIS Dinamis Midtrans</strong> sebesar <strong class="font-mono">Rp {{ number_format($grandTotal, 0, ',', '.') }}</strong>, atau konfirmasi manual jika memakai QRIS statis.
+                    </div>
+                    <flux:button type="button" wire:click="generateMidtransQris" variant="primary" size="sm" icon="qr-code" class="w-full">
+                        Buat QRIS Midtrans
+                    </flux:button>
+                </div>
+                @endif
+            @else
+            <div class="p-3 rounded border border-indigo-200 dark:border-indigo-800 bg-indigo-50/70 dark:bg-indigo-950/30 text-xs text-indigo-800 dark:text-indigo-200 space-y-1">
+                <div>Konfirmasi pembayaran <strong>QRIS</strong> sebesar <strong class="font-mono">Rp {{ number_format($grandTotal, 0, ',', '.') }}</strong> secara manual.</div>
+                <div class="text-[11px] text-zinc-500 dark:text-zinc-400">Tip: Isi <code>MIDTRANS_SERVER_KEY</code> di file <code>.env</code> untuk mengaktifkan QRIS Dinamis Midtrans Sandbox otomatis.</div>
+            </div>
+            @endif
+        @else
+        <div class="p-3 rounded border border-indigo-200 dark:border-indigo-800 bg-indigo-50/70 dark:bg-indigo-950/30 text-xs text-indigo-800 dark:text-indigo-200">
+            Pastikan pembayaran non-tunai (<strong>{{ strtoupper($paymentMethod) }}</strong>) sebesar <strong class="font-mono">Rp {{ number_format($grandTotal, 0, ',', '.') }}</strong> sudah masuk sebelum menyimpan transaksi.
+        </div>
+        @endif
 
         <!-- Tombol Aksi Modal Pembayaran -->
         <div class="flex items-center justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
@@ -542,7 +732,7 @@
                 size="sm"
                 class="bg-emerald-600 hover:bg-emerald-700"
                 icon="check-circle"
-                :disabled="(float)$nominalBayar < $grandTotal">
+                :disabled="($paymentMethod === 'cash' && (float)$nominalBayar < $grandTotal) || ($paymentMethod === 'tempo' && (! $selectedCustomer || $selectedCustomer->limit_kredit <= 0 || $selectedCustomer->sisa_limit_kredit < $grandTotal))">
                 Simpan & Cetak Struk
             </flux:button>
         </div>
@@ -560,8 +750,20 @@
 
         @if($lastSale)
         @php $storeProfile = \App\Models\StoreProfile::getProfile(); @endphp
+
+        @if($lastSale->is_dropship)
+        <div class="no-print flex items-center gap-2 p-1 bg-zinc-100 dark:bg-zinc-800 rounded text-xs">
+            <button type="button" wire:click="$set('receiptPrintMode', 'struk')" class="flex-1 py-1.5 px-2 rounded font-semibold transition {{ $receiptPrintMode === 'struk' ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm' : 'text-zinc-500' }}">
+                Struk Penjualan
+            </button>
+            <button type="button" wire:click="$set('receiptPrintMode', 'label')" class="flex-1 py-1.5 px-2 rounded font-semibold transition {{ $receiptPrintMode === 'label' ? 'bg-white dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-zinc-500' }}">
+                Label Pengiriman Dropship
+            </button>
+        </div>
+        @endif
+
         <!-- Area Preview / Cetak Struk (Thermal 58mm/80mm) -->
-        <div id="receipt-print-area" class="p-4 bg-white text-zinc-900 border border-dashed border-zinc-300 rounded shadow-inner font-mono text-xs leading-relaxed space-y-2">
+        <div id="receipt-print-area" class="{{ $lastSale->is_dropship && $receiptPrintMode === 'label' ? 'hidden' : '' }} p-4 bg-white text-zinc-900 border border-dashed border-zinc-300 rounded shadow-inner font-mono text-xs leading-relaxed space-y-2">
             <!-- Header Toko -->
             <div class="text-center space-y-0.5 pb-2 border-b border-dashed border-zinc-400">
                 <div class="text-base font-bold tracking-wider">{{ $storeProfile->nama_toko }}</div>
@@ -583,8 +785,14 @@
                 </div>
                 <div class="flex justify-between">
                     <span>Kasir:</span>
-                    <span>{{ $lastSale->kasir->name ?? 'Kasir' }}</span>
+                    <span>{{ $lastSale->nama_kasir_struk }}</span>
                 </div>
+                @if($lastSale->customer)
+                <div class="flex justify-between">
+                    <span>Member:</span>
+                    <span>{{ $lastSale->customer->nama }}</span>
+                </div>
+                @endif
             </div>
 
             <!-- Daftar Item Belanja -->
@@ -616,18 +824,37 @@
                     <span>Total Item / Qty:</span>
                     <span>{{ $lastSale->items->count() }} jenis ({{ $lastSale->items->sum('qty') }} pcs)</span>
                 </div>
+                @if($lastSale->potongan_poin > 0)
+                <div class="flex justify-between text-[11px]">
+                    <span>Tukar Poin ({{ $lastSale->poin_dipakai }} pts)</span>
+                    <span>- Rp {{ number_format($lastSale->potongan_poin, 0, ',', '.') }}</span>
+                </div>
+                @endif
                 <div class="flex justify-between font-bold text-sm">
                     <span>TOTAL</span>
                     <span>Rp {{ number_format($lastSale->total, 0, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between">
-                    <span>Tunai / Bayar</span>
+                    <span>Bayar ({{ strtoupper($lastSale->metode_pembayaran ?? 'cash') }})</span>
                     <span>Rp {{ number_format($lastSale->bayar, 0, ',', '.') }}</span>
                 </div>
+                @if($lastSale->status_pembayaran === 'piutang')
+                <div class="flex justify-between font-bold">
+                    <span>Sisa Bon / Piutang</span>
+                    <span>Rp {{ number_format($lastSale->sisa_piutang, 0, ',', '.') }}</span>
+                </div>
+                @else
                 <div class="flex justify-between font-bold">
                     <span>Kembali</span>
                     <span>Rp {{ number_format($lastSale->kembali, 0, ',', '.') }}</span>
                 </div>
+                @endif
+                @if($lastSale->poin_didapat > 0)
+                <div class="flex justify-between text-[10px] pt-1">
+                    <span>Poin Didapat:</span>
+                    <span>+{{ $lastSale->poin_didapat }} pts</span>
+                </div>
+                @endif
             </div>
 
             <!-- Footer Struk -->
@@ -636,30 +863,79 @@
                 <div>{{ $storeProfile->footer_struk ?: 'Barang yang sudah dibeli tidak dapat ditukar/dikembalikan' }}</div>
             </div>
         </div>
+
+        @if($lastSale->is_dropship)
+        <!-- Area Preview / Cetak Label Pengiriman Dropship (Tanpa Identitas Toko & Tanpa Harga) -->
+        <div id="dropship-label-print-area" class="{{ $receiptPrintMode === 'label' ? '' : 'hidden' }} p-4 bg-white text-zinc-900 border-2 border-zinc-800 rounded font-mono text-xs leading-relaxed space-y-2">
+            <div class="text-center pb-2 border-b-2 border-zinc-800">
+                <div class="text-sm font-black uppercase tracking-wider">LABEL PENGIRIMAN DROPSHIP</div>
+                <div class="text-[11px] font-bold">Ref Order: {{ $lastSale->no_transaksi }}</div>
+            </div>
+            <div class="pb-2 border-b border-dashed border-zinc-400 space-y-0.5">
+                <div class="text-[10px] uppercase font-bold text-zinc-500">PENGIRIM (DROPSHIPPER):</div>
+                <div class="font-bold text-sm">{{ $lastSale->dropshipper?->nama ?? 'Dropshipper' }}</div>
+                @if($lastSale->dropshipper?->telepon)
+                <div class="text-[11px]">Telp: {{ $lastSale->dropshipper->telepon }}</div>
+                @endif
+            </div>
+            <div class="pb-2 border-b border-dashed border-zinc-400 space-y-0.5">
+                <div class="text-[10px] uppercase font-bold text-zinc-500">KEPADA (PENERIMA):</div>
+                <div class="font-bold text-sm">{{ $lastSale->dropship_penerima_nama }}</div>
+                @if($lastSale->dropship_penerima_telepon)
+                <div class="text-[11px]">Telp: {{ $lastSale->dropship_penerima_telepon }}</div>
+                @endif
+                @if($lastSale->dropship_penerima_alamat)
+                <div class="text-[11px] whitespace-normal">{{ $lastSale->dropship_penerima_alamat }}</div>
+                @endif
+            </div>
+            <div class="space-y-1">
+                <div class="text-[10px] uppercase font-bold text-zinc-500">ISI PAKET ({{ $lastSale->items->sum('qty') }} PCS):</div>
+                @foreach($lastSale->items as $item)
+                <div class="flex justify-between text-[11px]">
+                    <span>{{ $item->nama_produk }}</span>
+                    <span class="font-bold">x{{ $item->qty }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
         @endif
 
         <!-- Tombol Aksi Modal Struk -->
+        @php $defaultPaper = ($storeProfile ?? \App\Models\StoreProfile::getProfile())->ukuran_kertas ?? '80mm'; @endphp
         <div class="no-print space-y-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
             <div class="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400">
                 <span class="font-medium">Ukuran Kertas Thermal:</span>
                 <select id="pos-paper-size" class="text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded px-2.5 py-1 font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none">
-                    <option value="80mm" selected>Thermal 80mm (Standar POS)</option>
-                    <option value="58mm">Thermal 58mm (Mini POS)</option>
+                    <option value="80mm" @selected($defaultPaper === '80mm')>Thermal 80mm (Standar POS)</option>
+                    <option value="58mm" @selected($defaultPaper === '58mm')>Thermal 58mm (Mini POS)</option>
                 </select>
             </div>
             <div class="flex items-center justify-between gap-2">
                 <flux:button type="button" wire:click="closeReceiptModal" variant="subtle" size="sm" icon="arrow-path">
                     Transaksi Baru
                 </flux:button>
-                <flux:button
-                    type="button"
-                    onclick="const s = document.getElementById('pos-paper-size')?.value || '80mm'; window.printThermalReceipt('receipt-print-area', s);"
-                    variant="primary"
-                    size="sm"
-                    class="bg-emerald-600 hover:bg-emerald-700"
-                    icon="printer">
-                    Cetak Struk Sekarang
-                </flux:button>
+                <div class="flex items-center gap-2">
+                    @if($lastSale?->is_dropship)
+                    <flux:button
+                        type="button"
+                        onclick="const s = document.getElementById('pos-paper-size')?.value || '{{ $defaultPaper }}'; window.printThermalReceipt('dropship-label-print-area', s);"
+                        variant="subtle"
+                        size="sm"
+                        icon="truck">
+                        Cetak Label Dropship
+                    </flux:button>
+                    @endif
+                    <flux:button
+                        type="button"
+                        onclick="const s = document.getElementById('pos-paper-size')?.value || '{{ $defaultPaper }}'; window.printThermalReceipt('receipt-print-area', s);"
+                        variant="primary"
+                        size="sm"
+                        class="bg-emerald-600 hover:bg-emerald-700"
+                        icon="printer">
+                        Cetak Struk Sekarang
+                    </flux:button>
+                </div>
             </div>
         </div>
     </flux:modal>
@@ -780,6 +1056,35 @@
         </div>
 
         <div class="space-y-3">
+            @if($activeEmployees->isNotEmpty())
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                    Pilih dari Master Karyawan (Opsional):
+                </label>
+                <select wire:model.live="selectedShiftEmployeeId" class="w-full py-2 px-3 text-xs font-medium rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100">
+                    <option value="">-- Input Nama Manual --</option>
+                    @foreach($activeEmployees as $emp)
+                    <option value="{{ $emp->id }}">{{ $emp->nama }} ({{ $emp->jabatan?->nama_jabatan ?? 'Staff' }})</option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
+
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                    Nama Pegawai / Kasir Bertugas: <span class="text-rose-500">*</span>
+                </label>
+                <input
+                    type="text"
+                    wire:model="namaPetugasInput"
+                    placeholder="Contoh: Rina, Budi, Andi..."
+                    class="w-full py-2 px-3 text-sm font-semibold rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100"
+                    autofocus>
+                @error('namaPetugasInput')
+                    <p class="text-[11px] text-rose-600 dark:text-rose-400 font-medium">{{ $message }}</p>
+                @enderror
+            </div>
+
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Pilihan Cepat Modal Awal:</label>
                 <div class="grid grid-cols-4 gap-1.5 font-mono">
@@ -971,7 +1276,7 @@
                 </div>
                 <div class="flex justify-between">
                     <span>Kasir:</span>
-                    <span class="font-bold">{{ $lastClosedShift->user->name ?? auth()->user()->name }}</span>
+                    <span class="font-bold">{{ $lastClosedShift->nama_petugas_display }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span>Waktu Buka:</span>
@@ -1028,7 +1333,7 @@
             <div class="pt-3 pb-1 grid grid-cols-2 text-center text-[10px] text-zinc-600">
                 <div class="space-y-8">
                     <div>Kasir Yang Menyerahkan</div>
-                    <div class="font-bold underline">{{ $lastClosedShift->user->name ?? 'Kasir' }}</div>
+                    <div class="font-bold underline">{{ $lastClosedShift->nama_petugas_display }}</div>
                 </div>
                 <div class="space-y-8">
                     <div>Supervisor / Finance</div>
@@ -1044,11 +1349,12 @@
         @endif
 
         <!-- Tombol Aksi Modal Rekap Shift -->
+        @php $shiftPaper = ($storeProfile ?? \App\Models\StoreProfile::getProfile())->ukuran_kertas ?? '80mm'; @endphp
         <div class="no-print flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-800">
             <flux:button type="button" wire:click="closeShiftReceiptModal" variant="subtle">
                 Selesai & Buka Shift Baru
             </flux:button>
-            <flux:button type="button" onclick="window.print()" variant="primary" class="gap-1.5">
+            <flux:button type="button" onclick="window.printThermalReceipt('shift-receipt-print-area', '{{ $shiftPaper }}')" variant="primary" class="gap-1.5">
                 <flux:icon name="printer" class="size-4" />
                 <span>Cetak Rekap Struk</span>
             </flux:button>

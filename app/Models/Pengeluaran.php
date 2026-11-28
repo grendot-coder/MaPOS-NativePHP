@@ -17,6 +17,8 @@ class Pengeluaran extends Model
         'no_referensi',
         'kategori',
         'nama_karyawan',
+        'employee_id',
+        'payroll_id',
         'nominal',
         'keterangan',
         'user_id',
@@ -41,5 +43,15 @@ class Pengeluaran extends Model
     public function cashShift(): BelongsTo
     {
         return $this->belongsTo(CashShift::class, 'cash_shift_id');
+    }
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
+    public function payroll(): BelongsTo
+    {
+        return $this->belongsTo(Payroll::class, 'payroll_id');
     }
 }

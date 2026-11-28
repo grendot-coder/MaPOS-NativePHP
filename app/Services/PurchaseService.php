@@ -84,6 +84,8 @@ class PurchaseService
                 $total += ($qty * $hargaBeli);
             }
 
+            $statusPembayaran = $headerData['status_pembayaran'] ?? 'lunas';
+
             $purchase = Purchase::create([
                 'no_faktur' => trim($headerData['no_faktur']),
                 'supplier_id' => $headerData['supplier_id'] ?? null,
@@ -91,7 +93,9 @@ class PurchaseService
                 'user_id' => $user->id,
                 'tanggal' => Carbon::parse($headerData['tanggal'] ?? now()),
                 'total' => $total,
-                'status_pembayaran' => $headerData['status_pembayaran'] ?? 'lunas',
+                'status_pembayaran' => $statusPembayaran,
+                'jatuh_tempo' => ! empty($headerData['jatuh_tempo']) ? Carbon::parse($headerData['jatuh_tempo']) : null,
+                'dibayar' => $statusPembayaran === 'lunas' ? $total : 0,
                 'catatan' => $headerData['catatan'] ?? null,
             ]);
 

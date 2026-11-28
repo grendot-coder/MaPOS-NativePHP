@@ -50,6 +50,9 @@
             <flux:subheading>Rekapitulasi penjualan kasir, total pendapatan, rincian nota, dan cetak ulang struk belanja.</flux:subheading>
         </div>
         <div class="flex items-center gap-2">
+            <flux:button type="button" wire:click="exportCsv" variant="primary" size="sm" icon="arrow-down-tray">
+                Export Excel (.csv)
+            </flux:button>
             <flux:button href="{{ route('kasir.pos') }}" variant="subtle" size="sm" icon="shopping-cart" wire:navigate>
                 Buka Kasir POS
             </flux:button>
@@ -104,6 +107,72 @@
                 Rp {{ number_format($rataRataBelanja, 0, ',', '.') }}
             </div>
             <div class="text-[11px] text-zinc-400">Basket size per pelanggan</div>
+        </div>
+    </div>
+
+    <!-- Analitik Lanjutan: Jam Sibuk Kasir & Top 10 Produk Terlaris -->
+    <div class="no-print grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Jam Sibuk Kasir -->
+        <div class="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">
+            <div class="p-3 bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                <span class="font-bold text-xs uppercase tracking-wider text-zinc-800 dark:text-zinc-200">Jam Sibuk Kasir (Peak Hours)</span>
+                <span class="text-[11px] font-mono text-zinc-400">Berdasarkan jumlah nota</span>
+            </div>
+            <div class="p-3.5 space-y-2 max-h-64 overflow-y-auto">
+                @forelse($peakHours as $ph)
+                    @php
+                        $pct = $maxHourCount > 0 ? round(($ph['count'] / $maxHourCount) * 100) : 0;
+                        $isPeak = $maxHourCount > 0 && $ph['count'] === $maxHourCount;
+                    @endphp
+                    <div class="flex items-center gap-3 text-xs font-mono">
+                        <span class="w-12 text-zinc-600 dark:text-zinc-400 font-bold">{{ $ph['label'] }}</span>
+                        <div class="flex-1 h-5 bg-zinc-100 dark:bg-zinc-800 rounded overflow-hidden">
+                            <div class="h-full {{ $isPeak ? 'bg-indigo-600 dark:bg-indigo-500' : 'bg-zinc-400 dark:bg-zinc-600' }} transition-all" style="width: {{ max(6, $pct) }}%"></div>
+                        </div>
+                        <span class="w-16 text-right font-bold {{ $isPeak ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-700 dark:text-zinc-300' }}">{{ $ph['count'] }} nota</span>
+                        <span class="w-24 text-right text-zinc-500">Rp {{ number_format($ph['omzet'], 0, ',', '.') }}</span>
+                    </div>
+                @empty
+                    <div class="py-6 text-center text-xs text-zinc-400">Belum ada data jam sibuk pada periode ini.</div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Top 10 Produk Terlaris -->
+        <div class="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">
+            <div class="p-3 bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                <span class="font-bold text-xs uppercase tracking-wider text-zinc-800 dark:text-zinc-200">Top 10 Produk Terlaris</span>
+                <span class="text-[11px] font-mono text-zinc-400">Qty & Omzet</span>
+            </div>
+            <div class="overflow-x-auto max-h-64 overflow-y-auto">
+                <table class="w-full text-left text-xs whitespace-nowrap">
+                    <thead class="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 uppercase text-[10px]">
+                        <tr>
+                            <th class="py-2 px-3 w-8 text-center">#</th>
+                            <th class="py-2 px-3">Produk</th>
+                            <th class="py-2 px-3 text-right">Terjual</th>
+                            <th class="py-2 px-3 text-right">Omzet</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800 font-mono">
+                        @forelse($topProducts as $idx => $tp)
+                        <tr>
+                            <td class="py-2 px-3 text-center text-zinc-400">{{ $idx + 1 }}</td>
+                            <td class="py-2 px-3 font-sans">
+                                <div class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $tp->nama_produk }}</div>
+                                <div class="text-[10px] font-mono text-zinc-400">{{ $tp->kode_produk }}</div>
+                            </td>
+                            <td class="py-2 px-3 text-right font-bold text-emerald-600 dark:text-emerald-400">{{ number_format($tp->total_qty) }}</td>
+                            <td class="py-2 px-3 text-right font-bold text-zinc-900 dark:text-zinc-100">Rp {{ number_format($tp->total_omzet, 0, ',', '.') }}</td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="py-6 text-center text-xs text-zinc-400 font-sans">Belum ada produk terjual pada periode ini.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -189,19 +258,30 @@
                     @forelse($sales as $s)
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition">
                             <td class="py-2 px-3 font-bold text-zinc-900 dark:text-zinc-100">
-                                {{ $s->no_transaksi }}
+                                <div>{{ $s->no_transaksi }}</div>
+                                @if($s->is_dropship)
+                                <span class="inline-block mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-sans font-semibold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
+                                    Dropship: {{ $s->dropshipper?->nama ?? '-' }}
+                                </span>
+                                @endif
                             </td>
                             <td class="py-2 px-3 text-[11px] text-zinc-500">
                                 {{ $s->waktu->format('d/m/Y H:i') }}
                             </td>
                             <td class="py-2 px-3 font-sans font-medium text-zinc-800 dark:text-zinc-200">
-                                {{ $s->kasir->name ?? 'Kasir Dihapus' }}
+                                {{ $s->nama_kasir_struk }}
+                                @if($s->cashShift?->nama_petugas && $s->kasir?->name && $s->cashShift->nama_petugas !== $s->kasir->name)
+                                    <span class="text-[10px] font-mono text-zinc-400">({{ $s->kasir->name }})</span>
+                                @endif
                             </td>
                             <td class="py-2 px-3 text-center">
                                 <span class="font-mono text-zinc-600 dark:text-zinc-400">{{ $s->items->sum('qty') }} item</span>
                             </td>
                             <td class="py-2 px-3 text-right font-bold text-zinc-900 dark:text-zinc-100">
-                                Rp {{ number_format($s->total, 0, ',', '.') }}
+                                <div>Rp {{ number_format($s->total, 0, ',', '.') }}</div>
+                                <div class="text-[10px] font-normal {{ $s->status_pembayaran === 'piutang' ? 'text-amber-600 font-bold' : 'text-zinc-400' }}">
+                                    {{ strtoupper($s->metode_pembayaran ?? 'cash') }}{{ $s->status_pembayaran === 'piutang' ? ' (BON)' : '' }}
+                                </div>
                             </td>
                             <td class="py-2 px-3 text-right text-zinc-500">
                                 Rp {{ number_format($s->bayar, 0, ',', '.') }}
@@ -272,8 +352,26 @@
                 </div>
                 <div class="flex justify-between">
                     <span>Kasir:</span>
-                    <span>{{ $selectedSale->kasir->name ?? 'Kasir' }}</span>
+                    <span>{{ $selectedSale->nama_kasir_struk }}</span>
                 </div>
+                @if($selectedSale->customer)
+                <div class="flex justify-between">
+                    <span>Member:</span>
+                    <span>{{ $selectedSale->customer->nama }}</span>
+                </div>
+                @endif
+                @if($selectedSale->is_dropship)
+                <div class="pt-1 mt-1 border-t border-dashed border-zinc-300 space-y-0.5">
+                    <div class="flex justify-between font-bold text-indigo-700">
+                        <span>Dropshipper:</span>
+                        <span>{{ $selectedSale->dropshipper?->nama ?? '-' }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Penerima:</span>
+                        <span>{{ $selectedSale->dropship_penerima_nama }}</span>
+                    </div>
+                </div>
+                @endif
             </div>
 
             <!-- Daftar Item Belanja -->
@@ -315,31 +413,80 @@
                 <div>{{ $storeProfile->footer_struk ?: 'Barang yang sudah dibeli tidak dapat ditukar/dikembalikan' }}</div>
             </div>
         </div>
+
+        @if($selectedSale->is_dropship)
+        <div id="laporan-dropship-label-print-area" class="hidden p-4 bg-white text-zinc-900 border-2 border-zinc-800 rounded font-mono text-xs leading-relaxed space-y-2">
+            <div class="text-center pb-2 border-b-2 border-zinc-800">
+                <div class="text-sm font-black uppercase tracking-wider">LABEL PENGIRIMAN DROPSHIP</div>
+                <div class="text-[11px] font-bold">Ref Order: {{ $selectedSale->no_transaksi }}</div>
+            </div>
+            <div class="pb-2 border-b border-dashed border-zinc-400 space-y-0.5">
+                <div class="text-[10px] uppercase font-bold text-zinc-500">PENGIRIM (DROPSHIPPER):</div>
+                <div class="font-bold text-sm">{{ $selectedSale->dropshipper?->nama ?? 'Dropshipper' }}</div>
+                @if($selectedSale->dropshipper?->telepon)
+                <div class="text-[11px]">Telp: {{ $selectedSale->dropshipper->telepon }}</div>
+                @endif
+            </div>
+            <div class="pb-2 border-b border-dashed border-zinc-400 space-y-0.5">
+                <div class="text-[10px] uppercase font-bold text-zinc-500">KEPADA (PENERIMA):</div>
+                <div class="font-bold text-sm">{{ $selectedSale->dropship_penerima_nama }}</div>
+                @if($selectedSale->dropship_penerima_telepon)
+                <div class="text-[11px]">Telp: {{ $selectedSale->dropship_penerima_telepon }}</div>
+                @endif
+                @if($selectedSale->dropship_penerima_alamat)
+                <div class="text-[11px] whitespace-normal">{{ $selectedSale->dropship_penerima_alamat }}</div>
+                @endif
+            </div>
+            <div class="space-y-1">
+                <div class="text-[10px] uppercase font-bold text-zinc-500">ISI PAKET ({{ $selectedSale->items->sum('qty') }} PCS):</div>
+                @foreach($selectedSale->items as $item)
+                <div class="flex justify-between text-[11px]">
+                    <span>{{ $item->nama_produk }}</span>
+                    <span class="font-bold">x{{ $item->qty }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
         @endif
 
         <!-- Tombol Aksi Modal Struk -->
+        @php $defaultPaper = ($storeProfile ?? \App\Models\StoreProfile::getProfile())->ukuran_kertas ?? '80mm'; @endphp
         <div class="no-print space-y-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
             <div class="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400">
                 <span class="font-medium">Ukuran Kertas:</span>
                 <select id="laporan-paper-size" class="text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded px-2.5 py-1 font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none">
-                    <option value="80mm" selected>Thermal 80mm</option>
-                    <option value="58mm">Thermal 58mm</option>
+                    <option value="80mm" @selected($defaultPaper === '80mm')>Thermal 80mm</option>
+                    <option value="58mm" @selected($defaultPaper === '58mm')>Thermal 58mm</option>
                 </select>
             </div>
             <div class="flex items-center justify-between gap-2">
                 <flux:button type="button" wire:click="closeReceiptModal" variant="subtle" size="sm">
                     Tutup
                 </flux:button>
-                <flux:button
-                    type="button"
-                    onclick="const s = document.getElementById('laporan-paper-size')?.value || '80mm'; window.printThermalReceipt('laporan-receipt-print-area', s);"
-                    variant="primary"
-                    size="sm"
-                    class="bg-emerald-600 hover:bg-emerald-700"
-                    icon="printer"
-                >
-                    Cetak Struk
-                </flux:button>
+                <div class="flex items-center gap-2">
+                    @if($selectedSale?->is_dropship)
+                    <flux:button
+                        type="button"
+                        onclick="const s = document.getElementById('laporan-paper-size')?.value || '{{ $defaultPaper }}'; window.printThermalReceipt('laporan-dropship-label-print-area', s);"
+                        variant="subtle"
+                        size="sm"
+                        icon="truck"
+                    >
+                        Cetak Label Dropship
+                    </flux:button>
+                    @endif
+                    <flux:button
+                        type="button"
+                        onclick="const s = document.getElementById('laporan-paper-size')?.value || '{{ $defaultPaper }}'; window.printThermalReceipt('laporan-receipt-print-area', s);"
+                        variant="primary"
+                        size="sm"
+                        class="bg-emerald-600 hover:bg-emerald-700"
+                        icon="printer"
+                    >
+                        Cetak Struk
+                    </flux:button>
+                </div>
             </div>
         </div>
     </flux:modal>

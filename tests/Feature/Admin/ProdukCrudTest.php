@@ -89,3 +89,35 @@ test('admin can generate internal barcode automatically', function () {
     expect(strlen($generatedCode))->toBe(13);
     expect(str_starts_with($generatedCode, '20001'))->toBeTrue();
 });
+
+test('admin can save wholesale min qty thresholds and promo dates on product', function () {
+    $admin = User::where('role', UserRole::Admin)->first();
+    $golongan = Golongan::first();
+
+    Livewire::actingAs($admin)
+        ->test(ProdukForm::class)
+        ->set('golongan_id', $golongan->id)
+        ->set('kode_produk', '8999999777888')
+        ->set('nama', 'Produk Grosir Promo')
+        ->set('satuan', 'pcs')
+        ->set('harga_beli', 8000)
+        ->set('harga_retail', 12000)
+        ->set('harga_grosir_1', 11000)
+        ->set('min_qty_grosir_1', 6)
+        ->set('harga_grosir_2', 10000)
+        ->set('min_qty_grosir_2', 24)
+        ->set('diskon', 5)
+        ->set('promo_mulai', '2026-11-01')
+        ->set('promo_sampai', '2026-11-30')
+        ->set('stok_etalase', 50)
+        ->set('stok_gudang', 0)
+        ->set('min_stok', 5)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $product = Product::where('kode_produk', '8999999777888')->first();
+    expect($product->min_qty_grosir_1)->toBe(6);
+    expect($product->min_qty_grosir_2)->toBe(24);
+    expect($product->promo_mulai?->format('Y-m-d'))->toBe('2026-11-01');
+    expect($product->promo_sampai?->format('Y-m-d'))->toBe('2026-11-30');
+});

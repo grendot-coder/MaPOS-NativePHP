@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Customer;
 use App\Models\Golongan;
 use App\Models\Product;
+use App\Models\Purchase;
 use App\Models\StockMovement;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -20,6 +22,10 @@ class Dashboard extends Component
         $totalGolongan = Golongan::count();
         $stokMenipisCount = Product::whereColumn('stok', '<=', 'min_stok')->count();
         $totalNilaiAset = Product::sum(DB::raw('stok * harga_beli'));
+        $totalPiutangPelanggan = (float) Customer::sum('piutang_berjalan');
+        $totalHutangSupplier = (float) Purchase::where('status_pembayaran', 'hutang')
+            ->selectRaw('COALESCE(SUM(total - dibayar), 0) as sisa')
+            ->value('sisa');
 
         $lowStockProducts = Product::with('golongan')
             ->whereColumn('stok', '<=', 'min_stok')
@@ -37,6 +43,8 @@ class Dashboard extends Component
             'totalGolongan' => $totalGolongan,
             'stokMenipisCount' => $stokMenipisCount,
             'totalNilaiAset' => $totalNilaiAset,
+            'totalPiutangPelanggan' => $totalPiutangPelanggan,
+            'totalHutangSupplier' => $totalHutangSupplier,
             'lowStockProducts' => $lowStockProducts,
             'recentMovements' => $recentMovements,
         ]);

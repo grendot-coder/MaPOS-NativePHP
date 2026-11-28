@@ -3,6 +3,7 @@
 use App\Enums\StockMovementType;
 use App\Enums\UserRole;
 use App\Livewire\Kasir\PosIndex;
+use App\Models\Golongan;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\StockMovement;
@@ -179,4 +180,64 @@ test('sale service generates sequential and length-aware transaction numbers', f
     ]);
 
     expect($saleService->generateTransactionNumber())->toBe($todayPrefix.'10001');
+});
+
+test('kasir automatically switches unit price to wholesale tiers based on product min qty and respects promo dates', function () {
+    $kasir = User::where('role', UserRole::Kasir)->first();
+    $golongan = Golongan::first();
+
+    $product = Product::create([
+        'golongan_id' => $golongan->id,
+        'kode_produk' => '8990000111222',
+        'nama' => 'Minyak Goreng Grosir Test',
+        'satuan' => 'pcs',
+        'harga_beli' => 10000,
+        'harga_retail' => 15000,
+        'harga_grosir_1' => 13500,
+        'min_qty_grosir_1' => 5,
+        'harga_grosir_2' => 12000,
+        'min_qty_grosir_2' => 12,
+        'diskon' => 10,
+        'promo_mulai' => now()->subDay()->format('Y-m-d'),
+        'promo_sampai' => now()->addDay()->format('Y-m-d'),
+        'stok_etalase' => 30,
+        'stok_gudang' => 0,
+        'stok' => 30,
+        'min_stok' => 5,
+    ]);
+
+    $test = Livewire::actingAs($kasir)
+        ->test(PosIndex::class)
+        ->call('selectProduct', $product->id);
+
+    // Qty 1 -> Retail 15,000 - 10% promo = 13,500
+    expect($test->get('cart')[$product->id]['harga_satuan'])->toEqual(15000.0);
+    expect($test->get('cart')[$product->id]['tier_harga'])->toBeNull();
+    expect($test->get('grandTotal'))->toEqual(13500.0);
+
+    // Qty 5 -> Grosir 1 (13,500) - 10% promo = 12,150 x 5 = 60,750
+    $test->call('updateQty', $product->id, 5);
+    expect($test->get('cart')[$product->id]['harga_satuan'])->toEqual(13500.0);
+    expect($test->get('cart')[$product->id]['tier_harga'])->toBe('Grosir 1');
+    expect($test->get('grandTotal'))->toEqual(60750.0);
+
+    // Qty 12 -> Grosir 2 (12,000) - 10% promo = 10,800 x 12 = 129,600
+    $test->call('updateQty', $product->id, 12);
+    expect($test->get('cart')[$product->id]['harga_satuan'])->toEqual(12000.0);
+    expect($test->get('cart')[$product->id]['tier_harga'])->toBe('Grosir 2');
+    expect($test->get('grandTotal'))->toEqual(129600.0);
+
+    // Drop back to Qty 3 -> reverts to Retail
+    $test->call('updateQty', $product->id, 3);
+    expect($test->get('cart')[$product->id]['harga_satuan'])->toEqual(15000.0);
+    expect($test->get('cart')[$product->id]['tier_harga'])->toBeNull();
+
+    // Expired promo -> discount becomes 0%
+    $product->update([
+        'promo_mulai' => now()->subDays(10)->format('Y-m-d'),
+        'promo_sampai' => now()->subDays(2)->format('Y-m-d'),
+    ]);
+    $test->call('updateQty', $product->id, 1);
+    expect($test->get('cart')[$product->id]['diskon'])->toEqual(0.0);
+    expect($test->get('grandTotal'))->toEqual(15000.0);
 });

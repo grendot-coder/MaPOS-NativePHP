@@ -15,11 +15,12 @@ DisableProgramGroupPage=yes
 OutputDir=dist-inno
 OutputBaseFilename=MaPOS-Setup-v{#MyAppVersion}
 SetupIconFile=public\favicon.ico
+UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
-CloseApplications=yes
+CloseApplications=force
 RestartApplications=no
 
 [Languages]
